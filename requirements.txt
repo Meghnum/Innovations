@@ -16,6 +16,9 @@ ollama>=0.1.0                  # Ollama Python client for Llama3
 langchain>=0.1.0               # LLM orchestration helpers
 langchain-community>=0.0.20    # LangChain community integrations
 
+# --- Visualization ---
+plotly>=5.0.0
+
 # --- Streamlit UI (Phase 3) ---
 streamlit>=1.20.0
 

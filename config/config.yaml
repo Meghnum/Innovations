@@ -7,25 +7,145 @@
 data:
   qvd_folder: "data/qvd/"                  # Folder where your QVD files live
   dummy_mode: true                           # Set to false when using real QVDs
-  dummy_row_count: 10000                     # Rows to generate in dummy mode
+  dummy_row_count: 5000000                   # Rows to generate in dummy mode
   recent_months: 12                          # Default: load only last N months
   chunk_size: 5000                           # Rows per chunk when processing large files
-  max_rows_in_memory: 500000                 # Hard cap on rows loaded at once
+  max_rows_in_memory: 5500000                # Hard cap on rows loaded at once
 
 # --- Column Mappings ---
 # Update these to match your real QVD column names when ready
+# Backward-compatible keys are preserved alongside the full 74-column mapping.
 columns:
-  claim_id: "ClaimID"
-  status: "Status"
-  claim_type: "ClaimType"
-  submitted_date: "SubmittedDate"
-  closed_date: "ClosedDate"
-  region: "Region"
-  claimant_name: "ClaimantName"
-  claim_amount: "ClaimAmount"
-  paid_amount: "PaidAmount"
-  reserve_amount: "ReserveAmount"
-  days_open: "DaysOpen"
+  # --- Backward-compatible keys (mapped to real column names) ---
+  claim_id: "Claim Number"
+  status: "Claim Status Derived"
+  claim_type: "Claim Type Description"
+  submitted_date: "Reported Date"
+  closed_date: "Claim Closed Date"
+  region: "Country"
+  claimant_name: "Policy Holder Name"
+  claim_amount: "Incurred USD"
+  paid_amount: "Indemnity Paid USD"
+  reserve_amount: "Outstanding Reserve USD"
+  days_open: "Claim Life Days"
+
+  # --- Identifiers ---
+  policy_number: "Policy Number"
+  claim_number: "Claim Number"
+
+  # --- Geography / Entity ---
+  country: "Country"
+  business_entity: "Business Entity"
+  entity: "Entity"
+
+  # --- Status ---
+  claim_status_derived: "Claim Status Derived"
+  claim_status_original: "Claim Status Original"
+  system_claim_status: "System Claim Status"
+  claim_dac_code: "Claim Dac Code"
+
+  # --- Lines of Business ---
+  executive_lob: "Executive LOB"
+  major_lob: "Major LOB"
+  minor_lob: "Minor LOB"
+
+  # --- Office / Adjuster ---
+  claim_office: "Claim Office"
+  responsible_adjuster: "Responsible Adjuster"
+
+  # --- Dates ---
+  event_date: "Event Date"
+  reported_date: "Reported Date"
+  claim_opened_date: "Claim Opened Date"
+  claim_closed_date: "Claim Closed Date"
+  accident_year: "Accident Year"
+
+  # --- Event Description ---
+  claim_event_desc: "Claim Event Desc"
+
+  # --- Currency ---
+  ledger_currency: "ledger Currency"
+
+  # --- Financials (USD) ---
+  indemnity_paid_usd: "Indemnity Paid USD"
+  expense_reserve_usd: "Expense Reserve USD"
+  expense_paid_usd: "Expense Paid USD"
+  recoveries_usd: "Recoveries USD"
+  outstanding_reserve_usd: "Outstanding Reserve USD"
+  incurred_usd: "Incurred USD"
+
+  # --- Financials (Ledger) ---
+  indemnity_paid_ledger: "Indemnity Paid Ledger"
+  expense_reserve_ledger: "Expense Reserve Ledger"
+  expense_paid_ledger: "Expense Paid Ledger"
+  recoveries_ledger: "Recoveries Ledger"
+  outstanding_reserve_ledger: "Outstanding Reserve Ledger"
+  incurred_ledger: "Incurred Ledger"
+
+  # --- Claim Characteristics ---
+  claim_life_days: "Claim Life Days"
+  catastrophe_code: "Catastrophe Code"
+  catastrophe_description: "Catastrophe Description"
+  coverage_code: "Coverage Code"
+  cause_of_loss_code: "Cause of Loss Code"
+  cause_of_loss_descr: "Cause Of Loss Descr"
+  claim_type_code: "Claim Type Code"
+  claim_type_description: "Claim Type Description"
+  condition_injury_damage_code: "Condition Injury Damage Code"
+  condition_injury_damage_name: "Condition Injury Damage Name"
+  contributing_factor_code: "Contributing Factor Code"
+  contributing_factor_descr: "Contributing Factor Descr"
+
+  # --- Producer / Industry ---
+  current_global_producer: "Current Global Producer"
+  producer_name: "Producer Name"
+  industry_explanation: "Industry Explanantion"
+
+  # --- Policy ---
+  policy_uwy: "Policy UWY"
+  policy_effective_date: "Policy Effective Date"
+  policy_expiration_date: "Policy Expiration Date"
+  policy_holder_name: "Policy Holder Name"
+
+  # --- Reserving ---
+  reserving_line: "Reserving Line"
+  reserving_class: "Reserving Class"
+
+  # --- Plant / Nominal ---
+  plant_division: "Plant Division"
+  nominal_reserve: "Nominal Reserve"
+
+  # --- Multinational ---
+  mn_description: "MN Description"
+  multinational_code: "Multinational Code"
+  mn: "MN"
+
+  # --- Loss ---
+  loss_description: "Loss Description"
+  location_of_loss: "Location of Loss"
+
+  # --- Producing Office ---
+  producing_office_code: "Producing Office Code"
+  producing_office: "Producing Office"
+
+  # --- Product / Source ---
+  product_code: "Product Code"
+  claim_source: "Claim Source"
+
+  # --- Flags / Indicators ---
+  mar_fast_track_flag: "MAR Fast Track Flag"
+  coinsurance: "Coinsurance"
+  bulk_claim_indicator: "Bulk Claim Indicator"
+
+  # --- Signal Reserves ---
+  company_signal_reserve: "Company Signal Reserve"
+  company_signal_reserve_amount: "Company Singal Reserve Amount"
+  market_place_signal_reserve: "Market Place Singal Reserve"
+  market_place_signal_reserve_amount: "Market Place Singal Reserve Amount"
+
+  # --- Share / Block ---
+  company_share: "Company Share"
+  block_indicator: "Block Indicator"
 
 # --- AI Settings ---
 ai:
@@ -34,10 +154,14 @@ ai:
   ollama_host: "http://localhost:11434"      # Ollama default endpoint
   top_k_results: 5                           # How many FAISS results to pass to LLM
   max_context_rows: 10                       # Max rows sent to LLM as context
+  query_analyzer_timeout: 8
+  faiss_score_threshold: 0.35
+  llm_retry_count: 2
+  llm_timeout: 30
 
 # --- Notification Thresholds ---
 notifications:
-  high_value_claim_threshold: 100000         # £ amount to trigger high-value alert
+  high_value_claim_threshold: 100000         # $ amount to trigger high-value alert
   open_claims_count_threshold: 500           # Alert if open claims exceed this
   pending_days_threshold: 90                 # Alert if claim open > X days
   rejection_rate_threshold: 0.25            # Alert if rejection rate > 25%

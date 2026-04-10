@@ -20,7 +20,7 @@ logger = logging.getLogger("claims.chunker")
 
 
 # ---------------------------------------------------------------------------
-# Single row → text
+# Single row -> text
 # ---------------------------------------------------------------------------
 
 def row_to_text(row: pd.Series, col: dict) -> str:
@@ -31,24 +31,20 @@ def row_to_text(row: pd.Series, col: dict) -> str:
     When a user asks a question, FAISS finds the most similar
     sentences and we return the original rows to the LLM as context.
 
+    Uses the full 74-column real insurance data schema for richer text.
+
     Args:
         row: A single row from the claims DataFrame (pd.Series).
         col: Column name mapping from config["columns"].
 
     Returns:
         A natural language string describing the claim.
-
-    Example output:
-        "Claim CLM0000001 is an Open Medical claim submitted on
-         21 Nov 2023 by John Williams in the South East region,
-         with a claim value of £65,910.76, reserve of £44,068.19,
-         and has been open for 867 days."
     """
 
     def fmt_currency(val) -> str:
-        """Format a number as £ currency, return 'N/A' if missing."""
+        """Format a number as $ currency, return 'N/A' if missing."""
         try:
-            return f"£{float(val):,.2f}"
+            return f"${float(val):,.2f}"
         except (TypeError, ValueError):
             return "N/A"
 
@@ -74,45 +70,74 @@ def row_to_text(row: pd.Series, col: dict) -> str:
             return "N/A"
         return str(val).strip() or "N/A"
 
-    # --- Extract fields ---
-    claim_id     = safe(row.get(col["claim_id"], ""))
-    status       = safe(row.get(col["status"], ""))
-    claim_type   = safe(row.get(col["claim_type"], ""))
-    submitted    = fmt_date(row.get(col["submitted_date"]))
-    closed       = fmt_date(row.get(col["closed_date"]))
-    region       = safe(row.get(col["region"], ""))
-    claimant     = safe(row.get(col["claimant_name"], ""))
-    amount       = fmt_currency(row.get(col["claim_amount"]))
-    paid         = fmt_currency(row.get(col["paid_amount"]))
-    reserve      = fmt_currency(row.get(col["reserve_amount"]))
-    days_open    = fmt_int(row.get(col["days_open"]))
+    # --- Extract fields using config column mapping ---
+    claim_id       = safe(row.get(col["claim_id"], ""))
+    status         = safe(row.get(col["status"], ""))
+    claim_type     = safe(row.get(col["claim_type"], ""))
+    country        = safe(row.get(col["region"], ""))
+    claimant       = safe(row.get(col["claimant_name"], ""))
+    days_open      = fmt_int(row.get(col["days_open"]))
+
+    # LOB info
+    exec_lob       = safe(row.get(col.get("executive_lob", "Executive LOB"), ""))
+    major_lob      = safe(row.get(col.get("major_lob", "Major LOB"), ""))
+    minor_lob      = safe(row.get(col.get("minor_lob", "Minor LOB"), ""))
+
+    # Financials (USD)
+    incurred       = fmt_currency(row.get(col["claim_amount"]))
+    paid           = fmt_currency(row.get(col["paid_amount"]))
+    reserve        = fmt_currency(row.get(col["reserve_amount"]))
+
+    # Dates
+    event_date     = fmt_date(row.get(col.get("event_date", "Event Date")))
+    reported_date  = fmt_date(row.get(col["submitted_date"]))
+    opened_date    = fmt_date(row.get(col.get("claim_opened_date",
+                                               "Claim Opened Date")))
+    closed_date    = fmt_date(row.get(col["closed_date"]))
+
+    # Cause of loss and claim type
+    cause_of_loss  = safe(row.get(col.get("cause_of_loss_descr",
+                                           "Cause Of Loss Descr"), ""))
 
     # --- Build sentence ---
-    # Core description always present
+    # Core: identity, status, LOB, country
     text = (
         f"Claim {claim_id} is a {status} {claim_type} claim "
-        f"submitted on {submitted} by {claimant} in the {region} region, "
-        f"with a claim value of {amount}"
+        f"in the {exec_lob}/{major_lob}/{minor_lob} line of business, "
+        f"located in {country}, policyholder {claimant}."
     )
 
-    # Append financial details based on status
+    # Financial summary
+    text += (
+        f" Financials: incurred {incurred}, paid {paid}, "
+        f"outstanding reserve {reserve}."
+    )
+
+    # Key dates
+    text += (
+        f" Event date {event_date}, reported {reported_date}, "
+        f"opened {opened_date}"
+    )
+
+    # Status-specific ending
     if status == "Closed":
-        text += f", paid amount of {paid}, and was closed on {closed}."
+        text += f", closed {closed_date}."
     elif status in ("Open", "Pending", "Under Review"):
-        text += (
-            f", reserve of {reserve}, "
-            f"and has been open for {days_open} days."
-        )
+        text += f", open for {days_open} days."
     elif status == "Rejected":
-        text += f" and was rejected on {closed}."
+        text += f", rejected on {closed_date}."
     else:
         text += "."
+
+    # Cause of loss
+    if cause_of_loss != "N/A":
+        text += f" Cause of loss: {cause_of_loss}."
 
     return text
 
 
 # ---------------------------------------------------------------------------
-# Full DataFrame → list of chunk dicts
+# Full DataFrame -> list of chunk dicts
 # ---------------------------------------------------------------------------
 
 def dataframe_to_chunks(
@@ -139,17 +164,6 @@ def dataframe_to_chunks(
 
     Returns:
         List of chunk dicts, one per DataFrame row.
-
-    Example return:
-        [
-            {
-                "chunk_id": 0,
-                "df_index": 0,
-                "claim_id": "CLM0000001",
-                "text": "Claim CLM0000001 is an Open Medical claim..."
-            },
-            ...
-        ]
     """
     if df is None or len(df) == 0:
         logger.warning("Empty DataFrame passed to dataframe_to_chunks.")
@@ -185,7 +199,7 @@ def dataframe_to_chunks(
 
         # Progress log every 10 batches
         if (batch_num + 1) % 10 == 0 or batch_num == total_chunks - 1:
-            logger.info(f"  Batch {batch_num + 1}/{total_chunks} done — {chunk_id:,} chunks so far")
+            logger.info(f"  Batch {batch_num + 1}/{total_chunks} done -- {chunk_id:,} chunks so far")
 
     logger.info(f"Text conversion complete. Total chunks: {len(chunks):,}")
     return chunks
