@@ -1,0 +1,89 @@
+/* ============================================================
+   Global Styles — Claims Assistant
+   Dark theme inspired by ChatGPT / Claude
+   ============================================================ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg-primary:    #212121;
+  --bg-secondary:  #2f2f2f;
+  --bg-sidebar:    #171717;
+  --bg-input:      #2f2f2f;
+  --bg-hover:      #3a3a3a;
+  --text-primary:  #ececec;
+  --text-secondary:#ababab;
+  --text-muted:    #6e6e6e;
+  --accent:        #10a37f;
+  --accent-hover:  #0d8a6c;
+  --accent-light:  rgba(16,163,127,0.15);
+  --user-bubble:   #2f2f2f;
+  --bot-bubble:    transparent;
+  --border:        rgba(255,255,255,0.1);
+  --pill-bg:       rgba(16,163,127,0.2);
+  --pill-text:     #10a37f;
+  --danger:        #ef4444;
+  --warning:       #f59e0b;
+  --radius:        12px;
+  --radius-sm:     8px;
+  --radius-full:   9999px;
+  --shadow:        0 4px 24px rgba(0,0,0,0.4);
+  --transition:    0.2s ease;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbars */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* Markdown inside bot messages */
+.bot-content h1, .bot-content h2, .bot-content h3 {
+  margin: 0.75em 0 0.4em;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.bot-content p { margin: 0.5em 0; }
+.bot-content ul, .bot-content ol {
+  margin: 0.5em 0 0.5em 1.4em;
+}
+.bot-content li { margin: 0.25em 0; }
+.bot-content strong { font-weight: 600; color: #fff; }
+.bot-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.75em 0;
+  font-size: 14px;
+}
+.bot-content th {
+  background: var(--bg-secondary);
+  padding: 8px 12px;
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 1px solid var(--border);
+}
+.bot-content td {
+  padding: 7px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+.bot-content tr:last-child td { border-bottom: none; }
+.bot-content code {
+  background: var(--bg-secondary);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Fira Code', 'Courier New', monospace;
+  font-size: 13px;
+  color: #10a37f;
+}

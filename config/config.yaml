@@ -1,0 +1,66 @@
+# =============================================================================
+# Claims ChatGPT - Central Configuration
+# =============================================================================
+# All settings live here. Never hardcode values in Python files.
+
+# --- Data Settings ---
+data:
+  qvd_folder: "data/qvd/"                  # Folder where your QVD files live
+  dummy_mode: true                           # Set to false when using real QVDs
+  dummy_row_count: 10000                     # Rows to generate in dummy mode
+  recent_months: 12                          # Default: load only last N months
+  chunk_size: 5000                           # Rows per chunk when processing large files
+  max_rows_in_memory: 500000                 # Hard cap on rows loaded at once
+
+# --- Column Mappings ---
+# Update these to match your real QVD column names when ready
+columns:
+  claim_id: "ClaimID"
+  status: "Status"
+  claim_type: "ClaimType"
+  submitted_date: "SubmittedDate"
+  closed_date: "ClosedDate"
+  region: "Region"
+  claimant_name: "ClaimantName"
+  claim_amount: "ClaimAmount"
+  paid_amount: "PaidAmount"
+  reserve_amount: "ReserveAmount"
+  days_open: "DaysOpen"
+
+# --- AI Settings ---
+ai:
+  embedding_model: "all-MiniLM-L6-v2"       # Fast, CPU-friendly sentence-transformer
+  ollama_model: "gemma3:4b"                     # Model name in Ollama
+  ollama_host: "http://localhost:11434"      # Ollama default endpoint
+  top_k_results: 5                           # How many FAISS results to pass to LLM
+  max_context_rows: 10                       # Max rows sent to LLM as context
+
+# --- Notification Thresholds ---
+notifications:
+  high_value_claim_threshold: 100000         # £ amount to trigger high-value alert
+  open_claims_count_threshold: 500           # Alert if open claims exceed this
+  pending_days_threshold: 90                 # Alert if claim open > X days
+  rejection_rate_threshold: 0.25            # Alert if rejection rate > 25%
+  teams_webhook_url: ""                      # Paste your Teams webhook URL here
+  email_smtp_server: "smtp.office365.com"
+  email_smtp_port: 587
+  email_from: ""                             # Your Outlook email
+  email_to: []                               # List of recipient emails
+
+  # --- Teams Bot ---
+teams_bot:
+  app_id:     ""
+  app_secret: ""
+  tenant_id:  ""
+  bot_name:   "claims-bot-mt"
+
+# --- Scheduler ---
+scheduler:
+  daily_summary_time: "07:00"               # Time to push daily summary (HH:MM)
+  refresh_time: "06:45"                     # Auto data refresh before summary
+
+# --- Streamlit UI ---
+streamlit:
+  page_title: "Claims Assistant"
+  page_icon: "📋"
+  max_chat_history: 50                       # Messages to keep in session

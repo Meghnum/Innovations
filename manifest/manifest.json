@@ -1,0 +1,40 @@
+{
+  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.16/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.16",
+  "version": "1.0.0",
+  "id": "733cb9a1-708b-41ca-9353-fc35d2b45c04",
+  "packageName": "com.claims.assistant",
+  "developer": {
+    "name": "Claims Team",
+    "websiteUrl": "https://yetta-disembodied-semidictatorially.ngrok-free.dev",
+    "privacyUrl": "https://yetta-disembodied-semidictatorially.ngrok-free.dev",
+    "termsOfUseUrl": "https://yetta-disembodied-semidictatorially.ngrok-free.dev"
+  },
+  "name": {
+    "short": "Claims Assistant v2",
+    "full": "Claims Data Assistant"
+  },
+  "description": {
+    "short": "Ask questions about claims data",
+    "full": "AI-powered claims data assistant. Ask questions in plain English and get instant answers."
+  },
+  "icons": {
+    "color": "color.png",
+    "outline": "outline.png"
+  },
+  "accentColor": "#10a37f",
+  "bots": [
+    {
+      "botId": "733cb9a1-708b-41ca-9353-fc35d2b45c04",
+      "scopes": ["personal", "team", "groupchat"],
+      "isNotificationOnly": false,
+      "supportsCalling": false,
+      "supportsVideo": false,
+      "supportsFiles": false
+    }
+  ],
+  "permissions": ["identity", "messageTeamMembers"],
+  "validDomains": [
+    "yetta-disembodied-semidictatorially.ngrok-free.dev"
+  ]
+}

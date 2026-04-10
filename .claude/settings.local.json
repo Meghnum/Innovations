@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(claude plugin:*)",
+      "Bash(claude marketplace:*)",
+      "Bash(/Users/meghnumnirwal/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.7/skills/brainstorming/scripts/start-server.sh --project-dir /Users/meghnumnirwal/chatgpt-claims)",
+      "Bash(npx @anthropic-ai/claude-code-skills add JuliusBrussee/caveman)",
+      "Bash(claude plugins:*)",
+      "Bash(npx -y @anthropic-ai/claude-code plugins add JuliusBrussee/caveman)",
+      "Bash(python3 -c ':*)",
+      "Bash(npx @anthropic-ai/claude-code-plugins install JuliusBrussee/caveman)"
+    ]
+  }
+}
