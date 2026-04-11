@@ -1,107 +1,159 @@
 # =============================================================================
 # bot/teams_bot.py
-# Teams Bot — handles incoming messages from Microsoft Teams
+# Teams Bot -- handles incoming messages from Microsoft Teams
+# Routes questions through RAG pipeline and replies with Adaptive Cards
 # =============================================================================
 
 import logging
+import re
+import time
+
 from botbuilder.core import ActivityHandler, TurnContext, MessageFactory
-from botbuilder.schema import ChannelAccount
+from botbuilder.schema import Activity
+
+from bot.adaptive_cards import (
+    aggregation_card,
+    lookup_card,
+    search_card,
+    error_card,
+    help_card,
+    status_card,
+)
 
 logger = logging.getLogger("claims.bot")
 
 
 class ClaimsBot(ActivityHandler):
     """
-    Microsoft Teams bot that receives messages and routes them
-    through the RAG pipeline to generate answers.
+    Microsoft Teams bot that receives messages, routes them through the
+    RAG pipeline, and replies with rich Adaptive Cards.
     """
 
     def __init__(self, pipeline):
         """
         Args:
-            pipeline: Initialised RAGPipeline instance
+            pipeline: Initialised RAGPipeline instance (must expose
+                      .ask(), .rebuild(), and .loader attributes).
         """
         super().__init__()
         self.pipeline = pipeline
 
+    # --------------------------------------------------------------------- #
+    # Message handling
+    # --------------------------------------------------------------------- #
+
     async def on_message_activity(self, turn_context: TurnContext):
-        """
-        Called every time a user sends a message to the bot in Teams.
-        Strips the bot mention, passes question to RAG pipeline,
-        and replies with the answer.
-        """
-        # Get the message text and strip bot mention (@ClaimsBot)
+        """Route the incoming message to the correct handler."""
         question = turn_context.activity.text or ""
         question = question.strip()
 
-        # Remove bot mention if present (e.g. "<at>Claims Assistant</at>")
+        # Strip bot @-mention if present
         if "<at>" in question:
-            import re
-            question = re.sub(r'<at>.*?</at>', '', question).strip()
+            question = re.sub(r"<at>.*?</at>", "", question).strip()
 
         if not question:
-            await turn_context.send_activity(
-                MessageFactory.text("Hi! Ask me anything about your claims data. 📋")
-            )
+            await self._send_card(turn_context, help_card())
             return
 
-        # Handle help command
-        if question.lower() in ["help", "@help", "hi", "hello"]:
-            help_text = (
-                "👋 **Claims Assistant** — ask me anything about your claims data!\n\n"
-                "**Example questions:**\n"
-                "• How many open claims are there?\n"
-                "• What is the total claim value?\n"
-                "• Give me total value by ClaimType\n"
-                "• Tell me about claim CLM0000003\n"
-                "• Show me high value medical claims\n"
-                "• Which region has the most claims?\n\n"
-                "Just type your question and I'll answer it!"
-            )
-            await turn_context.send_activity(MessageFactory.text(help_text))
+        lower = question.lower()
+
+        # --- Built-in commands ------------------------------------------- #
+        if lower in ("help", "hi", "hello"):
+            await self._send_card(turn_context, help_card())
             return
 
-        # Show typing indicator
-        await turn_context.send_activity(MessageFactory.text("🤔 Thinking..."))
+        if lower == "status":
+            await self._handle_status(turn_context)
+            return
 
+        if lower == "refresh":
+            await self._handle_refresh(turn_context)
+            return
+
+        # --- Pipeline question ------------------------------------------- #
+        await self._handle_question(turn_context, question)
+
+    # --------------------------------------------------------------------- #
+    # Command handlers
+    # --------------------------------------------------------------------- #
+
+    async def _handle_status(self, turn_context: TurnContext):
+        """Send system status card."""
         try:
-            # Route through RAG pipeline
+            loader = self.pipeline.loader
+            loader_info = {
+                "rows": getattr(loader, "row_count", "N/A"),
+                "columns": getattr(loader, "col_count", "N/A"),
+                "last_refresh": getattr(loader, "last_refresh", "N/A"),
+                "source": getattr(loader, "source", "N/A"),
+            }
+            llm_ok = getattr(self.pipeline, "llm_ok", True)
+            card = status_card(loader_info, llm_ok)
+            await self._send_card(turn_context, card)
+        except Exception as e:
+            logger.error(f"Status error: {e}")
+            card = error_card("status", str(e))
+            await self._send_card(turn_context, card)
+
+    async def _handle_refresh(self, turn_context: TurnContext):
+        """Rebuild pipeline and confirm."""
+        try:
+            await turn_context.send_activity(
+                MessageFactory.text("Refreshing data...")
+            )
+            self.pipeline.rebuild()
+            await turn_context.send_activity(
+                MessageFactory.text("Data refresh complete.")
+            )
+        except Exception as e:
+            logger.error(f"Refresh error: {e}")
+            card = error_card("refresh", str(e))
+            await self._send_card(turn_context, card)
+
+    async def _handle_question(self, turn_context: TurnContext, question: str):
+        """Ask the pipeline and reply with the appropriate card."""
+        try:
+            start = time.time()
             response = self.pipeline.ask(question)
-            answer   = response.get("answer", "Sorry, I could not find an answer.")
-            q_type   = response.get("question_type", "")
-            sources  = response.get("sources", [])
+            elapsed = time.time() - start
 
-            # Build reply with metadata
-            reply = answer
+            answer = response.get("answer", "Sorry, I could not find an answer.")
+            q_type = response.get("question_type", "")
+            sources = response.get("sources", [])
+            claim_id = response.get("claim_id", None)
 
-            # Add source claim IDs for search answers
-            if sources and q_type == "search":
-                source_list = ", ".join(sources[:5])
-                reply += f"\n\n_Sources: {source_list}_"
+            if q_type == "aggregation":
+                card = aggregation_card(question, answer, elapsed)
+            elif q_type == "lookup":
+                card = lookup_card(question, answer, claim_id or "N/A", elapsed)
+            elif q_type == "search":
+                card = search_card(question, answer, sources, elapsed)
+            else:
+                # Default to aggregation style for unknown types
+                card = aggregation_card(question, answer, elapsed)
 
-            # Add response type indicator
-            type_emoji = {"aggregation": "⚡", "lookup": "🔍", "search": "🤖"}.get(q_type, "")
-            if type_emoji:
-                reply += f"\n_{type_emoji} {q_type}_"
-
-            await turn_context.send_activity(MessageFactory.text(reply))
+            await self._send_card(turn_context, card)
 
         except Exception as e:
             logger.error(f"Bot error: {e}")
-            await turn_context.send_activity(
-                MessageFactory.text("⚠️ Something went wrong. Please try again.")
-            )
+            card = error_card(question, "Something went wrong. Please try again.")
+            await self._send_card(turn_context, card)
 
-    async def on_members_added_activity(
-        self, members_added, turn_context: TurnContext
-    ):
-        """Greet new members when they join the conversation."""
+    # --------------------------------------------------------------------- #
+    # Welcome
+    # --------------------------------------------------------------------- #
+
+    async def on_members_added_activity(self, members_added, turn_context: TurnContext):
+        """Greet new members with the help card."""
         for member in members_added:
             if member.id != turn_context.activity.recipient.id:
-                await turn_context.send_activity(
-                    MessageFactory.text(
-                        "👋 Hi! I'm the **Claims Assistant**.\n\n"
-                        "Ask me anything about your claims data in plain English.\n"
-                        "Type **help** to see example questions."
-                    )
-                )
+                await self._send_card(turn_context, help_card())
+
+    # --------------------------------------------------------------------- #
+    # Helpers
+    # --------------------------------------------------------------------- #
+
+    async def _send_card(self, turn_context: TurnContext, card_payload: dict):
+        """Deserialise an Adaptive Card payload and send it."""
+        activity = Activity.deserialize(card_payload)
+        await turn_context.send_activity(activity)
