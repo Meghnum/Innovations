@@ -87,54 +87,54 @@ def build_prompt(
     summary: dict,
 ) -> str:
     """
-    Build the full prompt sent to Llama3.
+    Build the 4-block prompt sent to the LLM.
 
-    Structure:
-      - System instruction: tells the LLM its role and rules
-      - Summary stats: high-level numbers always available
-      - Context rows: the specific claims retrieved by FAISS
-      - User question
-
-    The LLM never sees the whole DataFrame — only what FAISS
-    deemed relevant, keeping the prompt small and fast.
+    Block 1 — Role + hard rules (anti-hallucination)
+    Block 2 — Chain-of-thought instruction (internal reasoning only)
+    Block 3 — Structured context (summary stats + relevant rows)
+    Block 4 — Output format rules
 
     Args:
         question:     The user's plain English question.
-        context_rows: DataFrame rows returned by FAISS search.
+        context_rows: DataFrame rows returned by FAISS search (may be empty).
         col:          Column name mapping from config.
         summary:      Pre-computed summary stats dict.
 
     Returns:
-        A formatted prompt string.
+        A formatted prompt string ending with "ANSWER:".
     """
 
-    # --- System instruction ---
-    system = """You are a Claims Data Assistant for an insurance company.
-You answer questions about claims data clearly and concisely.
-Rules:
-- Only use the data provided below. Do not invent figures.
-- If the answer is not in the data, say so honestly.
-- Format currency as £ with comma separators.
-- Keep answers brief and professional.
-- If asked for a list or table, format it clearly.
-"""
+    # ── Block 1: Role + Hard Rules ─────────────────────────────────────────
+    block1 = """You are a Claims Data Analyst for an insurance company.
 
-    # --- Summary block (always included) ---
-    summary_block = f"""
-OVERALL DATA SUMMARY (as of {summary.get('data_loaded_at', 'unknown')}):
-- Total claims in dataset: {summary.get('total_claims', 'N/A'):,}
-- Total claim value: £{summary.get('total_claim_amount', 0):,.2f}
-- Total paid: £{summary.get('total_paid_amount', 0):,.2f}
-- Total reserves: £{summary.get('total_reserve_amount', 0):,.2f}
-- Average claim value: £{summary.get('avg_claim_amount', 0):,.2f}
+Rules you must never break:
+- Only use numbers explicitly present in the data below. Never invent or estimate figures.
+- If a Claim ID is mentioned in the retrieved rows, cite it in your answer.
+- Format all currency as $ with comma separators (e.g. $45,000 not 45000).
+- If the answer is not in the provided data, say exactly: "I don't have that information in the current dataset."
+- Do not apologise or hedge. Give direct, factual, professional answers.
+- Do not make up claim IDs, amounts, names, or dates."""
+
+    # ── Block 2: Chain-of-thought instruction ─────────────────────────────
+    block2 = """Before writing your answer, reason through these steps internally (do NOT output the reasoning):
+1. What exactly is being asked?
+2. Which rows or summary figures directly answer it?
+3. What calculation or lookup is needed?
+Then output ONLY the final answer."""
+
+    # ── Block 3: Structured context ───────────────────────────────────────
+    summary_block = f"""DATASET SUMMARY (as of {summary.get('data_loaded_at', 'unknown')}):
+- Total claims: {summary.get('total_claims', 'N/A'):,}
+- Total claim value: ${summary.get('total_claim_amount', 0):,.2f}
+- Total paid: ${summary.get('total_paid_amount', 0):,.2f}
+- Total reserves: ${summary.get('total_reserve_amount', 0):,.2f}
+- Average claim value: ${summary.get('avg_claim_amount', 0):,.2f}
 - Average days open: {summary.get('avg_days_open', 'N/A')} days
 - Status breakdown: {summary.get('status_counts', {})}
 - Region breakdown: {summary.get('region_counts', {})}
 - Claim type breakdown: {summary.get('type_counts', {})}
-- Date range: {summary.get('date_range_start', '')} to {summary.get('date_range_end', '')}
-"""
+- Date range: {summary.get('date_range_start', '')} to {summary.get('date_range_end', '')}"""
 
-    # --- Context rows block ---
     if context_rows is not None and len(context_rows) > 0:
         context_lines = ["RELEVANT CLAIMS RETRIEVED:"]
         for _, row in context_rows.iterrows():
@@ -144,14 +144,19 @@ OVERALL DATA SUMMARY (as of {summary.get('data_loaded_at', 'unknown')}):
 
             def c(field):
                 try:
-                    return f"£{float(row.get(col.get(field, ''), 0)):,.2f}"
+                    return f"${float(row.get(col.get(field, ''), 0)):,.2f}"
                 except Exception:
                     return "N/A"
+
+            submitted_str = s("submitted_date")
+            submitted_str = submitted_str[:10] if submitted_str != "N/A" else "N/A"
+            closed_str = s("closed_date")
+            closed_str = closed_str[:10] if closed_str != "N/A" else "Still open"
 
             line = (
                 f"- Claim {s('claim_id')}: {s('status')} {s('claim_type')} | "
                 f"Claimant: {s('claimant_name')} | Region: {s('region')} | "
-                f"Submitted: {s('submitted_date')[:10] if s('submitted_date') != 'N/A' else 'N/A'} | "
+                f"Submitted: {submitted_str} | Closed: {closed_str} | "
                 f"Amount: {c('claim_amount')} | Paid: {c('paid_amount')} | "
                 f"Reserve: {c('reserve_amount')} | Days open: {s('days_open')}"
             )
@@ -160,10 +165,22 @@ OVERALL DATA SUMMARY (as of {summary.get('data_loaded_at', 'unknown')}):
     else:
         context_block = "RELEVANT CLAIMS RETRIEVED: None found for this query."
 
-    # --- Assemble full prompt ---
-    prompt = f"""{system}
+    # ── Block 4: Output format rules ──────────────────────────────────────
+    block4 = """Output format rules:
+- If the answer contains 3 or more items, use a markdown table with headers.
+- If the answer is a single number, bold it with **$X,XXX** or **N**.
+- If the answer is a list of claims, use bullet points with Claim ID first.
+- For comparisons, use a side-by-side table."""
+
+    prompt = f"""{block1}
+
+{block2}
+
 {summary_block}
+
 {context_block}
+
+{block4}
 
 USER QUESTION: {question}
 
