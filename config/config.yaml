@@ -173,9 +173,9 @@ notifications:
 
   # --- Teams Bot ---
 teams_bot:
-  app_id:     ""
-  app_secret: ""
-  tenant_id:  ""
+  app_id:     ""          # Paste your Azure Bot app ID
+  app_secret: ""          # Paste your Azure Bot app secret
+  tenant_id:  ""          # Paste your Azure AD tenant ID
   bot_name:   "claims-bot-mt"
 
 # --- Scheduler ---
