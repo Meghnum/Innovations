@@ -270,6 +270,74 @@ class ClaimsSearchEngine:
         )
 
     # ------------------------------------------------------------------
+    def search_with_filter(
+        self,
+        query: str,
+        allowed_df_indices: set,
+        top_k: int = None,
+    ) -> List[Dict[str, Any]]:
+        """
+        Search the FAISS index but only return results whose chunk's
+        df_index is in the allowed set.
+
+        This is used when an entity filter (e.g. from the query analyzer)
+        has already narrowed down which DataFrame rows are relevant.
+        We still search the full FAISS index (for semantic ranking) but
+        post-filter to the allowed rows.
+
+        Args:
+            query:               Plain English question from the user.
+            allowed_df_indices:  Set of df_index values that are permitted
+                                 in the results.
+            top_k:               Max results to return (defaults to config
+                                 top_k_results).
+
+        Returns:
+            List of matching chunk dicts with similarity scores, filtered
+            to only those whose df_index is in allowed_df_indices.
+        """
+        import faiss
+
+        if top_k is None:
+            top_k = self.ai_cfg["top_k_results"]
+
+        # Short-circuit: nothing allowed or index not ready
+        if not allowed_df_indices or not self.is_ready:
+            return []
+
+        # Search wider than needed so we have enough after filtering
+        search_k = top_k * 5
+
+        # Embed and normalise the query
+        query_vec = self.model.encode(
+            [query], convert_to_numpy=True
+        ).astype("float32")
+        faiss.normalize_L2(query_vec)
+
+        # Search FAISS
+        distances, indices = self.index.search(query_vec, search_k)
+
+        results = []
+        for dist, idx in zip(distances[0], indices[0]):
+            if idx == -1:
+                continue
+            chunk = self.chunks[idx]
+            if chunk["df_index"] not in allowed_df_indices:
+                continue
+            entry = chunk.copy()
+            entry["score"] = round(float(dist), 4)
+            results.append(entry)
+            if len(results) >= top_k:
+                break
+
+        logger.debug(
+            f"Filtered search: '{query[:60]}...' → {len(results)} results "
+            f"(allowed {len(allowed_df_indices)} indices)"
+        )
+
+        return results
+
+    # ------------------------------------------------------------------
     def rebuild(self, chunks: List[Dict[str, Any]]):
         """
         Rebuild the index from scratch — used when data is refreshed.
