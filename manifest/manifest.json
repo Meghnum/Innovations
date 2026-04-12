@@ -2,7 +2,7 @@
   "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.16/MicrosoftTeams.schema.json",
   "manifestVersion": "1.16",
   "version": "1.0.0",
-  "id": "733cb9a1-708b-41ca-9353-fc35d2b45c04",
+  "id": "094a5829-eb83-4f60-8902-0eb33919d3e5",
   "packageName": "com.claims.assistant",
   "developer": {
     "name": "Claims Team",
@@ -11,7 +11,7 @@
     "termsOfUseUrl": "https://yetta-disembodied-semidictatorially.ngrok-free.dev"
   },
   "name": {
-    "short": "Claims Assistant v2",
+    "short": "Claims Assistant",
     "full": "Claims Data Assistant"
   },
   "description": {
@@ -25,7 +25,7 @@
   "accentColor": "#10a37f",
   "bots": [
     {
-      "botId": "733cb9a1-708b-41ca-9353-fc35d2b45c04",
+      "botId": "094a5829-eb83-4f60-8902-0eb33919d3e5",
       "scopes": ["personal", "team", "groupchat"],
       "isNotificationOnly": false,
       "supportsCalling": false,

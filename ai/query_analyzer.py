@@ -184,8 +184,10 @@ class QueryAnalyzer:
 
         # Claim-id lookup
         claim_id_match = re.search(r"(CLM\d+)", question, re.IGNORECASE)
+        # Policy number lookup (POL-xxx pattern)
+        policy_id_match = re.search(r'\b(POL[\-]?\d+[A-Za-z]*)\b', question, re.IGNORECASE)
 
-        if claim_id_match:
+        if claim_id_match or policy_id_match:
             intent = "lookup"
         elif any(kw in q_lower for kw in aggregation_kw):
             intent = "aggregation"
@@ -226,9 +228,15 @@ class QueryAnalyzer:
             re.search(r"high.?value|large|big|expensive|major", q_lower)
         )
 
+        # Policy ID
+        policy_id: Optional[str] = (
+            policy_id_match.group(1).upper() if policy_id_match else None
+        )
+
         return {
             "intent": intent,
             "claim_id": claim_id,
+            "policy_id": policy_id,
             "status": status,
             "region": region,
             "claim_type": claim_type,

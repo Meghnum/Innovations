@@ -812,6 +812,19 @@ def build_aggregated_summary(df: pd.DataFrame, col_map: dict) -> dict:
         "date_range_end":        str(df[c["submitted_date"]].max().date()),
     }
 
+    # --- Additional financial metrics (safe if columns missing) ---
+    recoveries_col = c.get("recoveries_usd", "Recoveries USD")
+    if recoveries_col in df.columns:
+        summary["total_recoveries"] = round(df[recoveries_col].sum(), 2)
+
+    expense_paid_col = c.get("expense_paid_usd", "Expense Paid USD")
+    if expense_paid_col in df.columns:
+        summary["total_expense_paid"] = round(df[expense_paid_col].sum(), 2)
+
+    nominal_col = c.get("nominal_reserve", "Nominal Reserve")
+    if nominal_col in df.columns:
+        summary["avg_nominal_reserve"] = round(df[nominal_col].mean(), 2)
+
     logger.info(
         f"Summary built: {summary['total_claims']:,} claims, "
         f"${summary['total_claim_amount']:,.0f} total value"

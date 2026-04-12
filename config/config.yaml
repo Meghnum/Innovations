@@ -7,7 +7,7 @@
 data:
   qvd_folder: "data/qvd/"                  # Folder where your QVD files live
   dummy_mode: true                           # Set to false when using real QVDs
-  dummy_row_count: 5000000                   # Rows to generate in dummy mode
+  dummy_row_count: 5000                   # Rows to generate in dummy mode
   recent_months: 12                          # Default: load only last N months
   chunk_size: 5000                           # Rows per chunk when processing large files
   max_rows_in_memory: 5500000                # Hard cap on rows loaded at once
@@ -173,10 +173,10 @@ notifications:
 
   # --- Teams Bot ---
 teams_bot:
-  app_id:     ""          # Paste your Azure Bot app ID
+  app_id:     "094a5829-eb83-4f60-8902-0eb33919d3e5"          # Paste your Azure Bot app ID
   app_secret: ""          # Paste your Azure Bot app secret
   tenant_id:  ""          # Paste your Azure AD tenant ID
-  bot_name:   "claims-bot-mt"
+  bot_name:   "claims-assistant-bot"
 
 # --- Scheduler ---
 scheduler:

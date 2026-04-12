@@ -144,7 +144,36 @@ st.markdown("""
     .status-bar-fill-purple { background: #bc8cff; }
     .status-bar-count { color: #8b949e; font-size: 12px; min-width: 45px; text-align: right; }
 
-    /* === Input === */
+    /* === Input — Gemini-style floating bar === */
+    .stChatInput {
+        background: transparent !important;
+    }
+    .stChatInput > div {
+        background: #1e1f20 !important;
+        border: 1px solid #3c4043 !important;
+        border-radius: 24px !important;
+        padding: 4px 8px !important;
+    }
+    .stChatInput textarea {
+        background: transparent !important;
+        color: #c9d1d9 !important;
+        font-size: 15px !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+    .stChatInput textarea::placeholder {
+        color: #8b949e !important;
+    }
+    .stChatInput button {
+        background: transparent !important;
+        border: none !important;
+        color: #8b949e !important;
+    }
+    .stChatInput button:hover {
+        color: #58a6ff !important;
+    }
+
+    /* Hide old text input if any */
     .stTextInput input {
         background: #161b22 !important; color: #c9d1d9 !important;
         border: 1px solid #30363d !important; border-radius: 24px !important;
@@ -421,7 +450,8 @@ def render_sidebar(loader):
         ]
         for ex in examples:
             if st.button(ex, use_container_width=True, key=f"ex_{hash(ex)}"):
-                st.session_state.pending_question = ex
+                st.session_state.pending_example = ex
+                st.rerun()
 
         st.markdown('<hr style="margin:10px 0"/>', unsafe_allow_html=True)
 
@@ -468,8 +498,6 @@ def main():
     # --- Session state ---
     if "messages" not in st.session_state:
         st.session_state.messages = []
-    if "pending_question" not in st.session_state:
-        st.session_state.pending_question = None
     if "last_question" not in st.session_state:
         st.session_state.last_question = ""
 
@@ -491,25 +519,13 @@ def main():
                 else:
                     render_bot_msg(msg, msg.get("elapsed"))
 
-    # --- Input bar ---
-    st.markdown('<div style="height: 8px"></div>', unsafe_allow_html=True)
-    col_input, col_clear = st.columns([6, 1])
+    # --- Input bar (Gemini-style) ---
+    question = st.chat_input("Ask about your claims data...")
 
-    with col_input:
-        default_val = st.session_state.pop("pending_question", None) or ""
-        question = st.text_input(
-            label="Ask a question",
-            value=default_val,
-            placeholder="e.g. How many open claims are there?",
-            label_visibility="collapsed",
-            key="question_input",
-        )
-
-    with col_clear:
-        if st.button("Clear", use_container_width=True):
-            st.session_state.messages = []
-            st.session_state.last_question = ""
-            st.rerun()
+    # --- Check for example button click ---
+    pending = st.session_state.pop("pending_example", None)
+    if pending:
+        question = pending
 
     # --- Process question (with dedup guard) ---
     if question and question.strip() and question != st.session_state.get("last_question", ""):

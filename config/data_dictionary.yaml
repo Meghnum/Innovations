@@ -1,0 +1,336 @@
+# =============================================================================
+# Claims Data Dictionary
+# Business meaning of all 74 columns in the claims dataset
+# =============================================================================
+
+# 1. Core Identification & Status
+Claim Number:
+  description: "Unique alphanumeric identifier for a specific loss event"
+  example: "CLM-2023-99812A"
+  category: "identification"
+
+Policy Number:
+  description: "Unique identifier for the insurance contract under which the claim is made"
+  example: "POL-GL-554321"
+  category: "identification"
+
+Claim Status Derived:
+  description: "Normalized enterprise status (Open/Closed/Reopened/Litigation) used for reporting"
+  note: "Standardized from System and Original status"
+  category: "status"
+
+Claim Status Original:
+  description: "Raw source data status before normalization"
+  category: "status"
+
+System Claim Status:
+  description: "Raw status from claims system (e.g. Guidewire). May say Pending_Review while Derived says Open"
+  category: "status"
+
+Claim Dac Code:
+  description: "Deferred Acquisition Costs identifier. Links acquisition costs of a policy to its claims for accounting"
+  category: "identification"
+
+# 2. Timeline & Lifecycle
+Event Date:
+  description: "Date the actual incident/loss occurred (Date of Loss)"
+  example: "2023-10-15 (day the warehouse fire happened)"
+  category: "timeline"
+
+Reported Date:
+  description: "Date insured/broker notified insurer of the loss. Gap from Event Date = Reporting Lag"
+  category: "timeline"
+
+Claim Opened Date:
+  description: "Date the claim file was physically opened in the system"
+  category: "timeline"
+
+Claim Closed Date:
+  description: "Date the claim was resolved and file shut"
+  category: "timeline"
+
+Accident Year:
+  description: "Year the loss event occurred. Actuaries group claims by AY to track performance"
+  example: "2023"
+  category: "timeline"
+
+Claim Life Days:
+  description: "Duration in days from Opened to Closed (or current date if open). Measures claims handling efficiency"
+  category: "timeline"
+
+# 3. Financials & Reserves (USD and Ledger Currency)
+Outstanding Reserve USD:
+  description: "Estimated money set aside (Case Reserve) for future costs on an open claim"
+  example: "$50,000 anticipating final settlement"
+  formula_role: "Component of Incurred"
+  category: "financial"
+
+Indemnity Paid USD:
+  description: "Actual money paid to claimant/insured for the covered loss. Excludes adjuster/legal fees"
+  example: "$45,000 paid to repair building"
+  formula_role: "Component of Incurred"
+  category: "financial"
+
+Expense Paid USD:
+  description: "ALAE - Allocated Loss Adjustment Expenses. Payments to third parties to investigate/defend (outside counsel, forensic engineers, PIs)"
+  example: "$5,000 paid to fire origin-and-cause forensic engineer"
+  formula_role: "Component of Incurred"
+  category: "financial"
+
+Expense Reserve USD:
+  description: "Estimated future ALAE expenses expected to settle the claim"
+  formula_role: "Component of Incurred"
+  category: "financial"
+
+Recoveries USD:
+  description: "Money recouped after claim is paid. Includes Subrogation (suing negligent third party) and Salvage (selling totaled asset)"
+  example: "$10,000 recovered from manufacturer of faulty appliance causing fire"
+  formula_role: "Subtracted from Incurred"
+  category: "financial"
+
+Incurred USD:
+  description: "Total financial impact of claim to date"
+  formula: "Indemnity Paid + Expense Paid + Outstanding Reserve + Expense Reserve - Recoveries"
+  category: "financial"
+
+# Ledger currency equivalents
+Indemnity Paid Ledger:
+  description: "Indemnity paid in local/ledger currency"
+  category: "financial"
+Expense Reserve Ledger:
+  description: "Expense reserve in local/ledger currency"
+  category: "financial"
+Expense Paid Ledger:
+  description: "Expense paid in local/ledger currency"
+  category: "financial"
+Recoveries Ledger:
+  description: "Recoveries in local/ledger currency"
+  category: "financial"
+Outstanding Reserve Ledger:
+  description: "Outstanding reserve in local/ledger currency"
+  category: "financial"
+Incurred Ledger:
+  description: "Total incurred in local/ledger currency"
+  category: "financial"
+
+ledger Currency:
+  description: "The local currency of the original transaction (GBP, EUR, CAD, etc.)"
+  category: "financial"
+
+Nominal Reserve:
+  description: "A minimal placeholder reserve (e.g. $1) set when a claim is opened before investigation"
+  category: "financial"
+
+# 4. Line of Business (LOB) - Hierarchical
+Executive LOB:
+  description: "Top-level product division"
+  example: "Commercial Lines"
+  category: "lob"
+
+Major LOB:
+  description: "Mid-level product category"
+  example: "Property"
+  category: "lob"
+
+Minor LOB:
+  description: "Granular product sub-class"
+  example: "Commercial Fire"
+  category: "lob"
+
+Reserving Line:
+  description: "Actuarial mapping code. Claims bucketed into reserving lines for IBNR calculation"
+  example: "Long Tail Liability vs Short Tail Property"
+  category: "lob"
+
+Reserving Class:
+  description: "Further actuarial sub-grouping within reserving line"
+  category: "lob"
+
+# 5. Loss Details & Coding
+Catastrophe Code:
+  description: "Industry-standard code (PCS - Property Claim Services) for major disasters"
+  example: "90"
+  category: "loss_detail"
+
+Catastrophe Description:
+  description: "Name of the catastrophe event"
+  example: "Hurricane Ian"
+  category: "loss_detail"
+
+Cause of Loss Code:
+  description: "Code for the proximate peril causing damage"
+  example: "WND"
+  category: "loss_detail"
+
+Cause Of Loss Descr:
+  description: "Description of proximate peril"
+  example: "Windstorm/Hail"
+  category: "loss_detail"
+
+Claim Type Code:
+  description: "Code classifying the nature of the sub-claim"
+  category: "loss_detail"
+
+Claim Type Description:
+  description: "Nature of claim: Bodily Injury, Property Damage, Business Interruption, etc."
+  category: "loss_detail"
+
+Condition Injury Damage Code:
+  description: "Code for specific anatomical/material damage"
+  category: "loss_detail"
+
+Condition Injury Damage Name:
+  description: "Description of specific damage"
+  example: "C-Spine Fracture (Workers Comp) or Roof Collapse (Property)"
+  category: "loss_detail"
+
+Contributing Factor Code:
+  description: "Code for the contributing factor to the loss"
+  category: "loss_detail"
+
+Contributing Factor Descr:
+  description: "What contributed to the loss event beyond the proximate cause"
+  example: "Inadequate maintenance, weather conditions, human error"
+  category: "loss_detail"
+
+Coverage Code:
+  description: "Specific coverage within the policy that applies to this claim"
+  category: "loss_detail"
+
+Location of Loss:
+  description: "Physical location where the loss occurred"
+  category: "loss_detail"
+
+Loss Description:
+  description: "Narrative text describing what happened"
+  example: "Employee slipped on wet floor in the Miami warehouse"
+  category: "loss_detail"
+
+Claim Event Desc:
+  description: "Description of the event that triggered the claim"
+  category: "loss_detail"
+
+# 6. Stakeholders & Geography
+Country:
+  description: "Country where the risk is located or claim is managed"
+  category: "geography"
+
+Business Entity:
+  description: "Corporate subsidiary of the insurer holding the risk"
+  example: "Acme Insurance UK Ltd vs Acme Insurance North America"
+  category: "stakeholder"
+
+Entity:
+  description: "Further sub-entity or division within the business entity"
+  category: "stakeholder"
+
+Claim Office:
+  description: "Branch office managing the claim"
+  category: "stakeholder"
+
+Producing Office Code:
+  description: "Code for branch that originally sold the policy"
+  category: "stakeholder"
+
+Producing Office:
+  description: "Branch that originally sold the policy"
+  category: "stakeholder"
+
+Responsible Adjuster:
+  description: "Specific claims handler managing the file"
+  category: "stakeholder"
+
+Current Global Producer:
+  description: "Code for the broker/agency that brought the client"
+  category: "stakeholder"
+
+Producer Name:
+  description: "Name of the broker or agency"
+  example: "Marsh, Aon, Willis Towers Watson"
+  category: "stakeholder"
+
+Policy Holder Name:
+  description: "The Named Insured on the policy"
+  category: "stakeholder"
+
+# 7. Policy & Underwriting
+Policy UWY:
+  description: "Underwriting Year - year the policy was bound. Different from Accident Year. A 2024 loss could be UWY 2023 if policy was written Nov 2023"
+  category: "policy"
+
+Policy Effective Date:
+  description: "Date the policy coverage begins"
+  category: "policy"
+
+Policy Expiration Date:
+  description: "Date the policy coverage ends"
+  category: "policy"
+
+Industry Explanantion:
+  description: "SIC or NAICS industry grouping of the client"
+  example: "Manufacturing - Pharmaceuticals"
+  category: "policy"
+
+Product Code:
+  description: "Internal code for the insurance product"
+  category: "policy"
+
+Claim Source:
+  description: "How the claim was received (e.g. phone, email, broker portal)"
+  category: "policy"
+
+# 8. Specialty / Market Indicators
+Multinational Code:
+  description: "Code flagging if claim belongs to a global master program with local admitted policies"
+  category: "market"
+
+MN:
+  description: "Multinational flag indicator"
+  category: "market"
+
+MN Description:
+  description: "Description of the multinational program arrangement"
+  category: "market"
+
+Coinsurance:
+  description: "Percentage of risk shared when multiple insurers participate"
+  example: "If $10M claim and Company Share is 20%, company incurred is $2M"
+  category: "market"
+
+Company Share:
+  description: "Your company's percentage share of the risk"
+  category: "market"
+
+Company Signal Reserve:
+  description: "Flag indicating if company has set a signal reserve (subscription/Lloyd's market)"
+  note: "Lead insurer puts up recommended reserve amount for following markets"
+  category: "market"
+
+Company Singal Reserve Amount:
+  description: "The signal reserve amount set by the company"
+  category: "market"
+
+Market Place Singal Reserve:
+  description: "Flag for marketplace signal reserve"
+  category: "market"
+
+Market Place Singal Reserve Amount:
+  description: "Marketplace-level signal reserve amount"
+  category: "market"
+
+Bulk Claim Indicator:
+  description: "Flag when multiple minor claims are grouped and handled/reserved in aggregate"
+  example: "Used for occupational disease or minor auto physical damage"
+  category: "market"
+
+Block Indicator:
+  description: "Indicates if the claim is part of a block/portfolio transfer"
+  category: "market"
+
+MAR Fast Track Flag:
+  description: "Marine fast-track claims processing indicator"
+  category: "market"
+
+Plant Division:
+  description: "Internal organizational division handling the claim"
+  category: "market"

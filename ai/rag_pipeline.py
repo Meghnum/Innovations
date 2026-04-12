@@ -74,7 +74,7 @@ def handle_aggregation(
             status_val = ent.get("status")
             if not status_val:
                 for kw in ["open", "closed", "pending", "rejected", "under review"]:
-                    if _has_word(kw) or (kw != "under review" and kw in q):
+                    if _has_word(kw):
                         status_val = kw.title()
                         break
             if status_val:
@@ -86,10 +86,10 @@ def handle_aggregation(
         if region_col in dframe.columns:
             region_val = ent.get("region")
             if not region_val:
-                for kw in ["uk", "us", "canada", "australia", "germany",
+                for kw in ["uk", "us", "usa", "canada", "australia", "germany",
                            "france", "japan", "brazil", "india"]:
                     if _has_word(kw):
-                        region_val = kw.upper() if kw in ("uk", "us") else kw.title()
+                        region_val = "US" if kw in ("us", "usa") else kw.upper() if kw == "uk" else kw.title()
                         break
             if region_val:
                 mask &= dframe[region_col].str.lower() == region_val.lower()
@@ -128,11 +128,12 @@ def handle_aggregation(
                     filtered = True
                     break
 
-        # --- Claim type filter ---
+        # --- Claim type filter (skip keyword detection if Minor LOB already matched) ---
+        minor_lob_matched = any(kw in q for kw in minor_lob_keywords) if minor_lob_col in dframe.columns else False
         claim_type_col = col.get("claim_type", "Claim Type Description")
         if claim_type_col in dframe.columns:
             claim_type_val = ent.get("claim_type")
-            if not claim_type_val:
+            if not claim_type_val and not minor_lob_matched:
                 for kw in ["bodily injury", "property damage", "motor",
                            "liability", "cyber"]:
                     if kw in q:
@@ -183,20 +184,33 @@ def handle_aggregation(
             filtered = True
 
         # --- Policyholder name filter ---
+        # Exclude known entity keywords to avoid "for Canada" triggering policyholder
+        _entity_words = {
+            "open", "closed", "pending", "rejected", "uk", "us", "usa",
+            "canada", "australia", "germany", "france", "japan", "brazil",
+            "india", "commercial", "marine", "cyber", "motor", "property",
+        }
         ph_col = col.get("policy_holder_name", "Policy Holder Name")
         if ph_col in dframe.columns:
             ph_match = re.search(r'\bfor\s+([A-Z][a-zA-Z]+(?:\s+[A-Z][a-zA-Z]+)*)', question)
             if ph_match:
                 ph_name = ph_match.group(1)
-                mask &= dframe[ph_col].str.lower() == ph_name.lower()
-                filtered = True
+                if ph_name.lower() not in _entity_words:
+                    mask &= dframe[ph_col].str.lower() == ph_name.lower()
+                    filtered = True
 
         if not filtered:
             return dframe
         return dframe[mask]
 
-    # --- Entity-aware status count ---
+    # --- Entity-aware status count (only when no other filters apply) ---
     if ent.get("status") and ("how many" in q or _has_word("count")):
+        # Check if there are additional filters beyond just status
+        fdf = _apply_filters(df) if df is not None else None
+        if fdf is not None and len(fdf) < len(df):
+            # Additional filters present — use filtered count
+            status_val = ent["status"]
+            return f"There are **{len(fdf):,}** {status_val} claims matching your criteria."
         status_val = ent["status"]
         count = summary["status_counts"].get(status_val, 0)
         return f"There are **{count:,}** {status_val} claims in the current dataset."
@@ -205,7 +219,8 @@ def handle_aggregation(
     if df is not None and col is not None and (
         ("how many" in q or _has_word("count")) and "region" in q
     ):
-        result = df.groupby(col["region"])[col["claim_id"]].count().sort_values(ascending=False)
+        fdf = _apply_filters(df)
+        result = fdf.groupby(col["region"])[col["claim_id"]].count().sort_values(ascending=False)
         lines = [f"- {r}: {c:,}" for r, c in result.items()]
         return "**Claims Count by Region:**\n" + "\n".join(lines)
 
@@ -213,7 +228,8 @@ def handle_aggregation(
     if df is not None and col is not None and (
         ("how many" in q or _has_word("count")) and "type" in q
     ):
-        result = df.groupby(col["claim_type"])[col["claim_id"]].count().sort_values(ascending=False)
+        fdf = _apply_filters(df)
+        result = fdf.groupby(col["claim_type"])[col["claim_id"]].count().sort_values(ascending=False)
         lines = [f"- {t}: {c:,}" for t, c in result.items()]
         return "**Claims Count by Claim Type:**\n" + "\n".join(lines)
 
@@ -221,7 +237,8 @@ def handle_aggregation(
     if df is not None and col is not None and (
         ("average" in q or "avg" in q) and "type" in q
     ):
-        result = df.groupby(col["claim_type"])[col["claim_amount"]].mean().sort_values(ascending=False)
+        fdf = _apply_filters(df)
+        result = fdf.groupby(col["claim_type"])[col["claim_amount"]].mean().sort_values(ascending=False)
         lines = [f"- {t}: ${v:,.2f}" for t, v in result.items()]
         return "**Average Claim Value by Claim Type:**\n" + "\n".join(lines)
 
@@ -229,7 +246,8 @@ def handle_aggregation(
     if df is not None and col is not None and (
         ("average" in q or "avg" in q) and "region" in q
     ):
-        result = df.groupby(col["region"])[col["claim_amount"]].mean().sort_values(ascending=False)
+        fdf = _apply_filters(df)
+        result = fdf.groupby(col["region"])[col["claim_amount"]].mean().sort_values(ascending=False)
         lines = [f"- {r}: ${v:,.2f}" for r, v in result.items()]
         return "**Average Claim Value by Region:**\n" + "\n".join(lines)
 
@@ -238,7 +256,8 @@ def handle_aggregation(
         "by claimtype" in q or "by claim type" in q or "per type" in q or
         ("type" in q and ("total" in q or "value" in q or "amount" in q))
     ):
-        result = df.groupby(col["claim_type"])[col["claim_amount"]].sum().sort_values(ascending=False)
+        fdf = _apply_filters(df)
+        result = fdf.groupby(col["claim_type"])[col["claim_amount"]].sum().sort_values(ascending=False)
         lines = [f"- {t}: ${v:,.2f}" for t, v in result.items()]
         return "**Total Claim Value by Claim Type:**\n" + "\n".join(lines)
 
@@ -247,7 +266,8 @@ def handle_aggregation(
         "by region" in q or "per region" in q or
         ("region" in q and ("total" in q or "value" in q or "amount" in q))
     ):
-        result = df.groupby(col["region"])[col["claim_amount"]].sum().sort_values(ascending=False)
+        fdf = _apply_filters(df)
+        result = fdf.groupby(col["region"])[col["claim_amount"]].sum().sort_values(ascending=False)
         lines = [f"- {r}: ${v:,.2f}" for r, v in result.items()]
         return "**Total Claim Value by Region:**\n" + "\n".join(lines)
 
@@ -259,21 +279,98 @@ def handle_aggregation(
         df is not None and col is not None and
         "status" in q and ("total" in q or "value" in q or "amount" in q)
     ):
-        result = df.groupby(col["status"])[col["claim_amount"]].sum().sort_values(ascending=False)
+        fdf = _apply_filters(df)
+        result = fdf.groupby(col["status"])[col["claim_amount"]].sum().sort_values(ascending=False)
         lines = [f"- {s}: ${v:,.2f}" for s, v in result.items()]
         return "**Total Claim Value by Status:**\n" + "\n".join(lines)
 
+    # --- Specific financial column queries ---
+    # Maps keyword patterns to (config_key, display_name)
+    _fin_columns = {
+        # Longer/more-specific keys MUST come before shorter ones
+        "outstanding reserve": ("outstanding_reserve_usd", "Outstanding Reserve USD"),
+        "nominal reserve": ("nominal_reserve", "Nominal Reserve"),
+        "expense reserve": ("expense_reserve_usd", "Expense Reserve USD"),
+        "expense paid": ("expense_paid_usd", "Expense Paid USD"),
+        "reserve": ("reserve_amount", "Outstanding Reserve USD"),
+        "recoveries": ("recoveries_usd", "Recoveries USD"),
+        "recovery": ("recoveries_usd", "Recoveries USD"),
+        "subrogation": ("recoveries_usd", "Recoveries USD"),
+        "salvage": ("recoveries_usd", "Recoveries USD"),
+        "alae": ("expense_paid_usd", "Expense Paid USD"),
+        "legal": ("expense_paid_usd", "Expense Paid USD"),
+        "indemnity": ("indemnity_paid_usd", "Indemnity Paid USD"),
+        "incurred": ("incurred_usd", "Incurred USD"),
+    }
+
+    if df is not None and col is not None:
+        for fin_kw, (cfg_key, display) in _fin_columns.items():
+            if fin_kw in q:
+                actual_col = col.get(cfg_key, display)
+                if actual_col not in df.columns:
+                    continue
+                fdf = _apply_filters(df)
+                filter_desc = f" ({len(fdf):,} matching claims)" if len(fdf) < len(df) else ""
+
+                if "average" in q or "avg" in q or "mean" in q:
+                    val = fdf[actual_col].mean()
+                    return f"Average {display}{filter_desc}: **${val:,.2f}**"
+
+                if "total" in q or "sum" in q or "how much" in q or "recovered" in q:
+                    val = fdf[actual_col].sum()
+                    return f"Total {display}{filter_desc}: **${val:,.2f}**"
+
+                if "by status" in q or "per status" in q:
+                    result = fdf.groupby(col["status"])[actual_col].sum().sort_values(ascending=False)
+                    lines = [f"- {s}: ${v:,.2f}" for s, v in result.items()]
+                    return f"**{display} by Status{filter_desc}:**\n" + "\n".join(lines)
+
+                if "by region" in q or "by country" in q:
+                    result = fdf.groupby(col["region"])[actual_col].sum().sort_values(ascending=False)
+                    lines = [f"- {r}: ${v:,.2f}" for r, v in result.items()]
+                    return f"**{display} by Country{filter_desc}:**\n" + "\n".join(lines)
+
+                if "by type" in q or "by claim type" in q:
+                    result = fdf.groupby(col["claim_type"])[actual_col].sum().sort_values(ascending=False)
+                    lines = [f"- {t}: ${v:,.2f}" for t, v in result.items()]
+                    return f"**{display} by Claim Type{filter_desc}:**\n" + "\n".join(lines)
+
+                # Default: show total
+                val = fdf[actual_col].sum()
+                return f"Total {display}{filter_desc}: **${val:,.2f}**"
+
     # --- Status count (generic) ---
     if "how many" in q or _has_word("count"):
+        # Detect status keyword for labeling
+        detected_status = None
         for status in ["open", "closed", "pending", "rejected", "under review"]:
             if status in q:
-                count = summary["status_counts"].get(status.title(), 0)
-                return f"There are **{count:,}** {status.title()} claims in the current dataset."
+                detected_status = status.title()
+                break
+
+        # Try _apply_filters to handle combined filters (status+region etc.)
+        fdf = _apply_filters(df) if df is not None else None
+        if fdf is not None and len(fdf) < len(df):
+            label = f"{detected_status} " if detected_status else "matching "
+            return f"There are **{len(fdf):,}** {label}claims in the current dataset."
+
+        # Simple status count from summary
+        if detected_status:
+            count = summary["status_counts"].get(detected_status, 0)
+            return f"There are **{count:,}** {detected_status} claims in the current dataset."
         if "claim" in q:
             return f"There are **{summary['total_claims']:,}** claims in the current dataset."
 
     # --- Total value ---
     if "total" in q and ("value" in q or "amount" in q or "claim" in q):
+        fdf = _apply_filters(df) if df is not None else None
+        if fdf is not None and len(fdf) < len(df):
+            filter_desc = f" ({len(fdf):,} matching claims)"
+            return (
+                f"Total claim value{filter_desc}: **${fdf[col['claim_amount']].sum():,.2f}**\n\n"
+                f"- Total paid: ${fdf[col['paid_amount']].sum():,.2f}\n"
+                f"- Total reserves: ${fdf[col['reserve_amount']].sum():,.2f}"
+            )
         return (
             f"The total claim value across all {summary['total_claims']:,} claims is "
             f"**${summary['total_claim_amount']:,.2f}**.\n\n"
@@ -283,8 +380,22 @@ def handle_aggregation(
 
     # --- Average ---
     if "average" in q or "avg" in q:
-        if "day" in q or "open" in q:
+        # "days open" is a metric name, not a status filter — detect it first
+        is_days_query = "day" in q or "life" in q or "claim life" in q or (
+            "open" in q and ("day" in q or "long" in q or "average" in q)
+        )
+
+        if is_days_query:
+            # For "average days open", only apply filters that aren't status="open"
+            # since "open" here means the metric, not a status filter
             return f"The average number of days a claim is open is **{summary['avg_days_open']}** days."
+
+        fdf = _apply_filters(df) if df is not None else None
+        filter_desc = f" ({len(fdf):,} matching claims)" if fdf is not None and len(fdf) < len(df) else ""
+
+        if fdf is not None and len(fdf) < len(df):
+            avg_val = round(fdf[col["claim_amount"]].mean(), 2)
+            return f"Average claim value{filter_desc}: **${avg_val:,.2f}**."
         return f"The average claim value is **${summary['avg_claim_amount']:,.2f}**."
 
     # --- Contributing Factor breakdown ---
@@ -293,21 +404,23 @@ def handle_aggregation(
     ):
         cf_col = col.get("contributing_factor_descr", "Contributing Factor Descr")
         if cf_col in df.columns:
-            result = df.groupby(cf_col)[col["claim_id"]].count().sort_values(ascending=False)
+            fdf = _apply_filters(df)
+            filter_desc = f" ({len(fdf):,} matching)" if len(fdf) < len(df) else ""
+            result = fdf.groupby(cf_col)[col["claim_id"]].count().sort_values(ascending=False)
             lines = [f"- {c}: {cnt:,}" for c, cnt in result.items()]
-            return "**Claims by Contributing Factor:**\n" + "\n".join(lines)
+            return f"**Claims by Contributing Factor{filter_desc}:**\n" + "\n".join(lines)
 
     # --- Cause of loss breakdown (explicit phrases only) ---
-    # NOTE: bare "cause" is NOT matched here to avoid stealing queries like
-    # "leading causes" that should go to the smart contributing-factor detector.
     if df is not None and col is not None and (
         "cause of loss" in q or "loss cause" in q
     ):
         cause_col = col.get("cause_of_loss_descr", "Cause Of Loss Descr")
         if cause_col in df.columns:
-            result = df.groupby(cause_col)[col["claim_id"]].count().sort_values(ascending=False)
+            fdf = _apply_filters(df)
+            filter_desc = f" ({len(fdf):,} matching)" if len(fdf) < len(df) else ""
+            result = fdf.groupby(cause_col)[col["claim_id"]].count().sort_values(ascending=False)
             lines = [f"- {c}: {cnt:,}" for c, cnt in result.items()]
-            return "**Claims by Cause of Loss:**\n" + "\n".join(lines)
+            return f"**Claims by Cause of Loss{filter_desc}:**\n" + "\n".join(lines)
 
     # --- LOB breakdown ---
     if df is not None and col is not None and (
@@ -315,17 +428,21 @@ def handle_aggregation(
     ):
         lob_col = col.get("executive_lob", "Executive LOB")
         if lob_col in df.columns:
-            result = df.groupby(lob_col)[col["claim_id"]].count().sort_values(ascending=False)
+            fdf = _apply_filters(df)
+            filter_desc = f" ({len(fdf):,} matching)" if len(fdf) < len(df) else ""
+            result = fdf.groupby(lob_col)[col["claim_id"]].count().sort_values(ascending=False)
             lines = [f"- {l}: {cnt:,}" for l, cnt in result.items()]
-            return "**Claims by Line of Business:**\n" + "\n".join(lines)
+            return f"**Claims by Line of Business{filter_desc}:**\n" + "\n".join(lines)
 
     # --- Country breakdown ---
     if df is not None and col is not None and (
         _has_word("country") or _has_word("countries")
     ):
-        result = df.groupby(col["region"])[col["claim_id"]].count().sort_values(ascending=False)
+        fdf = _apply_filters(df)
+        filter_desc = f" ({len(fdf):,} matching)" if len(fdf) < len(df) else ""
+        result = fdf.groupby(col["region"])[col["claim_id"]].count().sort_values(ascending=False)
         lines = [f"- {r}: {c:,}" for r, c in result.items()]
-        return "**Claims by Country:**\n" + "\n".join(lines)
+        return f"**Claims by Country{filter_desc}:**\n" + "\n".join(lines)
 
     # --- Smart "biggest / top / most / contributing factor" detector ---
     # Must be ABOVE generic breakdown handlers to catch "breakdown by contributing factor"
@@ -335,33 +452,36 @@ def handle_aggregation(
                          "dominant", "major", "leading"]
     ):
         # Show top contributors across multiple dimensions
+        fdf = _apply_filters(df)
+        filter_desc = f" (filtered to {len(fdf):,} claims)" if len(fdf) < len(df) else ""
         sections = []
 
         # By claim type
-        type_result = df.groupby(col["claim_type"])[col["claim_id"]].count().sort_values(ascending=False).head(5)
+        type_result = fdf.groupby(col["claim_type"])[col["claim_id"]].count().sort_values(ascending=False).head(5)
         lines = [f"- {t}: {c:,}" for t, c in type_result.items()]
         sections.append("**By Claim Type:**\n" + "\n".join(lines))
 
         # By cause of loss
         cause_col = col.get("cause_of_loss_descr", "Cause Of Loss Descr")
-        if cause_col in df.columns:
-            cause_result = df.groupby(cause_col)[col["claim_id"]].count().sort_values(ascending=False).head(5)
+        if cause_col in fdf.columns:
+            cause_result = fdf.groupby(cause_col)[col["claim_id"]].count().sort_values(ascending=False).head(5)
             lines = [f"- {c}: {cnt:,}" for c, cnt in cause_result.items()]
             sections.append("**By Cause of Loss:**\n" + "\n".join(lines))
 
         # By country
-        region_result = df.groupby(col["region"])[col["claim_id"]].count().sort_values(ascending=False).head(5)
+        region_result = fdf.groupby(col["region"])[col["claim_id"]].count().sort_values(ascending=False).head(5)
         lines = [f"- {r}: {c:,}" for r, c in region_result.items()]
         sections.append("**By Country:**\n" + "\n".join(lines))
 
         # By LOB
         lob_col = col.get("executive_lob", "Executive LOB")
-        if lob_col in df.columns:
-            lob_result = df.groupby(lob_col)[col["claim_id"]].count().sort_values(ascending=False).head(5)
+        if lob_col in fdf.columns:
+            lob_result = fdf.groupby(lob_col)[col["claim_id"]].count().sort_values(ascending=False).head(5)
             lines = [f"- {l}: {cnt:,}" for l, cnt in lob_result.items()]
             sections.append("**By Line of Business:**\n" + "\n".join(lines))
 
-        return f"**Top Contributing Factors by Claim Volume ({summary['total_claims']:,} total):**\n\n" + "\n\n".join(sections)
+        total_label = f"{len(fdf):,}" if len(fdf) < len(df) else f"{summary['total_claims']:,}"
+        return f"**Top Contributing Factors by Claim Volume ({total_label} total){filter_desc}:**\n\n" + "\n\n".join(sections)
 
     # --- Region breakdown ---
     if "region" in q and "breakdown" in q:
@@ -401,26 +521,44 @@ def handle_aggregation(
 # Lookup handler
 # ---------------------------------------------------------------------------
 
-def handle_lookup(claim_id: str, df: pd.DataFrame, col: dict) -> str:
-    """Look up a specific claim by ID and return a markdown table.
+def handle_lookup(claim_id: str, df: pd.DataFrame, col: dict,
+                  policy_id: str = None) -> str:
+    """Look up a specific claim by ID or policy number and return a markdown table.
 
     Args:
-        claim_id: Claim ID string (e.g. "CLM0000042"), already extracted
-                  by QueryAnalyzer.
-        df:       Full claims DataFrame.
-        col:      Column mapping dict.
+        claim_id:  Claim ID string (e.g. "CLM0000042"), already extracted
+                   by QueryAnalyzer.
+        df:        Full claims DataFrame.
+        col:       Column mapping dict.
+        policy_id: Policy number (e.g. "POL-GL-554321"), optional.
 
     Returns:
         Markdown-formatted claim detail table, or not-found message.
     """
-    if not claim_id:
-        return "I couldn't find a Claim ID in your question. Please include the claim ID (e.g. CLM0000042)."
+    row = None
 
-    claim_id = claim_id.upper()
-    row = df[df[col["claim_id"]] == claim_id]
+    # Try claim_id first
+    if claim_id:
+        claim_id = claim_id.upper()
+        row = df[df[col["claim_id"]] == claim_id]
+        if row.empty:
+            row = None
 
-    if row.empty:
-        return f"Claim **{claim_id}** was not found in the current dataset."
+    # Try policy_id if no claim found
+    if row is None and policy_id:
+        policy_id = policy_id.upper()
+        pol_col = col.get("policy_number", "Policy Number")
+        if pol_col in df.columns:
+            row = df[df[pol_col].astype(str).str.upper() == policy_id]
+            if row.empty:
+                row = None
+
+    if row is None:
+        if claim_id:
+            return f"Claim **{claim_id}** was not found in the current dataset."
+        if policy_id:
+            return f"Policy **{policy_id}** was not found in the current dataset."
+        return "I couldn't find a Claim ID or Policy Number in your question. Please include one (e.g. CLM0000042 or POL-GL-554321)."
 
     r = row.iloc[0]
 
@@ -434,13 +572,16 @@ def handle_lookup(claim_id: str, df: pd.DataFrame, col: dict) -> str:
         except Exception:
             return "N/A"
 
+    # Get actual claim_id from row data (in case lookup was by policy)
+    display_claim_id = claim_id or str(r.get(col.get("claim_id", ""), "N/A"))
+
     closed_val = s("closed_date")
     closed_display = closed_val[:10] if closed_val != "N/A" else "Still open"
 
     lines = [
         f"| Field | Value |",
         f"|-------|-------|",
-        f"| Claim ID | {claim_id} |",
+        f"| Claim ID | {display_claim_id} |",
         f"| Status | {s('status')} |",
         f"| Type | {s('claim_type')} |",
         f"| Claimant | {s('claimant_name')} |",
@@ -453,7 +594,7 @@ def handle_lookup(claim_id: str, df: pd.DataFrame, col: dict) -> str:
         f"| Days Open | {s('days_open')} |",
     ]
 
-    return f"**Claim {claim_id}**\n\n" + "\n".join(lines)
+    return f"**Claim {display_claim_id}**\n\n" + "\n".join(lines)
 
 
 # ---------------------------------------------------------------------------
@@ -528,7 +669,9 @@ class RAGPipeline:
 
         if intent == "lookup":
             claim_id = entities.get("claim_id")
-            answer = handle_lookup(claim_id, self.loader.df, self.loader.col)
+            policy_id = analysis.get("policy_id")
+            answer = handle_lookup(claim_id, self.loader.df, self.loader.col,
+                                   policy_id=policy_id)
             return {
                 "answer": answer,
                 "question_type": "lookup",
