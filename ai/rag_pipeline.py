@@ -51,15 +51,159 @@ def handle_aggregation(
     q = question.lower()
     ent = entities or {}
 
+    # Helper: word-boundary check to avoid substring matches like
+    # "count" inside "countries".
+    def _has_word(word: str) -> bool:
+        return bool(re.search(rf'\b{re.escape(word)}\b', q))
+
+    # -----------------------------------------------------------------------
+    # Helper: pre-filter DataFrame based on entities + keyword patterns.
+    # Returns a filtered copy of df (or df unchanged if no filters apply).
+    # Safe to call when df or col is None (returns df as-is).
+    # -----------------------------------------------------------------------
+    def _apply_filters(dframe: pd.DataFrame) -> pd.DataFrame:
+        if dframe is None or col is None:
+            return dframe
+
+        mask = pd.Series(True, index=dframe.index)
+        filtered = False
+
+        # --- Status filter ---
+        status_col = col.get("status", "Claim Status Derived")
+        if status_col in dframe.columns:
+            status_val = ent.get("status")
+            if not status_val:
+                for kw in ["open", "closed", "pending", "rejected", "under review"]:
+                    if _has_word(kw) or (kw != "under review" and kw in q):
+                        status_val = kw.title()
+                        break
+            if status_val:
+                mask &= dframe[status_col].str.lower() == status_val.lower()
+                filtered = True
+
+        # --- Region / Country filter ---
+        region_col = col.get("region", "Country")
+        if region_col in dframe.columns:
+            region_val = ent.get("region")
+            if not region_val:
+                for kw in ["uk", "us", "canada", "australia", "germany",
+                           "france", "japan", "brazil", "india"]:
+                    if _has_word(kw):
+                        region_val = kw.upper() if kw in ("uk", "us") else kw.title()
+                        break
+            if region_val:
+                mask &= dframe[region_col].str.lower() == region_val.lower()
+                filtered = True
+
+        # --- Minor LOB filter ---
+        minor_lob_col = col.get("minor_lob", "Minor LOB")
+        if minor_lob_col in dframe.columns:
+            minor_lob_keywords = [
+                "commercial fire", "marine cargo", "professional indemnity",
+                "auto liability", "workers comp", "cyber liability",
+                "product liability", "general liability",
+            ]
+            for kw in minor_lob_keywords:
+                if kw in q:
+                    mask &= dframe[minor_lob_col].str.lower().str.contains(
+                        re.escape(kw), na=False
+                    )
+                    filtered = True
+                    break
+
+        # --- Cause of loss filter ---
+        cause_col = col.get("cause_of_loss_descr", "Cause Of Loss Descr")
+        if cause_col in dframe.columns:
+            cause_keywords = [
+                "water damage", "slip and fall", "windstorm", "theft",
+                "collision", "workplace injury", "equipment failure",
+                "professional error", "cyber breach",
+                "fire",  # keep fire last so "commercial fire" (minor_lob) wins first
+            ]
+            for kw in cause_keywords:
+                if kw in q:
+                    mask &= dframe[cause_col].str.lower().str.contains(
+                        re.escape(kw), na=False
+                    )
+                    filtered = True
+                    break
+
+        # --- Claim type filter ---
+        claim_type_col = col.get("claim_type", "Claim Type Description")
+        if claim_type_col in dframe.columns:
+            claim_type_val = ent.get("claim_type")
+            if not claim_type_val:
+                for kw in ["bodily injury", "property damage", "motor",
+                           "liability", "cyber"]:
+                    if kw in q:
+                        claim_type_val = kw
+                        break
+            if claim_type_val:
+                mask &= dframe[claim_type_col].str.lower().str.contains(
+                    re.escape(claim_type_val.lower()), na=False
+                )
+                filtered = True
+
+        # --- Accident Year filter ---
+        accident_year_col = col.get("accident_year", "Accident Year")
+        if accident_year_col in dframe.columns:
+            ay_match = re.search(r'\baccident\s+year\s+(\d{4})\b', q)
+            if ay_match:
+                ay_val = int(ay_match.group(1))
+                mask &= dframe[accident_year_col] == ay_val
+                filtered = True
+
+        # --- Policy UWY filter ---
+        policy_uwy_col = col.get("policy_uwy", "Policy UWY")
+        if policy_uwy_col in dframe.columns:
+            uwy_match = re.search(
+                r'\b(?:uwy|underwriting\s+year)\s+(\d{4})\b', q
+            )
+            if uwy_match:
+                uwy_val = int(uwy_match.group(1))
+                mask &= dframe[policy_uwy_col] == uwy_val
+                filtered = True
+
+        # --- Bulk claim indicator filter ---
+        bulk_col = col.get("bulk_claim_indicator", "Bulk Claim Indicator")
+        if bulk_col in dframe.columns and _has_word("bulk"):
+            mask &= dframe[bulk_col].astype(str).str.lower().isin(
+                ["y", "yes", "true", "1"]
+            )
+            filtered = True
+
+        # --- MAR fast track filter ---
+        mar_col = col.get("mar_fast_track_flag", "MAR Fast Track Flag")
+        if mar_col in dframe.columns and (
+            "fast track" in q or _has_word("mar")
+        ):
+            mask &= dframe[mar_col].astype(str).str.lower().isin(
+                ["y", "yes", "true", "1"]
+            )
+            filtered = True
+
+        # --- Policyholder name filter ---
+        ph_col = col.get("policy_holder_name", "Policy Holder Name")
+        if ph_col in dframe.columns:
+            ph_match = re.search(r'\bfor\s+([A-Z][a-zA-Z]+(?:\s+[A-Z][a-zA-Z]+)*)', question)
+            if ph_match:
+                ph_name = ph_match.group(1)
+                mask &= dframe[ph_col].str.lower() == ph_name.lower()
+                filtered = True
+
+        if not filtered:
+            return dframe
+        return dframe[mask]
+
     # --- Entity-aware status count ---
-    if ent.get("status") and ("how many" in q or "count" in q):
+    if ent.get("status") and ("how many" in q or _has_word("count")):
         status_val = ent["status"]
         count = summary["status_counts"].get(status_val, 0)
         return f"There are **{count:,}** {status_val} claims in the current dataset."
 
     # --- Count BY region ---
     if df is not None and col is not None and (
-        ("how many" in q or "count" in q) and "region" in q
+        ("how many" in q or _has_word("count")) and "region" in q
     ):
         result = df.groupby(col["region"])[col["claim_id"]].count().sort_values(ascending=False)
         lines = [f"- {r}: {c:,}" for r, c in result.items()]
@@ -67,7 +211,7 @@ def handle_aggregation(
 
     # --- Count BY type ---
     if df is not None and col is not None and (
-        ("how many" in q or "count" in q) and "type" in q
+        ("how many" in q or _has_word("count")) and "type" in q
     ):
         result = df.groupby(col["claim_type"])[col["claim_id"]].count().sort_values(ascending=False)
         lines = [f"- {t}: {c:,}" for t, c in result.items()]
@@ -109,15 +253,18 @@ def handle_aggregation(
 
     # --- Total value BY status ---
     if df is not None and col is not None and (
-        "by status" in q or "per status" in q or
-        ("status" in q and ("total" in q or "value" in q or "amount" in q))
+        ("by status" in q or "per status" in q) and
+        ("total" in q or "value" in q or "amount" in q)
+    ) or (
+        df is not None and col is not None and
+        "status" in q and ("total" in q or "value" in q or "amount" in q)
     ):
         result = df.groupby(col["status"])[col["claim_amount"]].sum().sort_values(ascending=False)
         lines = [f"- {s}: ${v:,.2f}" for s, v in result.items()]
         return "**Total Claim Value by Status:**\n" + "\n".join(lines)
 
     # --- Status count (generic) ---
-    if "how many" in q or "count" in q:
+    if "how many" in q or _has_word("count"):
         for status in ["open", "closed", "pending", "rejected", "under review"]:
             if status in q:
                 count = summary["status_counts"].get(status.title(), 0)
@@ -140,17 +287,99 @@ def handle_aggregation(
             return f"The average number of days a claim is open is **{summary['avg_days_open']}** days."
         return f"The average claim value is **${summary['avg_claim_amount']:,.2f}**."
 
+    # --- Contributing Factor breakdown ---
+    if df is not None and col is not None and (
+        "contributing factor" in q or "contributing" in q and "factor" in q
+    ):
+        cf_col = col.get("contributing_factor_descr", "Contributing Factor Descr")
+        if cf_col in df.columns:
+            result = df.groupby(cf_col)[col["claim_id"]].count().sort_values(ascending=False)
+            lines = [f"- {c}: {cnt:,}" for c, cnt in result.items()]
+            return "**Claims by Contributing Factor:**\n" + "\n".join(lines)
+
+    # --- Cause of loss breakdown (explicit phrases only) ---
+    # NOTE: bare "cause" is NOT matched here to avoid stealing queries like
+    # "leading causes" that should go to the smart contributing-factor detector.
+    if df is not None and col is not None and (
+        "cause of loss" in q or "loss cause" in q
+    ):
+        cause_col = col.get("cause_of_loss_descr", "Cause Of Loss Descr")
+        if cause_col in df.columns:
+            result = df.groupby(cause_col)[col["claim_id"]].count().sort_values(ascending=False)
+            lines = [f"- {c}: {cnt:,}" for c, cnt in result.items()]
+            return "**Claims by Cause of Loss:**\n" + "\n".join(lines)
+
+    # --- LOB breakdown ---
+    if df is not None and col is not None and (
+        "lob" in q or "line of business" in q
+    ):
+        lob_col = col.get("executive_lob", "Executive LOB")
+        if lob_col in df.columns:
+            result = df.groupby(lob_col)[col["claim_id"]].count().sort_values(ascending=False)
+            lines = [f"- {l}: {cnt:,}" for l, cnt in result.items()]
+            return "**Claims by Line of Business:**\n" + "\n".join(lines)
+
+    # --- Country breakdown ---
+    if df is not None and col is not None and (
+        _has_word("country") or _has_word("countries")
+    ):
+        result = df.groupby(col["region"])[col["claim_id"]].count().sort_values(ascending=False)
+        lines = [f"- {r}: {c:,}" for r, c in result.items()]
+        return "**Claims by Country:**\n" + "\n".join(lines)
+
+    # --- Smart "biggest / top / most / contributing factor" detector ---
+    # Must be ABOVE generic breakdown handlers to catch "breakdown by contributing factor"
+    if df is not None and col is not None and any(
+        w in q for w in ["biggest", "largest", "top", "most", "highest",
+                         "contributing", "driver", "factor", "volume",
+                         "dominant", "major", "leading"]
+    ):
+        # Show top contributors across multiple dimensions
+        sections = []
+
+        # By claim type
+        type_result = df.groupby(col["claim_type"])[col["claim_id"]].count().sort_values(ascending=False).head(5)
+        lines = [f"- {t}: {c:,}" for t, c in type_result.items()]
+        sections.append("**By Claim Type:**\n" + "\n".join(lines))
+
+        # By cause of loss
+        cause_col = col.get("cause_of_loss_descr", "Cause Of Loss Descr")
+        if cause_col in df.columns:
+            cause_result = df.groupby(cause_col)[col["claim_id"]].count().sort_values(ascending=False).head(5)
+            lines = [f"- {c}: {cnt:,}" for c, cnt in cause_result.items()]
+            sections.append("**By Cause of Loss:**\n" + "\n".join(lines))
+
+        # By country
+        region_result = df.groupby(col["region"])[col["claim_id"]].count().sort_values(ascending=False).head(5)
+        lines = [f"- {r}: {c:,}" for r, c in region_result.items()]
+        sections.append("**By Country:**\n" + "\n".join(lines))
+
+        # By LOB
+        lob_col = col.get("executive_lob", "Executive LOB")
+        if lob_col in df.columns:
+            lob_result = df.groupby(lob_col)[col["claim_id"]].count().sort_values(ascending=False).head(5)
+            lines = [f"- {l}: {cnt:,}" for l, cnt in lob_result.items()]
+            sections.append("**By Line of Business:**\n" + "\n".join(lines))
+
+        return f"**Top Contributing Factors by Claim Volume ({summary['total_claims']:,} total):**\n\n" + "\n\n".join(sections)
+
     # --- Region breakdown ---
     if "region" in q and "breakdown" in q:
         lines = [f"- {r}: {c:,}" for r, c in summary["region_counts"].items()]
         return "**Claims by Region:**\n" + "\n".join(lines)
 
+    # --- Type breakdown (must be above status to avoid "type breakdown" -> status) ---
+    if "type" in q and ("breakdown" in q or "by type" in q):
+        lines = [f"- {t}: {c:,}" for t, c in summary["type_counts"].items()]
+        return "**Claims by Type:**\n" + "\n".join(lines)
+
     # --- Status breakdown ---
-    if "status" in q or "breakdown" in q:
+    if "status" in q or ("breakdown" in q and "cause" not in q and "lob" not in q
+                         and "country" not in q and "type" not in q):
         lines = [f"- {s}: {c:,}" for s, c in summary["status_counts"].items()]
         return "**Claims by Status:**\n" + "\n".join(lines)
 
-    # --- Type breakdown ---
+    # --- Type (generic, no "breakdown" keyword) ---
     if "type" in q:
         lines = [f"- {t}: {c:,}" for t, c in summary["type_counts"].items()]
         return "**Claims by Type:**\n" + "\n".join(lines)
