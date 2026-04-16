@@ -112,6 +112,21 @@ def test_evaluate_with_custom_config():
     assert reserve_r["passed"] is True
 
 
+def test_negative_reporting_lag_fails():
+    """Reported date before event date should fail — data integrity issue."""
+    row = pd.Series({
+        "Nominal Reserve": 500,
+        "Event Date": "2024-06-01",
+        "Reported Date": "2023-12-31",   # reported 5 months BEFORE event
+        "Condition Injury Damage Name": "Minor scratch",
+        "Major LOB": "Property Damage",
+    })
+    passed, results = evaluate_deterministic_rules(row)
+    lag_r = [r for r in results if r["name"] == "Reporting Lag"][0]
+    assert lag_r["passed"] is False
+    assert "before event" in lag_r["detail"]
+
+
 def test_disabled_rule_always_passes():
     """Disabled reserve rule should auto-pass even for huge amount."""
     custom = {

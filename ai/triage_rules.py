@@ -85,7 +85,10 @@ def evaluate_deterministic_rules(
             event_date = pd.to_datetime(row.get("Event Date", row.get("event_date")))
             reported_date = pd.to_datetime(row.get("Reported Date", row.get("reported_date")))
             lag = (reported_date - event_date).days
-            if lag > max_days:
+            if lag < 0:
+                results.append({"name": "Reporting Lag", "passed": False,
+                                "detail": f"Invalid dates: reported before event ({lag} days). Requires manual review."})
+            elif lag > max_days:
                 results.append({"name": "Reporting Lag", "passed": False,
                                 "detail": f"Reporting lag ({lag} days) exceeds {max_days}-day limit."})
             else:
