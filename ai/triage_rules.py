@@ -64,11 +64,17 @@ def evaluate_deterministic_rules(
     rcfg = rules.get("reserve_limit", {})
     if rcfg.get("enabled", True):
         max_reserve = rcfg.get("max_value", 3000)
-        reserve = pd.to_numeric(
-            row.get("Nominal Reserve", row.get("outstanding_reserve_usd", 0)),
-            errors="coerce",
+        # Use a sentinel (not 0) when the column is absent — otherwise the
+        # Null Trap assumes $0 and silently fast-tracks. NaN forces manual review.
+        raw_reserve = row.get(
+            "Nominal Reserve",
+            row.get("outstanding_reserve_usd", pd.NA),
         )
-        if pd.isna(reserve) or reserve > max_reserve:
+        reserve = pd.to_numeric(raw_reserve, errors="coerce")
+        if pd.isna(reserve):
+            results.append({"name": "Reserve Limit", "passed": False,
+                            "detail": f"Reserve is missing / NaN — requires manual review (cannot assume $0)."})
+        elif reserve > max_reserve:
             results.append({"name": "Reserve Limit", "passed": False,
                             "detail": f"Reserve (${reserve:,.2f}) exceeds the ${max_reserve:,.0f} limit."})
         else:

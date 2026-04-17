@@ -229,7 +229,19 @@ class TriageBrain:
         avg_sim = np.mean([p["similarity"] for p in precedents])
         parts.append(f"- Average similarity: **{avg_sim:.1%}**")
 
-        if approved > denied:
+        # Human Disagree is an authoritative override signal. Even one Disagree
+        # on a highly-similar precedent means the adjuster has already rejected
+        # the AI's past pattern — the correct behaviour is to route NEW similar
+        # claims to MANUAL REVIEW rather than ride the stale historical
+        # majority. (This is what allows the "180-degree flip" to take effect
+        # immediately after feedback, without needing a reindex.)
+        if disagrees > 0:
+            parts.append(
+                f"\nRecommendation: **MANUAL REVIEW** (adjuster disagreed with "
+                f"{disagrees} similar past decision{'s' if disagrees != 1 else ''} "
+                f"— historical consensus has shifted)"
+            )
+        elif approved > denied:
             parts.append("\nRecommendation: **FAST TRACK** (majority of similar claims were approved)")
         else:
             parts.append("\nRecommendation: **MANUAL REVIEW** (majority of similar claims were denied)")
