@@ -153,6 +153,88 @@ def _ensure_ollama() -> None:
 
 
 # ---------------------------------------------------------------------------
+# Complexity guardrail — decides when an aggregation query needs the Pandas Agent
+# ---------------------------------------------------------------------------
+# Philosophy: deterministic handlers own 80% of queries (fast, exact).
+# Escalate ONLY for patterns the heuristic genuinely cannot compute:
+#   - Derived numeric metrics (reporting lag in days)
+#   - Ratios / percentage-of-total
+#   - 3+ predicate WHERE clauses (status AND reserve>X AND paid=0)
+# Deliberately NOT triggering on: "distribution", "split", "vs", "by",
+# "between", "unique", "bottom" — those are now covered by Tier 1 handlers.
+
+_DERIVED_METRIC_PHRASES = [
+    "reporting lag", "reporting delay", "report delay",
+    "cycle time", "cycle-time", "days to close", "days open",
+    "time to settle", "settlement time", "time to close",
+]
+
+_RATIO_PHRASES = [
+    "percentage of", "percent of", "% of", " pct of",
+    "ratio of", "share of", "proportion of",
+    "what percent", "what percentage", "what % ",
+    "what fraction",
+]
+
+# Regex for 3+ filter predicates. Two patterns:
+#   a) (where|with) … and … and …          — explicit conjunctions
+#   b) (where|with) … <cmp> … (but|and) no/not  — mixed conjunction with
+#      a comparison plus a negation (typical "pending AND x>50k AND paid=0"
+#      phrasing users write as "where x>50k but no y paid yet").
+_MULTI_PREDICATE_RE = re.compile(
+    r"\b(where|with)\b.*\band\b.*\band\b",
+    re.IGNORECASE | re.DOTALL,
+)
+_MIXED_PREDICATE_RE = re.compile(
+    r"\b(where|with)\b.*(greater than|less than|more than|over|under|above|below|>|<)"
+    r".*\b(but|and)\b\s+(no|not|zero|none)\b",
+    re.IGNORECASE | re.DOTALL,
+)
+
+# Regex for "took more than N days" / "took over N days" — relative time filters
+_RELATIVE_TIME_RE = re.compile(
+    r"\b(took|takes|taking)\s+(more than|over|greater than|at least)\s+\d+\s+days?\b",
+    re.IGNORECASE,
+)
+
+
+def assess_query_complexity(query: str) -> tuple:
+    """Decide whether an aggregation query needs the Pandas Agent instead of
+    the heuristic handler.
+
+    Returns:
+        (should_escalate: bool, reason: str)
+    """
+    q = (query or "").lower().strip()
+    if not q:
+        return False, ""
+
+    # 1. Derived numeric metrics (need date math)
+    for phrase in _DERIVED_METRIC_PHRASES:
+        if phrase in q:
+            return True, f"derived-metric: '{phrase}'"
+
+    # 2. Ratios / percentage-of-total
+    for phrase in _RATIO_PHRASES:
+        if phrase in q:
+            return True, f"ratio: '{phrase.strip()}'"
+
+    # 3. Relative-time filter (e.g., "took more than 30 days between event and reported")
+    if _RELATIVE_TIME_RE.search(q):
+        return True, "relative-time filter"
+
+    # 4. Triple-predicate WHERE clause (explicit "and…and")
+    if _MULTI_PREDICATE_RE.search(q):
+        return True, "3+ filter predicates"
+
+    # 5. Mixed predicate (e.g. "where reserve > 50k but no indemnity paid")
+    if _MIXED_PREDICATE_RE.search(q):
+        return True, "3+ filter predicates"
+
+    return False, ""
+
+
+# ---------------------------------------------------------------------------
 # QueryAnalyzer
 # ---------------------------------------------------------------------------
 class QueryAnalyzer:

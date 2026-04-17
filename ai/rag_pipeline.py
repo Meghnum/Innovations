@@ -2203,10 +2203,54 @@ class RAGPipeline:
             }
 
         if intent == "aggregation":
+            # --- Tier 2: Complexity guardrail ---
+            # Some aggregation queries can't be answered by heuristic handlers
+            # (derived metrics like reporting lag, ratios, 3+ predicates).
+            # Escalate those to the Pandas Agent BEFORE running the heuristic
+            # path — otherwise the heuristic returns plausible-but-wrong answers.
+            from ai.query_analyzer import assess_query_complexity
+            should_escalate, reason = assess_query_complexity(question)
+            pandas_failed = False
+            if should_escalate:
+                logger.info(f"Complexity guardrail: escalating to Pandas Agent ({reason})")
+                try:
+                    from ai.pandas_agent import pandas_query
+                    ai_cfg = self.loader.config.get("ai", {})
+                    pandas_answer = pandas_query(
+                        question,
+                        self.loader.df,
+                        self.loader.col,
+                        ollama_model=ai_cfg.get("ollama_model", "gemma3:4b"),
+                        ollama_host=ai_cfg.get("ollama_host", "http://localhost:11434"),
+                    )
+                    if pandas_answer:
+                        return {
+                            "answer": pandas_answer,
+                            "question_type": "pandas_agent",
+                            "sources": [],
+                            "entities": entities,
+                            "escalation_reason": reason,
+                        }
+                    pandas_failed = True
+                    logger.warning(f"Pandas Agent failed on '{reason}' — falling back to heuristic")
+                except Exception as e:
+                    pandas_failed = True
+                    logger.warning(f"Pandas Agent threw: {e} — falling back to heuristic")
+
             answer = handle_aggregation(
                 question, self.loader.summary,
                 self.loader.df, self.loader.col, entities,
             )
+            # If the guardrail fired but the agent couldn't compute it, add a
+            # transparency note so the user doesn't mistake a heuristic
+            # best-effort for the exact answer to a complex query.
+            if should_escalate and pandas_failed:
+                answer = (
+                    f"_⚠️ This query needed {reason} — our precise computation "
+                    f"path is unavailable right now. Showing the closest "
+                    f"heuristic answer below; treat as approximate._\n\n"
+                    + answer
+                )
             return {
                 "answer": answer,
                 "question_type": "aggregation",
