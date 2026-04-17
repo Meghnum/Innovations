@@ -24,6 +24,10 @@ from ai.llm import ClaimsLLM, semantic_guardrail, explain_precedents, batch_keyw
 from ai.rag_pipeline import RAGPipeline
 from ai.triage_rules import evaluate_deterministic_rules, load_triage_config, save_triage_config
 from ai.triage_brain import TriageBrain
+from ai.kpi import (
+    compute_kpis, time_series, DEFAULT_LOG_PATH,
+    AGREEMENT_TARGET, LEAKAGE_TARGET, FRICTION_TARGET,
+)
 
 # ---------------------------------------------------------------------------
 # Logging
@@ -549,6 +553,121 @@ def render_triage_queue_tab(loader, brain):
                     st.warning(f"Claim {claim_id} routed to manual. Brain updated instantly.")
 
 
+def render_kpi_tab():
+    """Phase 4 Shadow-Mode KPIs — reads data/ai_feedback_log.csv.
+
+    Three metrics per spec:
+        Agreement Rate   (target > 90%)
+        Leakage / FPR    (target = 0%)  — AI FAST TRACK + human Disagree
+        Friction / FNR   (target < 10%) — AI MANUAL REVIEW + human Disagree
+    """
+    st.markdown("### Phase 4 — Shadow-Mode KPIs")
+    st.markdown(
+        "Live metrics from `data/ai_feedback_log.csv`. The AI makes "
+        "recommendations; adjusters click Agree / Disagree; this tab "
+        "measures how the pairing is performing."
+    )
+
+    log_path = Path(DEFAULT_LOG_PATH)
+    if not log_path.is_file():
+        st.info(
+            f"No feedback log yet at `{log_path}`. Metrics will populate "
+            "as adjusters review claims in the **Fast Track Triage** tab."
+        )
+        return
+
+    r = compute_kpis(path=log_path)
+    if r.total_decisions == 0:
+        st.info("Feedback log exists but is empty.")
+        return
+
+    # --- Header ---
+    st.markdown(
+        f"**{r.total_decisions:,}** decisions logged "
+        f"({r.agree_count:,} Agree · {r.disagree_count:,} Disagree)"
+    )
+    st.markdown('<hr style="margin:8px 0"/>', unsafe_allow_html=True)
+
+    # --- KPI tiles ---
+    def tile(label, value_pct, target_pct, status, direction, detail):
+        color = {"PASS": "#3fb950", "WARN": "#d29922", "FAIL": "#f85149"}[status]
+        arrow = ">" if direction == "above" else "<"
+        return (
+            f'<div style="background:#1c2128; border:1px solid #30363d; '
+            f'border-radius:10px; padding:14px;">'
+            f'<div style="font-size:11px; color:#8b949e; text-transform:uppercase; '
+            f'letter-spacing:0.5px;">{label}</div>'
+            f'<div style="font-size:28px; font-weight:700; color:{color}; margin:4px 0;">'
+            f'{value_pct:.1f}%</div>'
+            f'<div style="font-size:12px; color:#8b949e;">target {arrow} {target_pct:.0f}%</div>'
+            f'<div style="font-size:11px; color:#c9d1d9; margin-top:6px;">{detail}</div>'
+            f'<div style="font-size:11px; font-weight:700; color:{color}; margin-top:4px;">{status}</div>'
+            f'</div>'
+        )
+
+    c1, c2, c3 = st.columns(3)
+    with c1:
+        st.markdown(tile(
+            "Agreement Rate", r.agreement_rate * 100, AGREEMENT_TARGET * 100,
+            r.agreement_status, "above",
+            f"{r.agree_count}/{r.total_decisions} clicked Agree",
+        ), unsafe_allow_html=True)
+    with c2:
+        st.markdown(tile(
+            "Leakage (FPR)", r.leakage_rate * 100, LEAKAGE_TARGET * 100,
+            r.leakage_status, "below",
+            f"{r.fast_track_disagree}/{r.fast_track_total} AI-FT overruled",
+        ), unsafe_allow_html=True)
+    with c3:
+        st.markdown(tile(
+            "Friction (FNR)", r.friction_rate * 100, FRICTION_TARGET * 100,
+            r.friction_status, "below",
+            f"{r.manual_review_disagree}/{r.manual_review_total} AI-MR overruled",
+        ), unsafe_allow_html=True)
+
+    st.markdown('<hr style="margin:16px 0"/>', unsafe_allow_html=True)
+
+    # --- Trend chart ---
+    ts = time_series(path=log_path, freq="D")
+    if len(ts) >= 2:
+        st.markdown("#### Daily Trend")
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(
+            x=ts["period"], y=ts["agreement_rate"] * 100,
+            mode="lines+markers", name="Agreement %",
+            line={"color": "#3fb950"},
+        ))
+        fig.add_trace(go.Scatter(
+            x=ts["period"], y=ts["leakage_rate"] * 100,
+            mode="lines+markers", name="Leakage %",
+            line={"color": "#f85149"},
+        ))
+        fig.add_trace(go.Scatter(
+            x=ts["period"], y=ts["friction_rate"] * 100,
+            mode="lines+markers", name="Friction %",
+            line={"color": "#d29922"},
+        ))
+        fig.update_layout(
+            template="plotly_dark",
+            plot_bgcolor="#0d1117", paper_bgcolor="#0d1117",
+            height=320, margin={"l": 40, "r": 20, "t": 10, "b": 40},
+            yaxis_title="Percent", xaxis_title="",
+            legend={"orientation": "h", "y": 1.1, "x": 0},
+        )
+        st.plotly_chart(fig, use_container_width=True)
+
+    # --- Raw log tail + download ---
+    st.markdown("#### Raw Log (last 25 entries)")
+    df_log = pd.read_csv(log_path)
+    st.dataframe(df_log.tail(25), use_container_width=True, hide_index=True)
+    st.download_button(
+        "Download full feedback log",
+        data=df_log.to_csv(index=False),
+        file_name="ai_feedback_log.csv",
+        mime="text/csv",
+    )
+
+
 def render_optimizer_tab(loader, brain):
     """Render the Rule Optimizer tab for manager review."""
     st.markdown("### Rule Optimizer")
@@ -748,7 +867,9 @@ def main():
         new_question = True
 
     # --- Tabs ---
-    tab_chat, tab_ft, tab_opt = st.tabs(["Chat Assistant", "Fast Track Triage", "Rule Optimizer"])
+    tab_chat, tab_ft, tab_opt, tab_kpi = st.tabs(
+        ["Chat Assistant", "Fast Track Triage", "Rule Optimizer", "Shadow-Mode KPIs"]
+    )
 
     # ===================== TAB 1: Chat =====================
     with tab_chat:
@@ -798,6 +919,10 @@ def main():
     # ===================== TAB 3: Rule Optimizer =====================
     with tab_opt:
         render_optimizer_tab(loader, brain)
+
+    # ===================== TAB 4: Shadow-Mode KPIs =====================
+    with tab_kpi:
+        render_kpi_tab()
 
 if __name__ == "__main__":
     main()
