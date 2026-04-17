@@ -23,6 +23,12 @@ ESCALATE_CASES = [
     "Show me claims where it took more than 30 days between the event date and the reported date.",
     "Claims where it took over 60 days between event and reported dates.",
     "Only show me pending claims where the outstanding reserve is greater than $50,000 but no indemnity has been paid yet.",
+    # set-exclusion / NOT-IN
+    "What is the total nominal reserve for Open claims, excluding the Casualty and Auto LOBs?",
+    "Show closed claims except for Marine and Cyber.",
+    # disjunction / OR logic
+    "Find claims that are either Closed with no Paid Indemnity OR Open with over 100k in Nominal Reserve.",
+    "Either Pending or Reopened claims with reserve over 10k.",
 ]
 
 
@@ -39,7 +45,6 @@ KEEP_HEURISTIC_CASES = [
     "How many distinct accident years are there?",
     "Total expense paid for claims with event dates between Jan 1, 2020 and December 31, 2021.",
     "How many claims were closed YTD?",
-    "What is the total nominal reserve for Open claims, excluding the Casualty and Auto LOBs?",
     "Breakdown of claims by region.",
     "Top 3 LOBs by total reserve.",
     "How many claims were reported in 2024?",
@@ -80,3 +85,13 @@ def test_reasons_are_specific():
         "Show claims where status is pending and reserve > 50k and indemnity = 0"
     )
     assert "predicate" in r4
+
+    _, r5 = assess_query_complexity(
+        "Total reserve for Open claims, excluding Casualty and Auto."
+    )
+    assert "exclusion" in r5
+
+    _, r6 = assess_query_complexity(
+        "Either Closed with no indemnity or Open with reserve > 100k."
+    )
+    assert "disjunction" in r6

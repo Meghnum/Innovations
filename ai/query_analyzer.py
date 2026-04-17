@@ -197,6 +197,28 @@ _RELATIVE_TIME_RE = re.compile(
     re.IGNORECASE,
 )
 
+# Regex for set-exclusion like "excluding the Casualty and Auto LOBs" /
+# "except the X and Y" / "other than A, B". Heuristic handlers don't support
+# multi-value NOT-IN, so escalate.
+_EXCLUSION_RE = re.compile(
+    r"\b(excluding|except(?:\s+for)?|other than|not\s+in|aside from)\b.*\b(and|,|or)\b",
+    re.IGNORECASE | re.DOTALL,
+)
+
+# Regex for disjunction: "either A or B", "A or B" when paired with 2+
+# comparison/status predicates. Triggers on "either…or" unambiguously;
+# otherwise requires an explicit "or" joining two comparison-ish phrases.
+_DISJUNCTION_EITHER_RE = re.compile(
+    r"\beither\b.*\bor\b",
+    re.IGNORECASE | re.DOTALL,
+)
+_DISJUNCTION_PREDICATE_RE = re.compile(
+    r"\b(closed|open|pending|reopened|paid|unpaid|reserve|indemnity|expense|incurred)\b"
+    r".*\bor\b.*"
+    r"\b(closed|open|pending|reopened|paid|unpaid|reserve|indemnity|expense|incurred)\b",
+    re.IGNORECASE | re.DOTALL,
+)
+
 
 def assess_query_complexity(query: str) -> tuple:
     """Decide whether an aggregation query needs the Pandas Agent instead of
@@ -230,6 +252,18 @@ def assess_query_complexity(query: str) -> tuple:
     # 5. Mixed predicate (e.g. "where reserve > 50k but no indemnity paid")
     if _MIXED_PREDICATE_RE.search(q):
         return True, "3+ filter predicates"
+
+    # 6. Set exclusion: "excluding the Casualty and Auto LOBs" — heuristic
+    #    handler can only filter-include one LOB at a time.
+    if _EXCLUSION_RE.search(q):
+        return True, "set-exclusion (excluding/except/not-in)"
+
+    # 7. Disjunction: "either Closed with no Paid OR Open with over 100k".
+    #    Heuristic handler AND-combines all entities, so OR logic must escalate.
+    if _DISJUNCTION_EITHER_RE.search(q):
+        return True, "disjunction: 'either…or'"
+    if _DISJUNCTION_PREDICATE_RE.search(q):
+        return True, "disjunction: OR across status/amount predicates"
 
     return False, ""
 

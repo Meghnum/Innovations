@@ -32,16 +32,19 @@ _EXEC_TIMEOUT = 10  # seconds
 _BANNED_PATTERNS = [
     r"\bimport\b",
     r"\b__\w+__\b",       # dunder access
-    r"\bexec\b",
-    r"\beval\b",
-    r"\bopen\b",
+    # Match only as function calls, not bare words — the string literal 'Open'
+    # (LOB status) and the word "open" appearing in f-string output used to
+    # false-positive against `\bopen\b`.
+    r"\bexec\s*\(",
+    r"\beval\s*\(",
+    r"\bopen\s*\(",
+    r"\bcompile\s*\(",
     r"\bos\.\b",
     r"\bsys\.\b",
     r"\bsubprocess\b",
     r"\bshutil\b",
     r"\bglobals\b",
     r"\blocals\b",
-    r"\bcompile\b",
     r"\b\.to_csv\b",
     r"\b\.to_excel\b",
     r"\b\.to_parquet\b",
@@ -120,6 +123,21 @@ Question: "Only show me pending claims where the outstanding reserve > 50000 but
 Code:
 sub = df[(df['Claim Status Derived'] == 'Pending') & (df['Outstanding Reserve USD'] > 50000) & (df['Indemnity Paid USD'] == 0)]
 result = f"{{len(sub):,}} matching claims. Total outstanding reserve: ${{sub['Outstanding Reserve USD'].sum():,.2f}}"
+
+Question: "Total nominal reserve for Open claims, excluding the Casualty and Auto LOBs"
+Code:
+# EXCLUSION = negate isin() on the excluded list. Do NOT compute without the filter.
+excluded = ['Casualty', 'Auto']
+sub = df[(df['Claim Status Derived'] == 'Open') & (~df['Major LOB'].isin(excluded))]
+result = f"Total Nominal Reserve (Open, excl. {{excluded}}): ${{sub['Nominal Reserve'].sum():,.2f}} across {{len(sub):,}} claims"
+
+Question: "Find claims that are either Closed with no Paid Indemnity OR Open with over 100k in Nominal Reserve"
+Code:
+# DISJUNCTION = use | (bitwise OR) with parenthesised branches, then combine.
+branch1 = (df['Claim Status Derived'] == 'Closed') & (df['Indemnity Paid USD'] == 0)
+branch2 = (df['Claim Status Derived'] == 'Open')   & (df['Nominal Reserve']   > 100000)
+sub = df[branch1 | branch2]
+result = f"{{len(sub):,}} matching claims ({{branch1.sum():,}} closed-unpaid + {{branch2.sum():,}} open-high-reserve)"
 
 USER QUESTION: {question}
 
