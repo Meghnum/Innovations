@@ -294,10 +294,22 @@ def render_bot_msg(response_dict: dict, elapsed: float = None):
         "out_of_scope": '<span class="badge-lookup">OUT OF SCOPE</span>',
         "fuzzy_lookup": '<span class="badge-lookup">FUZZY LOOKUP</span>',
         "pandas_agent": '<span class="badge-search">PANDAS AGENT</span>',
+        "clarification": '<span class="badge-agg">NEEDS CLARIFICATION</span>',
     }
     badge = badge_map.get(qtype, badge_map["search"])
 
     st.markdown(f'{badge}', unsafe_allow_html=True)
+    if qtype == "clarification":
+        # Render as a visible question prompt, not a final answer.
+        st.markdown(
+            f'<div class="bot-bubble">'
+            f'<b>I need a bit more detail before I can answer this accurately.</b><br><br>'
+            f'{answer}<br><br>'
+            f'<i>Reply with the specific column/metric you want and I\'ll compute it.</i>'
+            f'</div>',
+            unsafe_allow_html=True,
+        )
+        return
     st.markdown(f'<div class="bot-bubble">\n\n{answer}\n\n</div>', unsafe_allow_html=True)
 
     labels, values = extract_chart_data(answer)
@@ -345,11 +357,11 @@ def render_sidebar(loader):
                 <div class="kpi-value kpi-blue">{summary['total_claims']:,}</div>
             </div>
             <div class="kpi-tile">
-                <div class="kpi-label">Total Value</div>
+                <div class="kpi-label">Total Incurred</div>
                 <div class="kpi-value kpi-green">${total_val_m:.1f}M</div>
             </div>
             <div class="kpi-tile">
-                <div class="kpi-label">Avg Claim</div>
+                <div class="kpi-label">Avg Incurred / Claim</div>
                 <div class="kpi-value kpi-amber">${summary['avg_claim_amount']:,.0f}</div>
             </div>
             <div class="kpi-tile">
@@ -435,6 +447,49 @@ def log_triage_decision(claim_id: str, ai_decision: str, human_decision: str):
             final_status
         ])
 
+def _analyse_claim_cached(claim_id, desc, row_dict, _brain):
+    """Per-claim triage analysis memoised in session_state.
+
+    Without this cache, every Streamlit rerun (e.g. after a chat question)
+    re-fires 10 × semantic_guardrail LLM calls + 10 × FAISS searches
+    synchronously, blocking Ollama and leaving the tab blank / greyed.
+    """
+    cache = st.session_state.setdefault("_triage_cache", {})
+    if claim_id in cache:
+        return cache[claim_id]
+
+    try:
+        math_pass, math_results = evaluate_deterministic_rules(row_dict)
+    except Exception as e:
+        math_pass, math_results = False, [
+            {"name": "System Error", "passed": False, "detail": f"Error: {e}"}
+        ]
+
+    if not desc or len(desc.strip()) < 10:
+        llm_pass, llm_reason = True, "Description too short to evaluate."
+    else:
+        try:
+            r = semantic_guardrail(desc)
+            llm_pass = r.get("semantic_pass", False)
+            llm_reason = r.get("reason", "Unknown")
+        except Exception as e:
+            llm_pass, llm_reason = False, f"LLM Guardrail failed: {e}"
+
+    try:
+        precedents = _brain.find_precedents(row_dict, top_k=5)
+        prec_summary = _brain.summarize_precedents(precedents)
+    except Exception as e:
+        precedents, prec_summary = [], f"Precedent lookup failed: {e}"
+
+    out = {
+        "math_pass": math_pass, "math_results": math_results,
+        "llm_pass": llm_pass,   "llm_reason": llm_reason,
+        "precedents": precedents, "prec_summary": prec_summary,
+    }
+    cache[claim_id] = out
+    return out
+
+
 def render_triage_queue_tab(loader, brain):
     """Renders the Triage Dashboard with AI precedent analysis."""
     st.markdown("### Pending Claims for Review")
@@ -448,28 +503,11 @@ def render_triage_queue_tab(loader, brain):
         reserve = pd.to_numeric(row.get("Nominal Reserve", row.get("outstanding_reserve_usd", 0)), errors="coerce")
         desc = str(row.get("Loss Description", row.get("loss_description", "No description.")))
 
-        # 1. Deterministic Rules
-        try:
-            math_pass, math_results = evaluate_deterministic_rules(row)
-        except Exception as e:
-            math_pass = False
-            math_results = [{"name": "System Error", "passed": False, "detail": f"Error: {e}"}]
-
-        # 2. Semantic Guardrail
-        if not desc or len(desc.strip()) < 10:
-            llm_pass = True
-            llm_reason = "Description too short to evaluate."
-        else:
-            try:
-                llm_result = semantic_guardrail(desc)
-                llm_pass = llm_result.get("semantic_pass", False)
-                llm_reason = llm_result.get("reason", "Unknown")
-            except Exception as e:
-                llm_pass, llm_reason = False, f"LLM Guardrail failed: {e}"
-
-        # 3. Precedent Analysis (FAISS Brain)
-        precedents = brain.find_precedents(row, top_k=5)
-        prec_summary = brain.summarize_precedents(precedents)
+        # Cached per-claim analysis — runs once, reused on every rerun.
+        a = _analyse_claim_cached(claim_id, desc, row, brain)
+        math_pass, math_results = a["math_pass"], a["math_results"]
+        llm_pass, llm_reason     = a["llm_pass"], a["llm_reason"]
+        precedents, prec_summary = a["precedents"], a["prec_summary"]
 
         # 4. Overall verdict
         overall_ai_pass = math_pass and llm_pass
@@ -658,7 +696,7 @@ def render_kpi_tab():
 
     # --- Raw log tail + download ---
     st.markdown("#### Raw Log (last 25 entries)")
-    df_log = pd.read_csv(log_path)
+    df_log = pd.read_csv(log_path, dtype={"claim_id": str})
     st.dataframe(df_log.tail(25), use_container_width=True, hide_index=True)
     st.download_button(
         "Download full feedback log",
@@ -823,7 +861,7 @@ def render_optimizer_tab(loader, brain):
 
 def main():
     ai_cfg = config.get("ai", {})
-    model_name = ai_cfg.get("ollama_model", "gemma3:4b")
+    model_name = ai_cfg.get("ollama_model", "llama3.2:3b")
     st.markdown(f"""
     <div class="header-bar">
         <div class="header-left">
@@ -914,15 +952,27 @@ def main():
 
     # ===================== TAB 2: Fast Track =====================
     with tab_ft:
-        render_triage_queue_tab(loader, brain)
+        try:
+            render_triage_queue_tab(loader, brain)
+        except Exception as e:
+            st.error(f"Fast-Track Triage failed to render: {type(e).__name__}: {e}")
+            st.exception(e)
 
     # ===================== TAB 3: Rule Optimizer =====================
     with tab_opt:
-        render_optimizer_tab(loader, brain)
+        try:
+            render_optimizer_tab(loader, brain)
+        except Exception as e:
+            st.error(f"Rule Optimizer failed to render: {type(e).__name__}: {e}")
+            st.exception(e)
 
     # ===================== TAB 4: Shadow-Mode KPIs =====================
     with tab_kpi:
-        render_kpi_tab()
+        try:
+            render_kpi_tab()
+        except Exception as e:
+            st.error(f"Shadow-Mode KPIs failed to render: {type(e).__name__}: {e}")
+            st.exception(e)
 
 if __name__ == "__main__":
     main()

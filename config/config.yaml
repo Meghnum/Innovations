@@ -7,7 +7,7 @@
 data:
   qvd_folder: "data/qvd/"                  # Folder where your QVD files live
   dummy_mode: false                           # Set to false when using real QVDs/CSV
-  csv_file: "Final_Ready_For_Triage_Claims_50K.csv" # CSV file to load (used when dummy_mode=false)
+  csv_file: "Industry_Standard_Claims_50K.csv" # CSV file to load (used when dummy_mode=false)
   dummy_row_count: 5000                   # Rows to generate in dummy mode
   recent_months: 12                          # Default: load only last N months
   chunk_size: 5000                           # Rows per chunk when processing large files
@@ -151,7 +151,7 @@ columns:
 # --- AI Settings ---
 ai:
   embedding_model: "all-MiniLM-L6-v2"       # Fast, CPU-friendly sentence-transformer
-  ollama_model: "gemma3:4b"                     # Model name in Ollama
+  ollama_model: "llama3.2:3b"                   # Model name in Ollama (faster + better JSON/code than gemma3:4b)
   ollama_host: "http://localhost:11434"      # Ollama default endpoint
   top_k_results: 5                           # How many FAISS results to pass to LLM
   max_context_rows: 10                       # Max rows sent to LLM as context

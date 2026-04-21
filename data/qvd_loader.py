@@ -794,22 +794,43 @@ def build_aggregated_summary(df: pd.DataFrame, col_map: dict) -> dict:
     """
     c = col_map   # shorthand
 
+    # Compute Claim Life Days if missing
+    days_col = c.get("days_open", "Claim Life Days")
+    if days_col not in df.columns:
+        submitted = c.get("submitted_date", "Reported Date")
+        closed = c.get("closed_date", "Claim Closed Date")
+        if submitted in df.columns:
+            report_dt = pd.to_datetime(df[submitted], errors="coerce")
+            if closed in df.columns:
+                close_dt = pd.to_datetime(df[closed], errors="coerce")
+                df[days_col] = (close_dt.fillna(datetime.now()) - report_dt).dt.days
+            else:
+                df[days_col] = (datetime.now() - report_dt).dt.days
+            df[days_col] = df[days_col].clip(lower=0).fillna(0).astype(int)
+            logger.info(f"Computed '{days_col}' from date columns")
+
+    # Safe column access helper
+    def _col_safe(key, default_col=None):
+        col_name = c.get(key, default_col or key)
+        return col_name if col_name in df.columns else None
+
     summary = {
         "total_claims":          len(df),
-        "status_counts":         df[c["status"]].value_counts().to_dict(),
-        "type_counts":           df[c["claim_type"]].value_counts().to_dict(),
-        "region_counts":         df[c["region"]].value_counts().to_dict(),
-        "total_claim_amount":    round(df[c["claim_amount"]].sum(), 2),
-        "total_paid_amount":     round(df[c["paid_amount"]].sum(), 2),
-        "total_reserve_amount":  round(df[c["reserve_amount"]].sum(), 2),
-        "avg_claim_amount":      round(df[c["claim_amount"]].mean(), 2),
-        "avg_days_open":         round(df[c["days_open"]].mean(), 1),
-        "max_claim_amount":      round(df[c["claim_amount"]].max(), 2),
-        "oldest_open_days":      int(df[df[c["status"]] == "Open"][c["days_open"]].max())
-                                 if "Open" in df[c["status"]].values else 0,
+        "status_counts":         df[c["status"]].value_counts().to_dict() if c["status"] in df.columns else {},
+        "type_counts":           df[c["claim_type"]].value_counts().to_dict() if c["claim_type"] in df.columns else {},
+        "region_counts":         df[c["region"]].value_counts().to_dict() if c["region"] in df.columns else {},
+        "total_claim_amount":    round(df[c["claim_amount"]].sum(), 2) if c["claim_amount"] in df.columns else 0,
+        "total_paid_amount":     round(df[c["paid_amount"]].sum(), 2) if c["paid_amount"] in df.columns else 0,
+        "total_reserve_amount":  round(df[c["reserve_amount"]].sum(), 2) if c["reserve_amount"] in df.columns else 0,
+        "avg_claim_amount":      round(df[c["claim_amount"]].mean(), 2) if c["claim_amount"] in df.columns else 0,
+        "avg_days_open":         round(df[days_col].mean(), 1) if days_col in df.columns else 0,
+        "max_claim_amount":      round(df[c["claim_amount"]].max(), 2) if c["claim_amount"] in df.columns else 0,
+        "oldest_open_days":      int(df[df[c["status"]] == "Open"][days_col].max())
+                                 if days_col in df.columns and c["status"] in df.columns
+                                 and "Open" in df[c["status"]].values else 0,
         "data_loaded_at":        datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        "date_range_start":      str(df[c["submitted_date"]].min().date()),
-        "date_range_end":        str(df[c["submitted_date"]].max().date()),
+        "date_range_start":      str(df[c["submitted_date"]].min().date()) if c["submitted_date"] in df.columns else "N/A",
+        "date_range_end":        str(df[c["submitted_date"]].max().date()) if c["submitted_date"] in df.columns else "N/A",
     }
 
     # --- Additional financial metrics (safe if columns missing) ---
@@ -878,6 +899,39 @@ class ClaimsDataLoader:
                 n_rows  = self.data_cfg["dummy_row_count"],
                 col_map = self.col,
             )
+        elif self.data_cfg.get("csv_file"):
+            csv_path = self.data_cfg["csv_file"]
+            logger.info(f"Loading CSV file: {csv_path}")
+            self.df = pd.read_csv(csv_path)
+            # Convert date columns
+            for date_col_key in ["submitted_date", "closed_date"]:
+                date_col = self.col.get(date_col_key, "")
+                if date_col in self.df.columns:
+                    self.df[date_col] = pd.to_datetime(
+                        self.df[date_col], errors="coerce"
+                    )
+            # Also try Event Date if present
+            if "Event Date" in self.df.columns:
+                self.df["Event Date"] = pd.to_datetime(
+                    self.df["Event Date"], errors="coerce"
+                )
+            # Convert Company Share from "99.4%" string to decimal 0.994
+            share_col = self.col.get("company_share", "Company Share")
+            if share_col in self.df.columns and self.df[share_col].dtype == object:
+                self.df[share_col] = (
+                    self.df[share_col].astype(str)
+                    .str.replace("%", "", regex=False)
+                    .pipe(pd.to_numeric, errors="coerce") / 100.0
+                )
+                logger.info("Converted Company Share from percentage to decimal")
+            # Convert additional date columns
+            for extra_date in ["Claim Opened Date", "Policy Effective Date",
+                               "Policy Expiration Date"]:
+                if extra_date in self.df.columns:
+                    self.df[extra_date] = pd.to_datetime(
+                        self.df[extra_date], errors="coerce"
+                    )
+            logger.info(f"CSV loaded. Shape: {self.df.shape}")
         else:
             logger.info("dummy_mode is OFF -- reading QVD files")
             self.df = load_all_qvd_files(

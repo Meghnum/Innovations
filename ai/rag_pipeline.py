@@ -2220,10 +2220,20 @@ class RAGPipeline:
                         question,
                         self.loader.df,
                         self.loader.col,
-                        ollama_model=ai_cfg.get("ollama_model", "gemma3:4b"),
+                        ollama_model=ai_cfg.get("ollama_model", "llama3.2:3b"),
                         ollama_host=ai_cfg.get("ollama_host", "http://localhost:11434"),
                     )
                     if pandas_answer:
+                        # Clarification short-circuit — agent asked user a question
+                        # instead of writing code. Surface it with a distinct type.
+                        if pandas_answer.startswith("__CLARIFY__:"):
+                            return {
+                                "answer": pandas_answer[len("__CLARIFY__:"):].strip(),
+                                "question_type": "clarification",
+                                "sources": [],
+                                "entities": entities,
+                                "escalation_reason": reason,
+                            }
                         return {
                             "answer": pandas_answer,
                             "question_type": "pandas_agent",
@@ -2324,10 +2334,17 @@ class RAGPipeline:
                 question,
                 self.loader.df,
                 self.loader.col,
-                ollama_model=ai_cfg.get("ollama_model", "gemma3:4b"),
+                ollama_model=ai_cfg.get("ollama_model", "llama3.2:3b"),
                 ollama_host=ai_cfg.get("ollama_host", "http://localhost:11434"),
             )
             if pandas_answer:
+                if pandas_answer.startswith("__CLARIFY__:"):
+                    return {
+                        "answer": pandas_answer[len("__CLARIFY__:"):].strip(),
+                        "question_type": "clarification",
+                        "sources": [],
+                        "entities": entities,
+                    }
                 return {
                     "answer": pandas_answer,
                     "question_type": "pandas_agent",
