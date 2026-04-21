@@ -294,6 +294,14 @@ def assess_query_complexity(query: str) -> tuple:
             return True, "date filter (year/quarter/month with reported/event disambiguator)"
         return True, "date-type ambiguity (year/quarter/month w/o Reported vs Event)"
 
+    # 9. Currency & ledger differentiation — the heuristic aggregation handler
+    #    only knows the *_USD columns. When the user asks for ledger / local /
+    #    converted currency we must escalate so the agent uses *_Ledger columns.
+    ledger_keywords = ("ledger", "local currency", "local",
+                       "exchange", "converted", "reporting currency")
+    if any(kw in q for kw in ledger_keywords):
+        return True, "currency/ledger differentiation (user asked for Ledger/Local, not USD)"
+
     return False, ""
 
 
