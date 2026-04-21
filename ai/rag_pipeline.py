@@ -2224,6 +2224,7 @@ class RAGPipeline:
                         ollama_model=ai_cfg.get("ollama_model", "llama3.2:3b"),
                         ollama_host=ai_cfg.get("ollama_host", "http://localhost:11434"),
                         llm_timeout=ai_cfg.get("llm_timeout", 15),
+                        provider=ai_cfg.get("pandas_agent_provider", "ollama"),
                     )
                     if pandas_answer:
                         # Clarification short-circuit — agent asked user a question
@@ -2371,6 +2372,7 @@ class RAGPipeline:
                 ollama_model=ai_cfg.get("ollama_model", "llama3.2:3b"),
                 ollama_host=ai_cfg.get("ollama_host", "http://localhost:11434"),
                 llm_timeout=ai_cfg.get("llm_timeout", 15),
+                provider=ai_cfg.get("pandas_agent_provider", "ollama"),
             )
             if pandas_answer:
                 if pandas_answer.startswith("__CLARIFY__:"):

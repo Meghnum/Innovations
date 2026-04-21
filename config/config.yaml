@@ -152,13 +152,14 @@ columns:
 ai:
   embedding_model: "all-MiniLM-L6-v2"       # Fast, CPU-friendly sentence-transformer
   ollama_model: "llama3.2:3b"                   # Model name in Ollama (faster + better JSON/code than gemma3:4b)
+  pandas_agent_provider: "gemini"            # "ollama" (local) or "gemini" (cloud). Only affects Pandas Agent code-gen.
   ollama_host: "http://localhost:11434"      # Ollama default endpoint
   top_k_results: 5                           # How many FAISS results to pass to LLM
   max_context_rows: 10                       # Max rows sent to LLM as context
   query_analyzer_timeout: 8
   faiss_score_threshold: 0.35
   llm_retry_count: 2
-  llm_timeout: 15                            # Hard wall-clock cap (s) on each ollama call (SIGALRM)
+  llm_timeout: 30                            # Hard wall-clock cap (s). Gemini = ~2s; kept tight so Ollama also fails fast.
   disable_heuristic_fallback: true           # QA mode: surface agent failures instead of ⚠️ approximate heuristic
 
 # --- Notification Thresholds ---

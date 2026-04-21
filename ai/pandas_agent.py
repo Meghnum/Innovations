@@ -309,6 +309,24 @@ def _timeout_handler(signum, frame):
     raise _TimeoutError("Code execution timed out")
 
 
+def _dispatch_codegen(provider, ollama_client, ollama_model, prompt, timeout_s):
+    """Route code-gen to the configured provider. Returns raw text OR an
+    `ERROR:` sentinel string (never raises). Keeps the rest of pandas_agent
+    unaware of which backend produced the code."""
+    if provider == "gemini":
+        from ai.gemini_client import gemini_code_gen
+        return gemini_code_gen(prompt, timeout=timeout_s)
+    # default: ollama with SIGALRM wall-clock cap
+    try:
+        return _call_llm_with_walltime(ollama_client, ollama_model, prompt, timeout_s)
+    except _TimeoutError:
+        logger.error(f"Ollama code-gen hit wall-clock timeout ({timeout_s}s)")
+        return f"ERROR: Pandas execution failed: Ollama timed out after {timeout_s}s"
+    except Exception as e:
+        logger.error(f"Ollama code-gen failed: {e}")
+        return f"ERROR: Pandas execution failed: {type(e).__name__}: {e}"
+
+
 def _call_llm_with_walltime(client, model, prompt, timeout_s):
     """Invoke ollama chat with a HARD wall-clock timeout via SIGALRM.
 
@@ -544,22 +562,29 @@ def pandas_query(
     ollama_model: str = "llama3.2:3b",
     ollama_host: str = "http://localhost:11434",
     llm_timeout: int = 90,
+    provider: str = "ollama",
 ) -> Optional[str]:
     """Use LLM to generate and execute Pandas code for a question.
 
-    Returns formatted answer string, or None if it fails.
-    `llm_timeout` is a hard wall-clock cap (seconds) on each ollama call —
-    prevents a stalled LLM from freezing the whole pipeline.
+    provider: "ollama" (local llama3.2:3b) or "gemini" (cloud Gemini 2.5 Flash).
+    Gemini path is used for code-gen only — triage/semantic calls still use ClaimsLLM.
+    Returns formatted answer string, or ERROR: sentinel on failure.
+    `llm_timeout` is a hard wall-clock cap (seconds) on each LLM call.
     """
-    try:
-        import ollama as _ollama
-    except ImportError:
-        logger.warning("ollama not installed — pandas agent unavailable")
-        return None
-
-    # Client with hard timeout. Without this, ollama.chat() can hang for
-    # 30+ minutes on complex prompts.
-    _client = _ollama.Client(host=ollama_host, timeout=llm_timeout)
+    _client = None
+    if provider == "ollama":
+        try:
+            import ollama as _ollama
+        except ImportError:
+            logger.warning("ollama not installed — pandas agent unavailable")
+            return "ERROR: Pandas execution failed: ollama not installed"
+        # Client with hard timeout. Without this, ollama.chat() can hang for
+        # 30+ minutes on complex prompts.
+        _client = _ollama.Client(host=ollama_host, timeout=llm_timeout)
+    elif provider == "gemini":
+        pass  # Lazy-imported inside _call_codegen
+    else:
+        return f"ERROR: Pandas execution failed: unknown provider '{provider}'"
 
     # Build column info for the prompt
     columns = sorted(df.columns.tolist())
@@ -575,17 +600,12 @@ def pandas_query(
 
     prompt = _build_codegen_prompt(question, columns, dtypes, sample_values, len(df))
 
-    # Ask LLM to generate code (SIGALRM hard cap — see _call_llm_with_walltime)
-    try:
-        raw_code = _call_llm_with_walltime(
-            _client, ollama_model, prompt, llm_timeout
-        ).strip()
-    except _TimeoutError:
-        logger.error(f"LLM code generation hit wall-clock timeout ({llm_timeout}s)")
-        return f"ERROR: Pandas execution failed: LLM timed out after {llm_timeout}s (code generation)"
-    except Exception as e:
-        logger.error(f"LLM code generation failed (timeout={llm_timeout}s): {e}")
-        return f"ERROR: Pandas execution failed: {type(e).__name__}: {e}"
+    # Ask LLM to generate code
+    raw_code = _dispatch_codegen(provider, _client, ollama_model, prompt, llm_timeout)
+    if raw_code.startswith("ERROR:"):
+        # Propagate provider error sentinel unchanged
+        return raw_code
+    raw_code = raw_code.strip()
 
     # Strip markdown fences + LeetCode-bleed wrappers + junk prefix tokens.
     raw_code = clean_llm_code(raw_code)
@@ -634,9 +654,11 @@ def pandas_query(
             f"CORRECTED CODE:"
         )
         try:
-            retry_code = _call_llm_with_walltime(
-                _client, ollama_model, retry_prompt, llm_timeout
+            retry_code = _dispatch_codegen(
+                provider, _client, ollama_model, retry_prompt, llm_timeout
             )
+            if retry_code.startswith("ERROR:"):
+                return retry_code
             retry_code = clean_llm_code(retry_code)
             # Retry output can also be a CLARIFY — honour it.
             for _ln in retry_code.splitlines():
