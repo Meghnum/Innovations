@@ -2211,6 +2211,7 @@ class RAGPipeline:
             from ai.query_analyzer import assess_query_complexity
             should_escalate, reason = assess_query_complexity(question)
             pandas_failed = False
+            pandas_error = ""
             if should_escalate:
                 logger.info(f"Complexity guardrail: escalating to Pandas Agent ({reason})")
                 try:
@@ -2222,7 +2223,7 @@ class RAGPipeline:
                         self.loader.col,
                         ollama_model=ai_cfg.get("ollama_model", "llama3.2:3b"),
                         ollama_host=ai_cfg.get("ollama_host", "http://localhost:11434"),
-                        llm_timeout=ai_cfg.get("llm_timeout", 90),
+                        llm_timeout=ai_cfg.get("llm_timeout", 15),
                     )
                     if pandas_answer:
                         # Clarification short-circuit — agent asked user a question
@@ -2235,18 +2236,50 @@ class RAGPipeline:
                                 "entities": entities,
                                 "escalation_reason": reason,
                             }
-                        return {
-                            "answer": pandas_answer,
-                            "question_type": "pandas_agent",
-                            "sources": [],
-                            "entities": entities,
-                            "escalation_reason": reason,
-                        }
-                    pandas_failed = True
-                    logger.warning(f"Pandas Agent failed on '{reason}' — falling back to heuristic")
+                        # Explicit agent failure — treat as fail (do NOT return
+                        # it as a pandas_agent success). Fall through to the
+                        # QA-mode / heuristic-fallback logic below.
+                        if pandas_answer.startswith("ERROR:"):
+                            pandas_failed = True
+                            pandas_error = pandas_answer
+                            logger.warning(f"Pandas Agent returned failure sentinel: {pandas_error}")
+                        else:
+                            return {
+                                "answer": pandas_answer,
+                                "question_type": "pandas_agent",
+                                "sources": [],
+                                "entities": entities,
+                                "escalation_reason": reason,
+                            }
+                    else:
+                        pandas_failed = True
+                        pandas_error = "returned None (empty / unparseable)"
+                        logger.warning(f"Pandas Agent failed on '{reason}'")
                 except Exception as e:
                     pandas_failed = True
-                    logger.warning(f"Pandas Agent threw: {e} — falling back to heuristic")
+                    pandas_error = f"{type(e).__name__}: {e}"
+                    logger.warning(f"Pandas Agent threw: {pandas_error}")
+
+            # --- QA mode: surface agent failures explicitly ---
+            # When disable_heuristic_fallback is true, DO NOT hide agent
+            # failures behind a plausible heuristic answer. Return an
+            # agent_error so test harness / humans see the real problem.
+            disable_fallback = bool(
+                self.loader.config.get("ai", {}).get(
+                    "disable_heuristic_fallback", False
+                )
+            )
+            if should_escalate and pandas_failed and disable_fallback:
+                return {
+                    "answer": (
+                        f"AGENT_ERROR: Pandas Agent could not answer this "
+                        f"query ({reason}). Reason: {pandas_error}"
+                    ),
+                    "question_type": "agent_error",
+                    "sources": [],
+                    "entities": entities,
+                    "escalation_reason": reason,
+                }
 
             answer = handle_aggregation(
                 question, self.loader.summary,
@@ -2337,13 +2370,23 @@ class RAGPipeline:
                 self.loader.col,
                 ollama_model=ai_cfg.get("ollama_model", "llama3.2:3b"),
                 ollama_host=ai_cfg.get("ollama_host", "http://localhost:11434"),
-                llm_timeout=ai_cfg.get("llm_timeout", 90),
+                llm_timeout=ai_cfg.get("llm_timeout", 15),
             )
             if pandas_answer:
                 if pandas_answer.startswith("__CLARIFY__:"):
                     return {
                         "answer": pandas_answer[len("__CLARIFY__:"):].strip(),
                         "question_type": "clarification",
+                        "sources": [],
+                        "entities": entities,
+                    }
+                # Explicit agent failure — propagate as agent_error so the
+                # test harness / UI sees the real exception.
+                if pandas_answer.startswith("ERROR:"):
+                    logger.warning(f"Pandas Agent returned failure sentinel: {pandas_answer}")
+                    return {
+                        "answer": pandas_answer,
+                        "question_type": "agent_error",
                         "sources": [],
                         "entities": entities,
                     }

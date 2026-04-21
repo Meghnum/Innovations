@@ -73,8 +73,24 @@ def _run_one(pipe: RAGPipeline, prompt: str) -> dict:
         answer = resp.get("answer", "")
         qtype = resp.get("question_type", "")
         reason = resp.get("escalation_reason", "")
-        status = "CLARIFY" if qtype == "clarification" else "OK"
         err = ""
+        # --- Strict QA assertions ---
+        # A plausible-looking answer is NOT a pass when:
+        #   1. Pandas Agent failed and heuristic gave an approximate answer
+        #      (detected by the ⚠️ banner)
+        #   2. Pipeline returned an explicit agent_error (QA mode)
+        #   3. Clarification requested (already flagged CLARIFY)
+        ans_str = answer if isinstance(answer, str) else str(answer)
+        if qtype == "clarification":
+            status = "CLARIFY"
+        elif qtype == "agent_error" or ans_str.startswith("AGENT_ERROR:"):
+            status = "FAIL"
+            err = ans_str[:500]
+        elif "⚠️" in ans_str or "approximate" in ans_str.lower():
+            status = "FAIL"
+            err = "heuristic fallback: Pandas Agent failed, approximate answer returned"
+        else:
+            status = "OK"
     except Exception as e:  # noqa: BLE001
         answer = ""
         qtype = ""
@@ -108,11 +124,12 @@ def _save(df: pd.DataFrame, path: Path) -> None:
             ["Source_File", "Test_ID", "Prompt", "Elapsed_s", "Status"]
         ]
         slow.to_excel(xl, sheet_name="Slowest 25", index=False)
-        errs = df[df["Status"] == "ERROR"][
-            ["Source_File", "Test_ID", "Prompt", "Error"]
+        errs = df[df["Status"].isin(["ERROR", "FAIL"])][
+            ["Source_File", "Test_ID", "Prompt", "Status", "Question_Type",
+             "Escalation_Reason", "Answer", "Error"]
         ]
         if len(errs):
-            errs.to_excel(xl, sheet_name="Errors", index=False)
+            errs.to_excel(xl, sheet_name="Failures", index=False)
 
 
 def main() -> None:

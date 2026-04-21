@@ -158,7 +158,8 @@ ai:
   query_analyzer_timeout: 8
   faiss_score_threshold: 0.35
   llm_retry_count: 2
-  llm_timeout: 90                            # Hard wall-clock cap (s) on each ollama call
+  llm_timeout: 15                            # Hard wall-clock cap (s) on each ollama call (SIGALRM)
+  disable_heuristic_fallback: true           # QA mode: surface agent failures instead of ⚠️ approximate heuristic
 
 # --- Notification Thresholds ---
 notifications:

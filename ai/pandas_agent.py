@@ -131,7 +131,16 @@ THE P&C DATA DICTIONARY  (apply when writing code)
 =================================================================
 
 ## 1. THE FINANCIAL ENGINE (Money rules — do not guess formulas)
-Default to USD columns. Never invent columns.
+
+### CURRENCY (HARD RULE — read before writing any $ code)
+- If the user says "local", "ledger", "local currency", "ledger currency",
+  or "reporting currency" → you MUST use columns ending in `Ledger`
+  (e.g. `Expense Paid Ledger`, `Indemnity Paid Ledger`, `Incurred Ledger`).
+- Otherwise (no currency mentioned, or user says "USD" / "dollars") →
+  default to the USD columns (e.g. `Incurred USD`, `Indemnity Paid USD`).
+- NEVER mix: do not return a USD column when the user asked for Ledger.
+
+### BUCKETS
 - Indemnity Paid (Loss Paid)   — money to the claimant/insured for the loss.
 - Expense Paid (ALAE)          — vendor costs: defense attorneys, IAs,
                                  forensics.  Synonyms: Legal Spend, Vendor Cost.
@@ -204,6 +213,13 @@ CODE-WRITING RULES  (only if no clarification needed)
 9. If the available columns genuinely cannot answer the (unambiguous) question:
    result = "I cannot answer this question with the available data columns."
 10. NEVER invent columns. Only reference columns listed above.
+11. MULTI-FILTER CHAINING — if the question has multiple filters (e.g.
+    "Theft claims in 2024", "Open Property in Germany"), you MUST chain
+    them with & inside ONE boolean mask. Do not pick only one filter.
+    Example:
+        mask = (df['Cause Of Loss Descr'] == 'Theft') & (df['Accident Year'] == 2024)
+        sub = df[mask]
+        result = f"Theft claims in AY 2024: {{len(sub):,}}"
 
 =================================================================
 OUTPUT FORMAT RULES  (CRITICAL — prevents LeetCode-bleed bugs)
@@ -291,6 +307,36 @@ class _TimeoutError(Exception):
 
 def _timeout_handler(signum, frame):
     raise _TimeoutError("Code execution timed out")
+
+
+def _call_llm_with_walltime(client, model, prompt, timeout_s):
+    """Invoke ollama chat with a HARD wall-clock timeout via SIGALRM.
+
+    `ollama.Client(timeout=...)` maps to httpx read-timeout, which RESETS
+    whenever the server dribbles bytes — so a slow generation can hang
+    for 20+ minutes. SIGALRM is Unix-only but always fires after N seconds
+    regardless of what the socket is doing. Returns raw string content.
+    Raises _TimeoutError on wall-clock cap.
+    """
+    import signal
+    try:
+        old = signal.signal(signal.SIGALRM, _timeout_handler)
+        signal.alarm(int(timeout_s))
+    except (ValueError, AttributeError):
+        old = None  # non-main thread / Windows — degrade to client timeout
+    try:
+        response = client.chat(
+            model=model,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        return response["message"]["content"]
+    finally:
+        try:
+            signal.alarm(0)
+            if old is not None:
+                signal.signal(signal.SIGALRM, old)
+        except (ValueError, AttributeError):
+            pass
 
 
 def clean_llm_code(raw_code: str) -> str:
@@ -529,16 +575,17 @@ def pandas_query(
 
     prompt = _build_codegen_prompt(question, columns, dtypes, sample_values, len(df))
 
-    # Ask LLM to generate code
+    # Ask LLM to generate code (SIGALRM hard cap — see _call_llm_with_walltime)
     try:
-        response = _client.chat(
-            model=ollama_model,
-            messages=[{"role": "user", "content": prompt}],
-        )
-        raw_code = response["message"]["content"].strip()
+        raw_code = _call_llm_with_walltime(
+            _client, ollama_model, prompt, llm_timeout
+        ).strip()
+    except _TimeoutError:
+        logger.error(f"LLM code generation hit wall-clock timeout ({llm_timeout}s)")
+        return f"ERROR: Pandas execution failed: LLM timed out after {llm_timeout}s (code generation)"
     except Exception as e:
         logger.error(f"LLM code generation failed (timeout={llm_timeout}s): {e}")
-        return None
+        return f"ERROR: Pandas execution failed: {type(e).__name__}: {e}"
 
     # Strip markdown fences + LeetCode-bleed wrappers + junk prefix tokens.
     raw_code = clean_llm_code(raw_code)
@@ -587,11 +634,9 @@ def pandas_query(
             f"CORRECTED CODE:"
         )
         try:
-            response2 = _client.chat(
-                model=ollama_model,
-                messages=[{"role": "user", "content": retry_prompt}],
+            retry_code = _call_llm_with_walltime(
+                _client, ollama_model, retry_prompt, llm_timeout
             )
-            retry_code = response2["message"]["content"]
             retry_code = clean_llm_code(retry_code)
             # Retry output can also be a CLARIFY — honour it.
             for _ln in retry_code.splitlines():
@@ -607,12 +652,17 @@ def pandas_query(
             result, error2 = _execute_sandboxed(retry_code, df)
             if error2:
                 logger.warning(f"Retry also failed: {error2}")
-                return None
-        except Exception:
-            return None
+                return (
+                    f"ERROR: Pandas execution failed: first attempt: {error}; "
+                    f"retry: {error2}"
+                )
+        except _TimeoutError:
+            return f"ERROR: Pandas execution failed: LLM timed out after {llm_timeout}s (retry)"
+        except Exception as retry_exc:
+            return f"ERROR: Pandas execution failed: retry raised {type(retry_exc).__name__}: {retry_exc}"
 
     if result is None:
-        return None
+        return "ERROR: Pandas execution failed: code produced no `result` variable"
 
     # Format and return
     formatted = _format_result(result)
