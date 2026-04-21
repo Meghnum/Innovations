@@ -158,7 +158,7 @@ ai:
   query_analyzer_timeout: 8
   faiss_score_threshold: 0.35
   llm_retry_count: 2
-  llm_timeout: 30
+  llm_timeout: 90                            # Hard wall-clock cap (s) on each ollama call
 
 # --- Notification Thresholds ---
 notifications:

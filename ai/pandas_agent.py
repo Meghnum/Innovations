@@ -497,16 +497,23 @@ def pandas_query(
     col: dict,
     ollama_model: str = "llama3.2:3b",
     ollama_host: str = "http://localhost:11434",
+    llm_timeout: int = 90,
 ) -> Optional[str]:
     """Use LLM to generate and execute Pandas code for a question.
 
     Returns formatted answer string, or None if it fails.
+    `llm_timeout` is a hard wall-clock cap (seconds) on each ollama call —
+    prevents a stalled LLM from freezing the whole pipeline.
     """
     try:
         import ollama as _ollama
     except ImportError:
         logger.warning("ollama not installed — pandas agent unavailable")
         return None
+
+    # Client with hard timeout. Without this, ollama.chat() can hang for
+    # 30+ minutes on complex prompts.
+    _client = _ollama.Client(host=ollama_host, timeout=llm_timeout)
 
     # Build column info for the prompt
     columns = sorted(df.columns.tolist())
@@ -524,13 +531,13 @@ def pandas_query(
 
     # Ask LLM to generate code
     try:
-        response = _ollama.chat(
+        response = _client.chat(
             model=ollama_model,
             messages=[{"role": "user", "content": prompt}],
         )
         raw_code = response["message"]["content"].strip()
     except Exception as e:
-        logger.error(f"LLM code generation failed: {e}")
+        logger.error(f"LLM code generation failed (timeout={llm_timeout}s): {e}")
         return None
 
     # Strip markdown fences + LeetCode-bleed wrappers + junk prefix tokens.
@@ -561,14 +568,26 @@ def pandas_query(
 
     if error:
         logger.warning(f"Pandas agent execution failed: {error}")
-        # Retry once with error context
+        # Retry once with error context.
+        # IMPORTANT: repeat the original question AND the failing code up
+        # front so the LLM doesn't drift to an unrelated answer. Also pin
+        # the contract (must assign `result`, no markdown, no wrappers).
         retry_prompt = (
-            f"{prompt}\n\n"
-            f"Your previous code failed with: {error}\n"
-            f"Fix the code and try again. Write ONLY the corrected Python code:"
+            f"You are fixing Python/Pandas code for the question below.\n"
+            f"Do NOT answer a different question. Do NOT invent new metrics.\n\n"
+            f"ORIGINAL QUESTION:\n{question}\n\n"
+            f"YOUR PREVIOUS CODE:\n{raw_code}\n\n"
+            f"IT FAILED WITH:\n{error}\n\n"
+            f"CONTRACT:\n"
+            f"- Fix the same question — not a new one.\n"
+            f"- The final line must assign to `result` "
+            f"(e.g. `result = ...`).\n"
+            f"- Return ONLY Python code. No markdown fences. "
+            f"No class/function wrappers.\n\n"
+            f"CORRECTED CODE:"
         )
         try:
-            response2 = _ollama.chat(
+            response2 = _client.chat(
                 model=ollama_model,
                 messages=[{"role": "user", "content": retry_prompt}],
             )
