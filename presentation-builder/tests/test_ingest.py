@@ -22,3 +22,10 @@ def test_ingest_unsupported_extension_returns_error(tmp_path):
     result = ingest(str(p))
     assert "error" in result
     assert "unsupported" in result["error"].lower()
+
+def test_ingest_xlsx_returns_dataframe_and_metadata(sample_xlsx):
+    result = ingest(str(sample_xlsx))
+    assert "dataframe" in result
+    assert result["metadata"]["file_type"] == "xlsx"
+    assert result["metadata"]["rows"] == 200
+    assert result["metadata"]["cols"] == 6

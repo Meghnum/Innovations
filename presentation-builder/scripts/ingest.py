@@ -9,6 +9,8 @@ def ingest(file_path: str) -> dict:
     try:
         if ext == ".csv":
             df = pl.read_csv(p)
+        elif ext in (".xlsx", ".xls"):
+            df = pl.read_excel(p)
         else:
             return {"error": f"unsupported file type: {ext}"}
     except Exception as e:
