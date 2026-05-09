@@ -64,3 +64,36 @@ def test_validate_blocks_pii_reference():
     result = validate_narrative(narrative, kv, pii_columns=pii_columns)
     assert result["valid"] is False
     assert any("PII" in m or "ssn" in m.lower() for m in result["mismatches"])
+
+
+def test_validate_ignores_bare_year():
+    kv = {"q3_revenue": 4_200_000}
+    narrative = {
+        "observe": "In 2026, revenue is $4,200,000.",
+        "analyze": "Across 3 months.",
+        "synthesize": "Plan ahead.",
+    }
+    result = validate_narrative(narrative, kv)
+    assert result["valid"] is True
+
+
+def test_validate_ignores_bare_ordinal():
+    kv = {"top_value": 1000.0}
+    narrative = {
+        "observe": "Top 5 products account for $1,000.",
+        "analyze": "Over 3 quarters.",
+        "synthesize": "Continue focus.",
+    }
+    result = validate_narrative(narrative, kv)
+    assert result["valid"] is True
+
+
+def test_validate_still_catches_fabricated_dollar_amount():
+    kv = {"q3_revenue": 4_200_000}
+    narrative = {
+        "observe": "Revenue is $9,999,999.",
+        "analyze": "Up.",
+        "synthesize": "Investigate.",
+    }
+    result = validate_narrative(narrative, kv)
+    assert result["valid"] is False

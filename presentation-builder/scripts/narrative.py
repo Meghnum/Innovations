@@ -1,6 +1,15 @@
 import re
 
-NUMBER_RX = re.compile(r"(?<!\w)-?\$?\d{1,3}(?:,\d{3})*(?:\.\d+)?%?(?!\w)|(?<!\w)-?\d+(?:\.\d+)?%?(?!\w)")
+# Only validate numbers that look like financial/statistical claims:
+# - $1,234.56 / $1234 / $1,234
+# - 12.5% / -7%
+# - 1,234,567 (with comma separators)
+# Skip bare integers (years, ordinals, counts).
+NUMBER_RX = re.compile(
+    r"-?\$\d{1,3}(?:,\d{3})*(?:\.\d+)?"  # $1,234.56 or $1234
+    r"|-?\d+(?:\.\d+)?%"                  # 12.5% or -7%
+    r"|-?\d{1,3}(?:,\d{3})+(?:\.\d+)?"    # 1,234,567 (must have at least one comma)
+)
 TOLERANCE = 0.0001  # 0.01%
 SSN_RX = re.compile(r"\b\d{3}-\d{2}-\d{4}\b")
 EMAIL_RX = re.compile(r"\b[^@\s]+@[^@\s]+\.[^@\s]+\b")
