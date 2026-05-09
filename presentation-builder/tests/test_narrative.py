@@ -97,3 +97,30 @@ def test_validate_still_catches_fabricated_dollar_amount():
     }
     result = validate_narrative(narrative, kv)
     assert result["valid"] is False
+
+
+def test_validate_pii_match_word_boundary():
+    kv = {"x": 1}
+    narrative = {
+        "observe": "Brand name awareness rose.",  # 'name' inside 'name awareness' — word boundary
+        "analyze": "ok.",
+        "synthesize": "ok.",
+    }
+    pii_columns = ["Name"]
+    result = validate_narrative(narrative, kv, pii_columns=pii_columns)
+    # 'name' IS a word in "Brand name awareness" — should be flagged
+    assert result["valid"] is False
+
+
+def test_validate_pii_no_match_substring():
+    kv = {"x": 1}
+    narrative = {
+        "observe": "filename and surname patterns considered.",
+        "analyze": "ok.",
+        "synthesize": "ok.",
+    }
+    pii_columns = ["Name"]
+    result = validate_narrative(narrative, kv, pii_columns=pii_columns)
+    # 'Name' substring inside 'filename' should NOT be flagged (word boundary)
+    # 'name' substring inside 'surname' should NOT be flagged
+    assert result["valid"] is True

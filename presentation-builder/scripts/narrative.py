@@ -52,7 +52,8 @@ def validate_narrative(narrative: dict, kv: dict, pii_columns: list | None = Non
     full_text = " ".join(str(narrative.get(k, "")) for k in ("observe", "analyze", "synthesize"))
     if pii_columns:
         for col in pii_columns:
-            if col.lower() in full_text.lower():
+            pattern = r"\b" + re.escape(col) + r"\b"
+            if re.search(pattern, full_text, re.IGNORECASE):
                 mismatches.append(f"PII column reference: {col}")
     if SSN_RX.search(full_text):
         mismatches.append("PII: SSN pattern in narrative")
