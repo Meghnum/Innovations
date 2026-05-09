@@ -85,3 +85,32 @@ def test_distributions_for_numeric():
     assert result["distributions"]["x"]["mean"] == 3.0
     assert result["distributions"]["x"]["min"] == 1
     assert result["distributions"]["x"]["max"] == 5
+
+
+def test_luhn_card_with_doubled_digit_over_9():
+    # 5500005555555559 requires d -= 9 branch (5*2=10 > 9)
+    df = pl.DataFrame({"acct": [5500005555555559, 5500005555555559]})
+    result = profile(df)
+    assert "acct" in result["pii_columns"]
+
+
+def test_luhn_invalid_short_number():
+    df = pl.DataFrame({"acct": [123]})
+    result = profile(df)
+    assert "acct" not in result["pii_columns"]
+
+
+def test_luhn_invalid_long_number():
+    df = pl.DataFrame({"acct": [12345678901234567890]})  # 20 digits
+    result = profile(df)
+    assert "acct" not in result["pii_columns"]
+
+
+def test_detect_pii_exception_path():
+    # Cover the except (ValueError, TypeError) in _detect_pii
+    from unittest.mock import patch
+    from scripts.profile import _detect_pii
+    with patch("scripts.profile._luhn_valid", side_effect=TypeError("bad")):
+        df = pl.DataFrame({"acct": [4111111111111111]})
+        result = _detect_pii(df)
+        assert "acct" not in result
