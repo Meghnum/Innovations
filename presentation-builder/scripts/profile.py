@@ -50,6 +50,36 @@ def _detect_pii(df: pl.DataFrame) -> list:
     return sorted(pii)
 
 
+def _date_range(df: pl.DataFrame) -> dict | None:
+    for col in df.columns:
+        if df[col].dtype in (pl.Date, pl.Datetime):
+            series = df[col].drop_nulls()
+            if series.len() == 0:
+                continue
+            return {
+                "column": col,
+                "min": str(series.min()),
+                "max": str(series.max()),
+            }
+    return None
+
+
+def _distributions(df: pl.DataFrame) -> dict:
+    out = {}
+    for col in df.columns:
+        if df[col].dtype.is_numeric():
+            series = df[col].drop_nulls()
+            if series.len() == 0:
+                continue
+            out[col] = {
+                "mean": float(series.mean()),
+                "min": series.min(),
+                "max": series.max(),
+                "std": float(series.std()) if series.len() > 1 else 0.0,
+            }
+    return out
+
+
 def _detect_outliers(df: pl.DataFrame, threshold_pct: float = 20.0) -> list:
     out = []
     for col in df.columns:
@@ -92,8 +122,8 @@ def profile(df: pl.DataFrame) -> dict:
         "schema": schema,
         "dtypes": schema,  # alias
         "null_pct": null_pct,
-        "distributions": {},
+        "distributions": _distributions(df),
         "outliers": _detect_outliers(df),
-        "date_range": None,
+        "date_range": _date_range(df),
         "pii_columns": _detect_pii(df),
     }

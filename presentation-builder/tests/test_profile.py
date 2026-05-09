@@ -64,3 +64,24 @@ def test_no_pii_in_clean_columns():
     df = pl.DataFrame({"Region": ["North"], "Revenue": [1000]})
     result = profile(df)
     assert result["pii_columns"] == []
+
+
+import datetime as dt
+
+
+def test_date_range_extracted():
+    df = pl.DataFrame({"Date": [dt.date(2026, 1, 1), dt.date(2026, 6, 30)]})
+    result = profile(df)
+    assert result["date_range"] is not None
+    assert result["date_range"]["min"] == "2026-01-01"
+    assert result["date_range"]["max"] == "2026-06-30"
+    assert result["date_range"]["column"] == "Date"
+
+
+def test_distributions_for_numeric():
+    df = pl.DataFrame({"x": [1, 2, 3, 4, 5]})
+    result = profile(df)
+    assert "x" in result["distributions"]
+    assert result["distributions"]["x"]["mean"] == 3.0
+    assert result["distributions"]["x"]["min"] == 1
+    assert result["distributions"]["x"]["max"] == 5
