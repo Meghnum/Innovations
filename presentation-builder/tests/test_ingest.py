@@ -29,3 +29,10 @@ def test_ingest_xlsx_returns_dataframe_and_metadata(sample_xlsx):
     assert result["metadata"]["file_type"] == "xlsx"
     assert result["metadata"]["rows"] == 200
     assert result["metadata"]["cols"] == 6
+
+def test_ingest_pdf_extracts_text_blocks(sample_pdf):
+    result = ingest(str(sample_pdf))
+    assert "metadata" in result
+    assert result["metadata"]["file_type"] == "pdf"
+    assert "text_blocks" in result["metadata"]
+    assert any("Quarterly Report" in t for t in result["metadata"]["text_blocks"])
