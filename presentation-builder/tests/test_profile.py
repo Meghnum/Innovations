@@ -32,3 +32,35 @@ def test_no_outliers_in_uniform_data():
     df = pl.DataFrame({"x": [10, 10, 10, 10, 10]})
     result = profile(df)
     assert result["outliers"] == []
+
+
+def test_pii_detected_by_column_name():
+    df = pl.DataFrame({"SSN": ["123-45-6789"], "Revenue": [100]})
+    result = profile(df)
+    assert "SSN" in result["pii_columns"]
+    assert "Revenue" not in result["pii_columns"]
+
+
+def test_pii_detected_by_value_pattern_ssn():
+    df = pl.DataFrame({"id_field": ["111-22-3333", "444-55-6666"]})
+    result = profile(df)
+    assert "id_field" in result["pii_columns"]
+
+
+def test_pii_detected_by_email_pattern():
+    df = pl.DataFrame({"contact": ["a@b.com", "c@d.org"]})
+    result = profile(df)
+    assert "contact" in result["pii_columns"]
+
+
+def test_pii_detected_by_luhn_credit_card():
+    # 4111111111111111 is a valid Luhn test card
+    df = pl.DataFrame({"acct": [4111111111111111, 4111111111111111]})
+    result = profile(df)
+    assert "acct" in result["pii_columns"]
+
+
+def test_no_pii_in_clean_columns():
+    df = pl.DataFrame({"Region": ["North"], "Revenue": [1000]})
+    result = profile(df)
+    assert result["pii_columns"] == []

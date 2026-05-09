@@ -1,4 +1,53 @@
+import re
+
 import polars as pl
+
+PII_NAME_RX = re.compile(
+    r"(?i)(ssn|social.?security|credit.?card|cc.?num|passport|home.?address|tax.?id|dob|date.?of.?birth|email|phone|account.?number|acct.?num)"
+)
+SSN_RX = re.compile(r"^\d{3}-\d{2}-\d{4}$")
+EMAIL_RX = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+
+
+def _luhn_valid(num: int) -> bool:
+    digits = [int(d) for d in str(num)]
+    if len(digits) < 13 or len(digits) > 19:
+        return False
+    checksum = 0
+    parity = len(digits) % 2
+    for i, d in enumerate(digits):
+        if i % 2 == parity:
+            d *= 2
+            if d > 9:
+                d -= 9
+        checksum += d
+    return checksum % 10 == 0
+
+
+def _detect_pii(df: pl.DataFrame) -> list:
+    pii = set()
+    for col in df.columns:
+        if PII_NAME_RX.search(col):
+            pii.add(col)
+            continue
+        series = df[col].drop_nulls()
+        if series.len() == 0:
+            continue
+        sample = series.head(min(20, series.len())).to_list()
+        if df[col].dtype == pl.String:
+            if any(SSN_RX.match(str(v)) for v in sample):
+                pii.add(col)
+                continue
+            if any(EMAIL_RX.match(str(v)) for v in sample):
+                pii.add(col)
+                continue
+        if df[col].dtype.is_numeric():
+            try:
+                if all(_luhn_valid(int(v)) for v in sample):
+                    pii.add(col)
+            except (ValueError, TypeError):
+                pass
+    return sorted(pii)
 
 
 def _detect_outliers(df: pl.DataFrame, threshold_pct: float = 20.0) -> list:
@@ -46,5 +95,5 @@ def profile(df: pl.DataFrame) -> dict:
         "distributions": {},
         "outliers": _detect_outliers(df),
         "date_range": None,
-        "pii_columns": [],
+        "pii_columns": _detect_pii(df),
     }
