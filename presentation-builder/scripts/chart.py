@@ -15,28 +15,45 @@ FALLBACK_COLORS = {
 
 
 def get_brand_colors(template_path: str | None) -> dict:
+    """Extract brand colors from corporate template's theme XML, or use fallback."""
     if template_path is None or not Path(template_path).exists():
         return dict(FALLBACK_COLORS)
     try:
-        from pptx import Presentation
-        prs = Presentation(template_path)
-        # python-pptx exposes theme colors on the slide master.
-        # If accessible, override the primary color from theme; else fallback.
-        # Theme color access is API-limited; we keep fallback as default.
-        # Future: parse <a:srgbClr> from theme XML for true brand colors.
-        return dict(FALLBACK_COLORS)
+        import zipfile
+        import re
+        with zipfile.ZipFile(template_path) as z:
+            theme_files = [n for n in z.namelist() if n.startswith("ppt/theme/theme") and n.endswith(".xml")]
+            if not theme_files:
+                return dict(FALLBACK_COLORS)
+            theme_xml = z.read(theme_files[0]).decode("utf-8", errors="replace")
+        # Extract sRGB hex codes from theme color scheme; first 6 are typical brand
+        # Theme XML uses namespace; use regex to find srgbClr values reliably
+        srgb_matches = re.findall(r'<a:srgbClr val="([0-9A-Fa-f]{6})"', theme_xml)
+        if len(srgb_matches) < 2:
+            return dict(FALLBACK_COLORS)
+        # Standard PPTX theme order: bg1, tx1, bg2, tx2, accent1..accent6
+        # Use accent1 (index 4) as primary if available, else fallback
+        colors = dict(FALLBACK_COLORS)
+        # Try to map: tx1 (dark) → neutral, accent1 → primary, accent2 → secondary
+        if len(srgb_matches) >= 5:
+            colors["primary"] = "#" + srgb_matches[4].upper()
+        if len(srgb_matches) >= 6:
+            colors["secondary"] = "#" + srgb_matches[5].upper()
+        if len(srgb_matches) >= 7:
+            colors["accent"] = "#" + srgb_matches[6].upper()
+        return colors
     except Exception:
         return dict(FALLBACK_COLORS)
 
 
-def render_chart(chart_data: dict, out_path: str, title: str = "") -> dict:
+def render_chart(chart_data: dict, out_path: str, title: str = "", template_path: str | None = None) -> dict:
     labels = chart_data.get("labels", [])
     values = chart_data.get("values", [])
     chart_type = chart_data.get("chart_type", "bar")
     if not labels or not values:
         return {"error": "no data to render", "png_path": None}
 
-    colors = get_brand_colors(None)
+    colors = get_brand_colors(template_path)
     sns.set_style("whitegrid")
     fig, ax = plt.subplots(figsize=(10, 6), dpi=150)
 
