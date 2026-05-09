@@ -1,3 +1,58 @@
+import re
+
+NUMBER_RX = re.compile(r"(?<!\w)-?\$?\d{1,3}(?:,\d{3})*(?:\.\d+)?%?(?!\w)|(?<!\w)-?\d+(?:\.\d+)?%?(?!\w)")
+TOLERANCE = 0.0001  # 0.01%
+SSN_RX = re.compile(r"\b\d{3}-\d{2}-\d{4}\b")
+EMAIL_RX = re.compile(r"\b[^@\s]+@[^@\s]+\.[^@\s]+\b")
+
+
+def _normalize_number(s: str) -> float | None:
+    s = s.replace("$", "").replace(",", "").replace("%", "")
+    try:
+        return float(s)
+    except ValueError:
+        return None
+
+
+def _matches_kv(claim: float, kv_values: list) -> bool:
+    for v in kv_values:
+        if v == 0:
+            if abs(claim) < 0.01:
+                return True
+            continue
+        # also accept absolute value match (e.g. "Down 7%" referencing -7.0)
+        if abs(claim - v) / abs(v) < TOLERANCE:
+            return True
+        if abs(v) != 0 and abs(abs(claim) - abs(v)) / abs(v) < TOLERANCE:
+            return True
+    return False
+
+
+def validate_narrative(narrative: dict, kv: dict, pii_columns: list | None = None) -> dict:
+    mismatches = []
+    text = " ".join(str(narrative.get(k, "")) for k in ("observe", "analyze"))
+    kv_values = [float(v) for v in kv.values() if isinstance(v, (int, float))]
+    for raw in NUMBER_RX.findall(text):
+        n = _normalize_number(raw)
+        if n is None:
+            continue
+        if not _matches_kv(n, kv_values):
+            mismatches.append(f"fabricated number: {raw}")
+
+    # PII guards: scan all narrative tiers
+    full_text = " ".join(str(narrative.get(k, "")) for k in ("observe", "analyze", "synthesize"))
+    if pii_columns:
+        for col in pii_columns:
+            if col.lower() in full_text.lower():
+                mismatches.append(f"PII column reference: {col}")
+    if SSN_RX.search(full_text):
+        mismatches.append("PII: SSN pattern in narrative")
+    if EMAIL_RX.search(full_text):
+        mismatches.append("PII: email pattern in narrative")
+
+    return {"valid": len(mismatches) == 0, "mismatches": mismatches}
+
+
 PROMPT_TEMPLATE = """You are an executive presentation analyst. Generate a 3-tier narrative for this slide.
 
 SLIDE TITLE: {title}
