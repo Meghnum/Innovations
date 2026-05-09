@@ -80,25 +80,40 @@ def _distributions(df: pl.DataFrame) -> dict:
     return out
 
 
-def _detect_outliers(df: pl.DataFrame, threshold_pct: float = 20.0) -> list:
+def _detect_outliers(df: pl.DataFrame, max_per_col: int = 5) -> list:
+    """IQR-based outlier detection. Returns top-N most extreme outliers per column."""
     out = []
     for col in df.columns:
         if not df[col].dtype.is_numeric():
             continue
         series = df[col].drop_nulls()
-        if series.len() < 2:
+        if series.len() < 4:  # Need enough data for quartiles
             continue
+        q1 = series.quantile(0.25)
+        q3 = series.quantile(0.75)
+        if q1 is None or q3 is None:
+            continue
+        iqr = q3 - q1
+        if iqr == 0:
+            continue
+        lower = q1 - 1.5 * iqr
+        upper = q3 + 1.5 * iqr
         mean = series.mean()
         if mean is None or mean == 0:
             continue
+        # Find values outside IQR fences
+        candidates = []
         for v in series.unique().to_list():
-            dev_pct = 100.0 * (v - mean) / abs(mean)
-            if abs(dev_pct) > threshold_pct:
-                out.append({
+            if v < lower or v > upper:
+                dev_pct = 100.0 * (v - mean) / abs(mean)
+                candidates.append({
                     "col": col,
                     "value": v,
                     "deviation_pct": round(dev_pct, 2),
                 })
+        # Keep top-N by absolute deviation
+        candidates.sort(key=lambda x: abs(x["deviation_pct"]), reverse=True)
+        out.extend(candidates[:max_per_col])
     return out
 
 

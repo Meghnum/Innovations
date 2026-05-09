@@ -114,3 +114,11 @@ def test_detect_pii_exception_path():
         df = pl.DataFrame({"acct": [4111111111111111]})
         result = _detect_pii(df)
         assert "acct" not in result
+
+
+def test_outliers_capped_per_column():
+    """Regression: don't explode on uniform-ish data."""
+    df = pl.DataFrame({"x": list(range(100)) + [1000, 2000, 3000, 4000, 5000, 6000, 7000]})
+    result = profile(df)
+    x_outliers = [o for o in result["outliers"] if o["col"] == "x"]
+    assert len(x_outliers) <= 5
