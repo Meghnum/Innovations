@@ -41,7 +41,7 @@ def _monthly_revenue(df: pl.DataFrame) -> dict:
         abbr = _MONTH_ABBR.get(mm, mm)
         key = abbr + "_revenue"
         out[key] = float(t)
-    if len(totals) >= 2:
+    if len(totals) >= 2 and totals[-2] != 0:
         delta = (totals[-1] - totals[-2]) / totals[-2] * 100.0
         out["last_mom_delta_pct"] = round(delta, 2)
     out["total_revenue"] = float(sum(totals))
@@ -127,6 +127,9 @@ def aggregate(df: pl.DataFrame, chart_spec: dict) -> dict:
               .rename({x: "_x"})
         )
     if grouped.height > MAX_POINTS:
+        # Sort by value descending so we keep the most significant points
+        if chart_type != "line":  # preserve chronological order for time series
+            grouped = grouped.sort("_y", descending=True)
         grouped = grouped.head(MAX_POINTS)
     return {
         "labels": [str(v) for v in grouped["_x"].to_list()],

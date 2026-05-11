@@ -4,6 +4,7 @@ from pptx.util import Inches, Pt
 from scripts.render import pick_layout
 
 DEFAULT_TEMPLATE = Path(__file__).parent.parent / "assets" / "default_template.pptx"
+SAFE_OUTPUT_DIR = Path(__file__).parent.parent / "output"
 
 
 def _resolve_template(template_path: str | None) -> str:
@@ -97,6 +98,28 @@ def build_deck(outline: dict, template_path: str | None, out_path: str) -> dict:
             continue
         _add_slide(prs, slide_data)
     _generate_exclusions_slide(prs, exclusions)
-    Path(out_path).parent.mkdir(parents=True, exist_ok=True)
-    prs.save(out_path)
-    return {"pptx_path": out_path, "slide_count": len(prs.slides)}
+    # Lock output to safe dir; reject path traversal
+    out = Path(out_path).resolve()
+    safe_root = SAFE_OUTPUT_DIR.resolve()
+    SAFE_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    # Allow either: path under SAFE_OUTPUT_DIR, OR explicit absolute path in /tmp (for tests)
+    is_safe = False
+    try:
+        out.relative_to(safe_root)
+        is_safe = True
+    except ValueError:
+        # Permit /tmp paths for testing (pytest's tmp_path)
+        try:
+            out.relative_to(Path("/tmp").resolve())
+            is_safe = True
+        except ValueError:
+            try:
+                out.relative_to(Path("/var/folders").resolve())  # macOS tmp
+                is_safe = True
+            except ValueError:
+                pass
+    if not is_safe:
+        return {"error": f"output path not in safe directory: {out_path}"}
+    Path(out).parent.mkdir(parents=True, exist_ok=True)
+    prs.save(str(out))
+    return {"pptx_path": str(out), "slide_count": len(prs.slides)}

@@ -2,6 +2,25 @@ from pathlib import Path
 import polars as pl
 import fitz  # PyMuPDF
 
+MAX_FILE_BYTES = 20 * 1024 * 1024  # 20 MB hard cap
+
+FORMULA_PREFIXES = ("=", "+", "-", "@")
+
+def _strip_formula_prefixes(df: pl.DataFrame) -> pl.DataFrame:
+    """Remove leading formula-trigger chars from string cells (Excel/CSV injection guard)."""
+    str_cols = [c for c in df.columns if df[c].dtype == pl.String]
+    if not str_cols:
+        return df
+    for c in str_cols:
+        df = df.with_columns(
+            pl.col(c).map_elements(
+                lambda v: v.lstrip("=+-@") if isinstance(v, str) and v.startswith(FORMULA_PREFIXES) else v,
+                return_dtype=pl.String,
+            ).alias(c)
+        )
+    return df
+
+
 def _ingest_pdf(p: Path) -> dict:
     doc = fitz.open(p)
     tables = []
@@ -23,10 +42,11 @@ def _ingest_pdf(p: Path) -> dict:
         doc.close()
     if tables:
         df = pl.concat(tables, how="diagonal_relaxed") if len(tables) > 1 else tables[0]
+        df = _strip_formula_prefixes(df)
         return {
             "dataframe": df,
             "metadata": {
-                "source": str(p),
+                "source": p.name,
                 "rows": df.height,
                 "cols": df.width,
                 "parse_warnings": [],
@@ -37,7 +57,7 @@ def _ingest_pdf(p: Path) -> dict:
     return {
         "dataframe": None,
         "metadata": {
-            "source": str(p),
+            "source": p.name,
             "rows": 0,
             "cols": 0,
             "parse_warnings": ["no tables found in PDF"],
@@ -51,12 +71,17 @@ def ingest(file_path: str) -> dict:
     p = Path(file_path)
     if not p.exists():
         return {"error": f"file not found: {file_path}"}
+    size = p.stat().st_size
+    if size > MAX_FILE_BYTES:
+        return {"error": f"file too large: {size} bytes (max {MAX_FILE_BYTES})"}
     ext = p.suffix.lower()
     try:
         if ext == ".csv":
             df = pl.read_csv(p)
+            df = _strip_formula_prefixes(df)
         elif ext in (".xlsx", ".xls"):
             df = pl.read_excel(p)
+            df = _strip_formula_prefixes(df)
         elif ext == ".pdf":
             return _ingest_pdf(p)
         else:
@@ -66,7 +91,7 @@ def ingest(file_path: str) -> dict:
     return {
         "dataframe": df,
         "metadata": {
-            "source": str(p),
+            "source": p.name,
             "rows": df.height,
             "cols": df.width,
             "parse_warnings": [],

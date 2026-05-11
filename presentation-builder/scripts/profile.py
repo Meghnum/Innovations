@@ -54,7 +54,8 @@ def _detect_pii(df: pl.DataFrame) -> list:
         series = df[col].drop_nulls()
         if series.len() == 0:
             continue
-        sample = series.head(min(20, series.len())).to_list()
+        sample_size = min(200, series.len())
+        sample = series.sample(n=sample_size, seed=42).to_list() if series.len() > sample_size else series.to_list()
         if df[col].dtype == pl.String:
             if any(SSN_RX.match(str(v)) for v in sample):
                 pii.add(col)
