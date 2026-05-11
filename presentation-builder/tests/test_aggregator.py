@@ -1,6 +1,6 @@
 import polars as pl
 import datetime as dt
-from scripts.aggregator import aggregate
+from scripts.analyze import aggregate
 
 def test_aggregate_time_series_reduces_to_monthly_points():
     df = pl.DataFrame({

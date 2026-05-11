@@ -1,5 +1,5 @@
 from pptx import Presentation
-from scripts.layouts import pick_layout, decide_render_mode
+from scripts.render import pick_layout, decide_render_mode
 
 
 def test_decide_render_mode_native_for_small_slice():

@@ -2,12 +2,33 @@ import re
 
 import polars as pl
 
+# ── PII regexes ──────────────────────────────────────────────────────────────
 PII_NAME_RX = re.compile(
     r"(?i)(ssn|social.?security|credit.?card|cc.?num|passport|home.?address|tax.?id|dob|date.?of.?birth|email|phone|account.?number|acct.?num)"
 )
 SSN_RX = re.compile(r"^\d{3}-\d{2}-\d{4}$")
 EMAIL_RX = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
+# ── Context detection regexes ─────────────────────────────────────────────────
+REVENUE_RX = re.compile(r"(?i)(revenue|sales|income|amount)")
+COST_RX = re.compile(r"(?i)(cost|expense|spend|cogs)")
+REGION_RX = re.compile(r"(?i)(region|country|state|city|territory|segment|department)")
+DATE_RX = re.compile(r"(?i)(date|time|month|quarter|year|period)")
+
+# ── Outline constants ─────────────────────────────────────────────────────────
+# Map computation_id → required columns (regex match against profile schema).
+COMPUTATION_REQUIREMENTS = {
+    "monthly_revenue": [r"(?i)(revenue|sales|income|amount)"],
+    "gross_margin": [r"(?i)(revenue|sales|income)", r"(?i)(cost|expense|cogs)"],
+    "top_n_by_region": [r"(?i)(region|country|segment|territory)"],
+    "outlier_drill": [],
+    "descriptive_summary": [],
+}
+
+NULL_THRESHOLD_PCT = 15.0
+
+
+# ── profile helpers ───────────────────────────────────────────────────────────
 
 def _luhn_valid(num: int) -> bool:
     digits = [int(d) for d in str(num)]
@@ -142,3 +163,131 @@ def profile(df: pl.DataFrame) -> dict:
         "date_range": _date_range(df),
         "pii_columns": _detect_pii(df),
     }
+
+
+# ── context detection ─────────────────────────────────────────────────────────
+
+def _has_match(cols, rx):
+    return any(rx.search(c) for c in cols)
+
+def _find_first(cols, rx):
+    for c in cols:
+        if rx.search(c):
+            return c
+    return None
+
+def detect_context(profile: dict) -> dict:
+    cols = list(profile.get("schema", {}).keys())
+    sections = []
+    computations = []
+    story_parts = []
+
+    has_date = profile.get("date_range") is not None or _has_match(cols, DATE_RX)
+    has_revenue = _has_match(cols, REVENUE_RX)
+    has_cost = _has_match(cols, COST_RX)
+    has_region = _has_match(cols, REGION_RX)
+
+    if has_date and has_revenue:
+        sections.append("Revenue Trend")
+        computations.append("monthly_revenue")
+        story_parts.append("time-series")
+    if has_revenue and has_cost:
+        sections.append("Margin Analysis")
+        computations.append("gross_margin")
+        story_parts.append("margin")
+    if has_region:
+        numeric_cols = [c for c, t in profile.get("schema", {}).items() if "Int" in t or "Float" in t]
+        if numeric_cols:
+            sections.append("Regional Breakdown")
+            computations.append("top_n_by_region")
+            story_parts.append("regional")
+    if profile.get("outliers"):
+        sections.append("Outlier Deep Dive")
+        computations.append("outlier_drill")
+
+    if not sections:
+        sections.append("Data Summary")
+        computations.append("descriptive_summary")
+        story_parts.append("descriptive")
+
+    return {
+        "story_type": " + ".join(story_parts),
+        "suggested_sections": sections,
+        "required_computations": computations,
+    }
+
+
+# ── outline building ──────────────────────────────────────────────────────────
+
+def _columns_matching(schema_cols, pattern):
+    rx = re.compile(pattern)
+    return [c for c in schema_cols if rx.search(c)]
+
+
+def _check_viability(profile: dict, computation_id: str) -> tuple:
+    schema_cols = list(profile.get("schema", {}).keys())
+    null_pct = profile.get("null_pct", {})
+    pii = set(profile.get("pii_columns", []))
+    requirements = COMPUTATION_REQUIREMENTS.get(computation_id, [])
+    for pattern in requirements:
+        matches = _columns_matching(schema_cols, pattern)
+        if not matches:
+            return False, f"No column matching {pattern} found"
+        # Check viability of best match
+        viable = [c for c in matches if c not in pii and null_pct.get(c, 0) <= NULL_THRESHOLD_PCT]
+        if not viable:
+            offending = matches[0]
+            if offending in pii:
+                return False, f"Column '{offending}' excluded for PII privacy compliance"
+            return False, f"Column '{offending}' has {null_pct.get(offending, 0)}% nulls (>{NULL_THRESHOLD_PCT}%)"
+    return True, ""
+
+
+def build_outline(profile: dict, context: dict) -> dict:
+    slides = []
+    n = 1
+    # Slide 1: Exec Summary placeholder (filled in Stage 2 from synthesized takeaways)
+    slides.append({
+        "n": n,
+        "layout": "Title and Content",
+        "title": "Executive Summary",
+        "content_type": "exec_summary",
+        "computation_id": None,
+        "chart_spec": None,
+        "status": "active",
+    })
+    n += 1
+
+    # Section slides
+    sections = context.get("suggested_sections", [])
+    computations = context.get("required_computations", [])
+    for section, comp_id in zip(sections, computations):
+        viable, reason = _check_viability(profile, comp_id)
+        slide = {
+            "n": n,
+            "layout": "Image + Text",
+            "title": section,
+            "content_type": "section",
+            "computation_id": comp_id,
+            "chart_spec": {"type": "auto"},
+            "status": "active" if viable else "excluded",
+            "reason": "" if viable else reason,
+        }
+        slides.append(slide)
+        n += 1
+
+    # Deep-dive slides per outlier
+    for outlier in profile.get("outliers", []):
+        slides.append({
+            "n": n,
+            "layout": "Big Number",
+            "title": f"Deep Dive: {outlier['col']} = {outlier['value']}",
+            "content_type": "deep_dive",
+            "computation_id": "outlier_drill",
+            "chart_spec": {"type": "annotation", "outlier": outlier},
+            "status": "active",
+            "outlier": outlier,
+        })
+        n += 1
+
+    return {"slides": slides}

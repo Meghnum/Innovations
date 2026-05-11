@@ -1,4 +1,4 @@
-from scripts.context import detect_context
+from scripts.profile import detect_context
 
 def _profile(schema: dict, date_range=None) -> dict:
     return {

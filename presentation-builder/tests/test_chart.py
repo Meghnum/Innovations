@@ -1,5 +1,5 @@
 from pathlib import Path
-from scripts.chart import render_chart, get_brand_colors
+from scripts.render import render_chart, get_brand_colors
 
 def test_render_bar_chart_writes_png(tmp_path):
     chart_data = {

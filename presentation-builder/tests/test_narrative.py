@@ -1,4 +1,4 @@
-from scripts.narrative import build_prompt, validate_narrative
+from scripts.render import build_prompt, validate_narrative
 
 
 def test_build_prompt_contains_kv_facts():

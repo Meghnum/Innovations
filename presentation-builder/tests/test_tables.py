@@ -1,7 +1,7 @@
 import polars as pl
 from pptx import Presentation
 from pptx.util import Inches
-from scripts.tables import add_native_table
+from scripts.render import add_native_table
 
 def test_add_native_table_to_slide(tmp_path):
     df = pl.DataFrame({

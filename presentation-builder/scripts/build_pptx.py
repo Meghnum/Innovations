@@ -1,7 +1,7 @@
 from pathlib import Path
 from pptx import Presentation
 from pptx.util import Inches, Pt
-from scripts.layouts import pick_layout
+from scripts.render import pick_layout
 
 DEFAULT_TEMPLATE = Path(__file__).parent.parent / "assets" / "default_template.pptx"
 

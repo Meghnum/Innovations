@@ -2,13 +2,9 @@
 from pathlib import Path
 from pptx import Presentation
 from scripts.ingest import ingest
-from scripts.profile import profile
-from scripts.context import detect_context
-from scripts.outline import build_outline
-from scripts.analyze import analyze
-from scripts.aggregator import aggregate
-from scripts.chart import render_chart
-from scripts.narrative import validate_narrative
+from scripts.profile import profile, detect_context, build_outline
+from scripts.analyze import analyze, aggregate
+from scripts.render import render_chart, validate_narrative
 from scripts.build_pptx import build_deck
 
 

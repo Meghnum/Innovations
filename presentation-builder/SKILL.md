@@ -14,8 +14,8 @@ You are a world-class Data Analyst and Presentation Designer. Your goal is to tr
 
 1. Call `scripts/ingest.py::ingest(file_path)` to load the file. If it returns an error, ask the user for a fixed file. Do NOT attempt analysis on a failed ingest.
 2. Call `scripts/profile.py::profile(df)` on the resulting DataFrame. This produces schema, null percentages, outlier flags, PII columns, and date range.
-3. Call `scripts/context.py::detect_context(profile)` to infer the story shape from column patterns.
-4. Call `scripts/outline.py::build_outline(profile, context)` to produce the slide list. This includes:
+3. Call `scripts/profile.py::detect_context(profile)` to infer the story shape from column patterns.
+4. Call `scripts/profile.py::build_outline(profile, context)` to produce the slide list. This includes:
    - Slide 1 always Executive Summary.
    - Section slides per detected story.
    - Auto-inserted Deep Dive slides for outliers >20% deviation.
@@ -32,14 +32,14 @@ You are a world-class Data Analyst and Presentation Designer. Your goal is to tr
 For each `active` slide in the confirmed outline:
 
 1. Call `scripts/analyze.py::analyze(df, computation_id)` to produce a flat key-value store of facts.
-2. Call `scripts/aggregator.py::aggregate(df, chart_spec)` to reduce the DataFrame to Chart-Ready JSON (≤100 points). Charts must NEVER receive raw DataFrames — always go through the aggregator.
-3. Use `scripts/layouts.py::decide_render_mode(rows, cols)` to choose between native PPTX table (≤10 rows AND ≤5 cols) or rendered chart image.
-4. If chart: call `scripts/chart.py::render_chart(chart_data, out_path, title)` to write a PNG.
-5. Generate the narrative yourself using the prompt produced by `scripts/narrative.py::build_prompt(kv, slide_ctx)`. Output strictly the JSON shape `{"observe": "...", "analyze": "...", "synthesize": "..."}`. Follow the Observe → Analyze → Synthesize chain:
+2. Call `scripts/analyze.py::aggregate(df, chart_spec)` to reduce the DataFrame to Chart-Ready JSON (≤100 points). Charts must NEVER receive raw DataFrames — always go through the aggregator.
+3. Use `scripts/render.py::decide_render_mode(rows, cols)` to choose between native PPTX table (≤10 rows AND ≤5 cols) or rendered chart image.
+4. If chart: call `scripts/render.py::render_chart(chart_data, out_path, title)` to write a PNG.
+5. Generate the narrative yourself using the prompt produced by `scripts/render.py::build_prompt(kv, slide_ctx)`. Output strictly the JSON shape `{"observe": "...", "analyze": "...", "synthesize": "..."}`. Follow the Observe → Analyze → Synthesize chain:
    - **Observe**: state the raw fact (single sentence, exact number from KV).
    - **Analyze**: state the comparative or trend context (single sentence, exact delta from KV).
    - **Synthesize**: state the business "So What" (single sentence, no new numbers).
-6. Validate the narrative with `scripts/narrative.py::validate_narrative(narrative, kv, pii_columns)`. If `valid` is False:
+6. Validate the narrative with `scripts/render.py::validate_narrative(narrative, kv, pii_columns)`. If `valid` is False:
    - On a `fabricated number` mismatch: regenerate the narrative ONCE. If still invalid, strip the offending claim and add a warning to speaker notes.
    - On a PII mismatch: rewrite the narrative without referencing PII fields.
 7. Attach the narrative + chart_png path + table descriptor to the slide entry.
@@ -62,8 +62,8 @@ Finally:
 - **Slide Economy**: max 6 bullet points per slide.
 - **Visual Priority**: every data slide must contain a chart or native table.
 - **So What? Rule**: synthesis text on slide; observe/analyze in speaker notes only.
-- **Brand Hex**: charts use brand colors from `chart.py` palette (or template if extracted).
-- **Native vs Image**: ≤10×5 → native table; else image. Decided by `layouts.py`.
+- **Brand Hex**: charts use brand colors from `render.py` palette (or template if extracted).
+- **Native vs Image**: ≤10×5 → native table; else image. Decided by `render.py`.
 
 ## Failure Modes
 

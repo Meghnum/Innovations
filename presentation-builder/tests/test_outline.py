@@ -1,4 +1,4 @@
-from scripts.outline import build_outline
+from scripts.profile import build_outline
 
 def _ctx(sections, computations):
     return {
