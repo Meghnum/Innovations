@@ -6,7 +6,8 @@
 # --- Data Settings ---
 data:
   qvd_folder: "data/qvd/"                  # Folder where your QVD files live
-  dummy_mode: true                           # Set to false when using real QVDs
+  dummy_mode: false                           # Set to false when using real QVDs/CSV
+  csv_file: "Final_Ready_For_Triage_Claims_50K.csv" # CSV file to load (used when dummy_mode=false)
   dummy_row_count: 5000                   # Rows to generate in dummy mode
   recent_months: 12                          # Default: load only last N months
   chunk_size: 5000                           # Rows per chunk when processing large files
@@ -19,15 +20,15 @@ columns:
   # --- Backward-compatible keys (mapped to real column names) ---
   claim_id: "Claim Number"
   status: "Claim Status Derived"
-  claim_type: "Claim Type Description"
+  claim_type: "Claim Type Description"        # Full 74-col dataset has this
   submitted_date: "Reported Date"
   closed_date: "Claim Closed Date"
   region: "Country"
-  claimant_name: "Policy Holder Name"
+  claimant_name: "Policy Holder Name"        # Full 74-col dataset has this
   claim_amount: "Incurred USD"
   paid_amount: "Indemnity Paid USD"
   reserve_amount: "Outstanding Reserve USD"
-  days_open: "Claim Life Days"
+  days_open: "Claim Life Days"               # Will be computed if missing
 
   # --- Identifiers ---
   policy_number: "Policy Number"

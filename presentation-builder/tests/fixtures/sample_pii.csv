@@ -1,0 +1,21 @@
+Customer_Name,SSN,Email,Revenue
+Person 0,100-20-1000,user0@example.com,1000
+Person 1,101-21-1001,user1@example.com,2000
+Person 2,102-22-1002,user2@example.com,3000
+Person 3,103-23-1003,user3@example.com,4000
+Person 4,104-24-1004,user4@example.com,5000
+Person 5,105-25-1005,user5@example.com,6000
+Person 6,106-26-1006,user6@example.com,7000
+Person 7,107-27-1007,user7@example.com,8000
+Person 8,108-28-1008,user8@example.com,9000
+Person 9,109-29-1009,user9@example.com,10000
+Person 10,110-30-1010,user10@example.com,11000
+Person 11,111-31-1011,user11@example.com,12000
+Person 12,112-32-1012,user12@example.com,13000
+Person 13,113-33-1013,user13@example.com,14000
+Person 14,114-34-1014,user14@example.com,15000
+Person 15,115-35-1015,user15@example.com,16000
+Person 16,116-36-1016,user16@example.com,17000
+Person 17,117-37-1017,user17@example.com,18000
+Person 18,118-38-1018,user18@example.com,19000
+Person 19,119-39-1019,user19@example.com,20000
