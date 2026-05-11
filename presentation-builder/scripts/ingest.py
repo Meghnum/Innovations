@@ -41,7 +41,17 @@ def _ingest_pdf(p: Path) -> dict:
     finally:
         doc.close()
     if tables:
-        df = pl.concat(tables, how="diagonal_relaxed") if len(tables) > 1 else tables[0]
+        warnings = []
+        if len(tables) > 1:
+            schemas = [set(t.columns) for t in tables]
+            base = schemas[0]
+            if not all(s == base for s in schemas[1:]):
+                warnings.append(
+                    f"merged {len(tables)} PDF tables with mismatched schemas; missing columns filled with nulls"
+                )
+            df = pl.concat(tables, how="diagonal_relaxed")
+        else:
+            df = tables[0]
         df = _strip_formula_prefixes(df)
         return {
             "dataframe": df,
@@ -49,7 +59,7 @@ def _ingest_pdf(p: Path) -> dict:
                 "source": p.name,
                 "rows": df.height,
                 "cols": df.width,
-                "parse_warnings": [],
+                "parse_warnings": warnings,
                 "file_type": "pdf",
                 "text_blocks": text_blocks,
             },
@@ -86,8 +96,8 @@ def ingest(file_path: str) -> dict:
             return _ingest_pdf(p)
         else:
             return {"error": f"unsupported file type: {ext}"}
-    except Exception as e:
-        return {"error": f"parse failed: {e}"}
+    except Exception:
+        return {"error": "file could not be parsed; ensure it is a valid Excel/CSV/PDF file"}
     return {
         "dataframe": df,
         "metadata": {

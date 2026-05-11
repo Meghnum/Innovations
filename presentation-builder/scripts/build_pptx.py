@@ -5,12 +5,14 @@ from scripts.render import pick_layout
 
 DEFAULT_TEMPLATE = Path(__file__).parent.parent / "assets" / "default_template.pptx"
 SAFE_OUTPUT_DIR = Path(__file__).parent.parent / "output"
+MAX_SLIDES = 50
 
 
-def _resolve_template(template_path: str | None) -> str:
+def _resolve_template(template_path: str | None) -> tuple[str, bool]:
+    """Returns (template_path, used_fallback)."""
     if template_path and Path(template_path).exists():
-        return template_path
-    return str(DEFAULT_TEMPLATE)
+        return template_path, False
+    return str(DEFAULT_TEMPLATE), True
 
 
 def _add_text(text_frame, text: str, font_size: int = 18):
@@ -86,9 +88,11 @@ def _generate_exclusions_slide(prs, exclusions: list):
 
 
 def build_deck(outline: dict, template_path: str | None, out_path: str) -> dict:
-    template = _resolve_template(template_path)
+    template, used_fallback = _resolve_template(template_path)
     prs = Presentation(template)
     exclusions = []
+    active_added = 0
+    truncated_count = 0
     for slide_data in outline.get("slides", []):
         if slide_data.get("status") == "excluded":
             exclusions.append({
@@ -96,7 +100,21 @@ def build_deck(outline: dict, template_path: str | None, out_path: str) -> dict:
                 "reason": slide_data.get("reason", "no reason provided"),
             })
             continue
+        if active_added >= MAX_SLIDES:
+            truncated_count += 1
+            continue
         _add_slide(prs, slide_data)
+        active_added += 1
+    if truncated_count > 0:
+        exclusions.append({
+            "title": f"+{truncated_count} additional slides",
+            "reason": f"Deck capped at {MAX_SLIDES} slides for readability",
+        })
+    if used_fallback and template_path:
+        exclusions.append({
+            "title": "Corporate template not loaded",
+            "reason": f"Template '{template_path}' not found; using default template (brand styling will not match)",
+        })
     _generate_exclusions_slide(prs, exclusions)
     # Lock output to safe dir; reject path traversal
     out = Path(out_path).resolve()
@@ -122,4 +140,8 @@ def build_deck(outline: dict, template_path: str | None, out_path: str) -> dict:
         return {"error": f"output path not in safe directory: {out_path}"}
     Path(out).parent.mkdir(parents=True, exist_ok=True)
     prs.save(str(out))
-    return {"pptx_path": str(out), "slide_count": len(prs.slides)}
+    return {
+        "pptx_path": str(out),
+        "slide_count": len(prs.slides),
+        "used_default_template": used_fallback,
+    }
