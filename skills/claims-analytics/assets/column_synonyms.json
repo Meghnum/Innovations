@@ -1,0 +1,316 @@
+{
+ "_doc": "Column resolution config. 'concept_aliases' is what the engine resolves on (casing/spacing variants already match via normalization, so only genuinely different wordings are listed). 'synonym_groups' are reviewed true synonyms for the interpretation layer. 'known_distinct' are look-alike columns that must NOT be merged.",
+ "concept_aliases": {
+  "claim_id": [
+   "Claim Number",
+   "CLAIM_NUMBER",
+   "System Claim Number"
+  ],
+  "claimant_id": [
+   "CLAIM_CLAIMANT_NUMBER",
+   "Claim Claimant Number"
+  ],
+  "status_derived": [
+   "Claim Status Derived"
+  ],
+  "status_original": [
+   "Claim Status Original",
+   "Claim Status"
+  ],
+  "status_genius": [
+   "Genius Claim Status"
+  ],
+  "status_secondary": [
+   "Claim Secondary Status",
+   "Secondary Claim Status",
+   "File Secondary Status"
+  ],
+  "reported_date": [
+   "Reported Date",
+   "Claim Report Date"
+  ],
+  "opened_date": [
+   "Opened Date",
+   "Claim Opened Date",
+   "Clam Opened Date"
+  ],
+  "closed_date": [
+   "Closed Date",
+   "Claim Closed Date"
+  ],
+  "reopened_date": [
+   "Reopened Date"
+  ],
+  "period_month": [
+   "Month",
+   "MonthYear"
+  ],
+  "accident_year": [
+   "Accident Year"
+  ],
+  "country": [
+   "COG_COUNTRY",
+   "Country",
+   "Policy Country"
+  ],
+  "life_days": [
+   "Claim Life Days",
+   "CLAIM_LIFE_DAYS_NUMBER"
+  ],
+  "life_banding": [
+   "Claim Life Banding",
+   "CLAIM_LIFE_BANDING"
+  ],
+  "nominal_reserve": [
+   "Nominal Reserve",
+   "NOMINAL_INDICATOR"
+  ],
+  "incurred_usd": [
+   "Incurred (USD)",
+   "USD Incurred",
+   "Incurred USD",
+   "INCURRED_TOTAL_GROSS_USD_AMT",
+   "$ Claims Incurred"
+  ],
+  "indemnity_paid_usd": [
+   "Indemnity (USD)",
+   "USD Indemnity Paid",
+   "Indemnity Paid USD"
+  ],
+  "expense_paid_usd": [
+   "Expense Total (USD)",
+   "USD Expense Paid",
+   "Expense Paid USD"
+  ],
+  "recovery_usd": [
+   "USD Recovery",
+   "Recoveries USD",
+   "Gross Recoveries"
+  ],
+  "oslr_usd": [
+   "OSLR Total (USD)",
+   "Outstanding Reserve USD",
+   "USD OSLR Total",
+   "OSLR USD"
+  ]
+ },
+ "synonym_groups": [
+  {
+   "canonical": "ACCOUNTING YEAR",
+   "synonyms": [
+    "Accounting Year"
+   ],
+   "shared_definition": "accounting year is dervied from uwyear"
+  },
+  {
+   "canonical": "Adjuster Name",
+   "synonyms": [
+    "ADJUSTER NAME"
+   ],
+   "shared_definition": "name of the adjuster"
+  },
+  {
+   "canonical": "Broker Name",
+   "synonyms": [
+    "BROKER NAME"
+   ],
+   "shared_definition": "name of the broker"
+  },
+  {
+   "canonical": "Claim Number",
+   "synonyms": [
+    "System Claim Number"
+   ],
+   "shared_definition": "claim number"
+  },
+  {
+   "canonical": "CLAIM REFERENCE",
+   "synonyms": [
+    "COR (LLOYDS)/CLMREF (LIRMA)",
+    "COR(LLOYDS)/CLAIM REF(LIRMA)"
+   ],
+   "shared_definition": "claim reference number"
+  },
+  {
+   "canonical": "Claim Status",
+   "synonyms": [
+    "CLAIM STATUS"
+   ],
+   "shared_definition": "status of the claim"
+  },
+  {
+   "canonical": "Claimant",
+   "synonyms": [
+    "Claimant Name",
+    "Claimant_Name"
+   ],
+   "shared_definition": "name of the claimant"
+  },
+  {
+   "canonical": "CLAIMS STATUS",
+   "synonyms": [
+    "CLAIM STATUS FLAG"
+   ],
+   "shared_definition": "claim status"
+  },
+  {
+   "canonical": "COG_COUNTRY",
+   "synonyms": [
+    "Source System Country"
+   ],
+   "shared_definition": "country name"
+  },
+  {
+   "canonical": "CoInsurance",
+   "synonyms": [
+    "Coinsurance"
+   ],
+   "shared_definition": "coinsurace as follow or lead"
+  },
+  {
+   "canonical": "CoInsurance Indicator",
+   "synonyms": [
+    "COINSURANCE INDICATOR"
+   ],
+   "shared_definition": "exclusive/lead/follow"
+  },
+  {
+   "canonical": "ENTITY",
+   "synonyms": [
+    "Entity"
+   ],
+   "shared_definition": "company/lloyds\u2026"
+  },
+  {
+   "canonical": "GDPR Risk",
+   "synonyms": [
+    "GDPR Risk of Claim"
+   ],
+   "shared_definition": "gdpr risk as high, low or no risk"
+  },
+  {
+   "canonical": "INCURRED",
+   "synonyms": [
+    "INCURRED (100%)"
+   ],
+   "shared_definition": "total incurred amount"
+  },
+  {
+   "canonical": "Incurred USD",
+   "synonyms": [
+    "USD Incurred"
+   ],
+   "shared_definition": "the aggregation of all financials on a claim i.e. (indemnity + expenses + reserves - recoveries) in usd"
+  },
+  {
+   "canonical": "INSURED",
+   "synonyms": [
+    "Insured"
+   ],
+   "shared_definition": "insured name"
+  },
+  {
+   "canonical": "LOB",
+   "synonyms": [
+    "LOB Drill-Down"
+   ],
+   "shared_definition": "line of business"
+  },
+  {
+   "canonical": "LOSS DT",
+   "synonyms": [
+    "Loss Date",
+    "DATE OF LOSS"
+   ],
+   "shared_definition": "date of loss"
+  },
+  {
+   "canonical": "Loss Name",
+   "synonyms": [
+    "LOSS NAME"
+   ],
+   "shared_definition": "name of the loss"
+  },
+  {
+   "canonical": "MAJOR LINE",
+   "synonyms": [
+    "Major Line"
+   ],
+   "shared_definition": "major line of business name"
+  },
+  {
+   "canonical": "Minor Line",
+   "synonyms": [
+    "MINOR LINE"
+   ],
+   "shared_definition": "minor line of business name"
+  },
+  {
+   "canonical": "OSLR USD",
+   "synonyms": [
+    "USD OSLR Total"
+   ],
+   "shared_definition": "the total reserve for every claim that is open, reopened or closed in the maximum selected accounting period in usd"
+  },
+  {
+   "canonical": "Policy Number",
+   "synonyms": [
+    "POLICY_NUMBER"
+   ],
+   "shared_definition": "policy number"
+  },
+  {
+   "canonical": "PRODUCT",
+   "synonyms": [
+    "Product"
+   ],
+   "shared_definition": "product name"
+  },
+  {
+   "canonical": "Source",
+   "synonyms": [
+    "SOURCE"
+   ],
+   "shared_definition": "data source: eg. genius, lloyds etc."
+  },
+  {
+   "canonical": "USD Indemnity Paid",
+   "synonyms": [
+    "INDEMNITY PAID (USD)"
+   ],
+   "shared_definition": "indemnity paid in usd"
+  },
+  {
+   "canonical": "USD Indemnity Reserve",
+   "synonyms": [
+    "INDEMNITY RESERVE (USD)",
+    "INDEMNITY RESERVED (USD)"
+   ],
+   "shared_definition": "indemnity reserve in usd"
+  }
+ ],
+ "known_distinct": [
+  {
+   "fields": [
+    "Adjuster",
+    "Responsible Adjuster",
+    "Source Adjuster"
+   ],
+   "note": "Distinct roles/sources \u2014 do NOT treat as the same column."
+  },
+  {
+   "fields": [
+    "Loss Location",
+    "Incident Country"
+   ],
+   "note": "Distinct \u2014 do NOT merge."
+  },
+  {
+   "fields": [
+    "UCR_ENERGY",
+    "UCR_SUBSCRIBE"
+   ],
+   "note": "Different references \u2014 do NOT merge."
+  }
+ ]
+}
