@@ -364,3 +364,109 @@ An open claim is one that has been reported to the insurance company but has not
 - **Transaction Processed by LOB**  `[OWNER-DEFINED]` — Number of Transaction by Lines of Business
 - **Transaction Volumes & Speed of Performance**  `[OWNER-DEFINED]` — Count of Response Time Days and Within SLA % Broker wise
 - **Year Month**  `[OWNER-DEFINED]` — Year Month for Lloyd's and LIRMA
+
+
+---
+
+# Appendix A — Proprietary KPIs needing owner sign-off
+
+6 metrics are proprietary to your business. Provisional definitions are in the
+catalogue tagged PROPRIETARY; replace them with the owning team's authoritative wording.
+
+## A&H Claims Connect Database (4)
+- [ ] % CSP Achieved - Basic Book/Direct Marketing/NAC  (sheet: CSP Usage)
+- [ ] CSP Ingested Claims - Basic Book/Direct Marketing/NAC  (sheet: CSP Usage)
+- [ ] Class 3 Check  (sheet: Conduct Risk)
+- [ ] Total Claim - Basic Book/Direct Marketing/NAC  (sheet: CSP Usage)
+
+## MAR-Operational (1)
+- [ ] Reserve ending in 001 for Local Regulatory Reason  (sheet: Nominals)
+
+## TPA Performance Dashboard (1)
+- [ ] Vendor Performance Management Levels  (sheet: Case Analysis & Data Quality)
+
+---
+
+# Appendix B — Reclassified dimensions (were labelled KPIs)
+
+These were labelled as KPIs in the source but are dimensions/attributes, not metrics.
+Treat them as breakdown/filter fields, not as numbers to compute.
+
+## A&H Claims Connect Database
+
+- **2 Year Status** — Status banding flagging whether a claim has been open/reopened for 2 years or more. A dimension, not a metric.
+- **Actime Claim** — Appears to be a typo for 'Active Claim' — a flag/count of claims currently open/active. Confirm intended spelling and whether count or flag.
+- **Certificate Number** — Insurance certificate identifier. A dimension/attribute, not a metric.
+- **Claim Country** — Country associated with the claim. A dimension, not a metric.
+- **Class 3 Description** — Text description of the internal 'Class 3' classification. A dimension; the classification itself is proprietary.
+- **Declinature Reason** — Reason a claim was declined. A dimension, not a metric.
+- **Master Policy** — Master policy reference under which sub-policies/certificates sit. A dimension/identifier.
+
+## M7 Pipeline Report Issue Tracker
+
+- **Due Diligence Workflow** — Due-diligence workflow stage/status for a vendor in onboarding. A dimension.
+- **Split By Current Position** — A chart split (breakdown) of pipeline items by their current position/stage. A dimension.
+- **Split By Onboarding Type** — A chart split of pipeline items by onboarding type. A dimension.
+- **Split By Stall Issue** — A chart split of pipeline items by the issue causing them to stall. A dimension.
+- **Status** — Status of the tracked item. A dimension, not a metric.
+- **Vendor Activity Type** — Type of vendor activity. A dimension, not a metric.
+
+---
+
+# Appendix C — Non-metric items (excluded)
+
+Chart/table objects and navigation labels from the source list. Not analysable metrics —
+the skill should ignore these if a user references them.
+
+## TPA Performance Dashboard
+
+- **All Figures On This Tab Relate To The Most Recent Scorecard Submission.**  `[NAVIGATION/LABEL]` — Explanatory note on the tab, not a metric. Exclude from analysis.
+- **Click Here For Direct Access To The AP Dashboard**  `[NAVIGATION/LABEL]` — Navigation link, not a metric. Exclude from analysis.
+- **Click Here To Declinatures Tab**  `[NAVIGATION/LABEL]` — Navigation link, not a metric. Exclude from analysis.
+- **Click Here To Fraud Tab**  `[NAVIGATION/LABEL]` — Navigation link, not a metric. Exclude from analysis.
+- **Click Here To Recent TPA Scorecard Level**  `[NAVIGATION/LABEL]` — Navigation link, not a metric. Exclude from analysis.
+- **Click Here To Service & Performance Tab'**  `[NAVIGATION/LABEL]` — Navigation link, not a metric. Exclude from analysis.
+- **Click Here To TPA Scorecard Gap Analysis Tab**  `[NAVIGATION/LABEL]` — Navigation link, not a metric. Exclude from analysis.
+- **Customer Metrics Rag Table By Vendor**  `[CHART/TABLE OBJECT]` — A Red/Amber/Green status table of customer-service metrics per vendor — a presentation object, not a single metric.
+- **Declinatures Overview By TPA**  `[CHART/TABLE OBJECT]` — A chart object showing declinatures broken down by TPA, not a single metric.
+- **Financial Overview By Year**  `[CHART/TABLE OBJECT]` — A chart object showing financials by year, not a single metric.
+- **Financials  Overview By TPA**  `[CHART/TABLE OBJECT]` — A chart object showing financials broken down by TPA, not a single metric.
+- **Fraud Referrals Overview By TPB**  `[CHART/TABLE OBJECT]` — A chart object showing fraud referrals by TPA (source says 'TPB'), not a single metric.
+- **Telephony Stats By Year**  `[CHART/TABLE OBJECT]` — A chart object showing telephony stats by year, not a single metric.
+- **Telephony Stats Overview By TPA**  `[CHART/TABLE OBJECT]` — A chart object showing telephony stats by TPA, not a single metric.
+- **Total Recovery By Vendor**  `[CHART/TABLE OBJECT]` — Sum of recoveries broken down by TPA/vendor — a chart breakdown of the recovery total.
+
+---
+
+# Appendix D — Owner-documented definitions (authoritative)
+
+These supersede earlier industry-standard placeholders; provenance is OWNER-DEFINED.
+
+- **New Claims** — Claims opened in one accounting period.
+- **Closed Claims** — Claims closed in one accounting period.
+- **Pending Claims** — Claims with a status of open or reopened at the end of an accounting period.
+- **Reopened Claims** — Claims reopened in the accounting period.
+- **Closing Ratio** — Claims closed in the accounting period divided by claims opened in the accounting period.
+- **Net Closing Ratio** — Claims closed in the accounting period divided by claims opened and reopened in the accounting period.
+- **Reopened Ratio** — Claims reopened in the accounting period divided by claims closed in the accounting period.
+- **ACPOC** — The incurred value of all open or reopened claims divided by the count of those claims (Average Cost per Outstanding Claims).
+- **ACPSC** — The incurred value of all closed claims divided by the count of closed claims (Average Cost per Settled Claims).
+- **Claim Life Days** — Days open (reported to closed for closed claims; reported to current date for pending claims) divided by the count of those claims.
+- **Time to Settle** — The average claim life days for all closed claims selected.
+- **Incurred** — Indemnity + expenses + reserves − recoveries.
+- **Nominal Reserves** — The sum of reserves on any claim with a cumulative gross (DACs 1 & 2) original-currency reserve of 77, 88, 99 or 123.
+- **Nominal Age** — The average age of claims holding a nominal reserve in the period selected.
+- **Inactive Claims (>270 days)** — Count of open or reopened claims with no financial transaction for 270 days or more.
+- **Volume - 1 Year Static Claims** — Claims opened or reopened in the accounting period with no financial movement for 365 days.
+- **Value - 1 Year Static Claims** — Incurred total of claims opened or reopened in the accounting period with no financial movement for 365 days.
+- **Paid Indemnity** — The paid indemnity in the time period selected.
+- **Paid Expenses** — The paid expenses in the time period selected.
+- **FNOL to First Indemnity** — Days from the reported date to the first indemnity payment in Genius.
+- **FNOL to Final Indemnity** — Days from the reported date to the last indemnity payment in Genius.
+- **Reserve Completion (0-20 Business days)** — Count of claims where registration (opened date − reported date) was below 20 business days, against all claims opened in that accounting period.
+- **Claim Frequency** — The percentage of distinct claims per policy.
+- **Claim Lag** — The time gap between a policy's effective date and when the first claim is reported.
+- **Closed Claims Volume** — Claims reported based on underwriting year, now closed.
+- **Open Claims Volume** — Claims reported based on underwriting year, still open.
+- **Policy with Claim** — The percentage of policies which have at least one claim on them.
+- **Total Claims** — Claims reported with respect to underwriting year.

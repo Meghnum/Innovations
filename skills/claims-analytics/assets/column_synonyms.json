@@ -287,6 +287,15 @@
     "INDEMNITY RESERVED (USD)"
    ],
    "shared_definition": "indemnity reserve in usd"
+  },
+  {
+   "canonical": "Country",
+   "synonyms": [
+    "COG_COUNTRY",
+    "Policy Country"
+   ],
+   "shared_definition": "owner-confirmed: same country concept across apps",
+   "source": "owner-confirmed"
   }
  ],
  "known_distinct": [

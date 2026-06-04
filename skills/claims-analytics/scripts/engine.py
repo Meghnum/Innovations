@@ -17,12 +17,48 @@ import pandas as pd
 
 _HERE = os.path.dirname(__file__)
 try:
-    _CAT = json.load(open(os.path.join(_HERE, "..", "assets", "kpi_catalogue.json")))
+    _RAW = json.load(open(os.path.join(_HERE, "..", "assets", "kpi_catalogue.json")))
 except Exception:
-    _CAT = []
+    _RAW = []
+if isinstance(_RAW, dict):                 # new form: {apps, rag_thresholds, metrics}
+    _CAT  = _RAW.get("metrics", [])
+    _APPS = _RAW.get("apps", {})
+    _RAG  = _RAW.get("rag_thresholds", {})
+else:                                       # legacy form: a bare list of metrics
+    _CAT, _APPS, _RAG = _RAW, {}, {}
 _CAT_BY_NAME = {}
 for m in _CAT:
     _CAT_BY_NAME.setdefault(re.sub(r"[^a-z0-9]", "", m["name"].lower()), m)
+
+
+def where_to_see(query):
+    """Which app(s) hold a metric, with link placeholders — for 'where can I see X' questions.
+    Prefers exact name matches, then prefix, then contains; returns every app for the best tier."""
+    q = re.sub(r"[^a-z0-9]", "", str(query).lower())
+    qs = q.rstrip("s")
+    exact, prefix, contains = [], [], []
+    for m in _CAT:
+        nm = re.sub(r"[^a-z0-9]", "", m["name"].lower())
+        app = m.get("app"); info = _APPS.get(app, {})
+        row = {"metric": m["name"], "app": info.get("display", app), "url": info.get("url")}
+        if nm == q or nm == qs:
+            exact.append(row)
+        elif qs and nm.startswith(qs):
+            prefix.append(row)
+        elif qs and qs in nm:
+            contains.append(row)
+    best = exact or prefix or contains
+    out, seen = [], set()
+    for r in best:
+        k = (r["metric"], r["app"])
+        if k not in seen:
+            seen.add(k); out.append(r)
+    return out
+
+
+def rag_for(metric):
+    """Owner-documented Red/Amber/Green thresholds for a metric, if any."""
+    return _RAG.get(re.sub(r"[^a-z0-9]", "", str(metric).lower()))
 
 def _n(s): return re.sub(r"[^a-z0-9]", "", str(s).lower())
 

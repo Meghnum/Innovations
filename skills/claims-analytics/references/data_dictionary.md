@@ -553,3 +553,15 @@ and if the consent is withheld or withdrwan it will be valued at 3
 - **Workflow** — Maintained in Workflow or not
 - **Workitem Attachment** — Workitem attached or handled by ClaimConnect
 - **Workview Implementation Date** — Date claim implemented in Workview
+
+
+## Portfolio Insight — column headers
+
+Policy-and-claim grain (EMEA; policies from 2005, claims from 2020). Headers:
+Underwriting Year, Policy Number, Country, Policy Inception Date, Policy Effective
+Date, Policy Expiration Date, Executive LOB, Major LOB, Coverage Code, Policy Type,
+Policy Status, Claim Number, Claim Opened Date, Claim Loss Date, Claim Event Date,
+Lag Days, Reserving Class, Reserving Line, Coinsurance, Product, GWP, USD Incurred.
+
+Note: this app pairs policy and claim fields, so a "policy with claim" / claim-
+frequency view is possible here that the claim-only MAR extracts cannot give.

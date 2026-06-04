@@ -1,2530 +1,2808 @@
-[
- {
-  "app": "A&H Claims Connect Database",
-  "sheet": "CSP Usage",
-  "name": "% CSP Achieved - Basic Book/Direct Marketing/NAC",
-  "definition": "Percentage of claims in the Basic Book / Direct Marketing / NAC books that were handled via the CSP (Claims Service Provider) route. CSP, NAC and the book segments are internal definitions \u2014 confirm exact numerator/denominator with the A&H team.",
-  "provenance": "PROP",
-  "computation": "ratio"
- },
- {
-  "app": "A&H Claims Connect Database",
-  "sheet": "Fast Track",
-  "name": "% Fast Track Acieved",
-  "definition": "Percentage of claims handled through the fast-track (simplified, low-touch) route in the period = Fast Track Claims / total eligible claims x 100. (Source name misspelled 'Acieved'.)",
-  "provenance": "IND",
-  "computation": "ratio"
- },
- {
-  "app": "A&H Claims Connect Database",
-  "sheet": "Fast Track",
-  "name": "% Fast Track Target",
-  "definition": "The target/benchmark percentage of claims that should be handled via fast track in the period.",
-  "provenance": "IND",
-  "computation": "ratio"
- },
- {
-  "app": "A&H Claims Connect Database",
-  "sheet": "Fast Track",
-  "name": "% Fast Track Throughput",
-  "definition": "Percentage of fast-track claims completed (closed) relative to fast-track claims entering the route in the period.",
-  "provenance": "IND",
-  "computation": "ratio"
- },
- {
-  "app": "A&H Claims Connect Database",
-  "sheet": "Conduct Risk",
-  "name": "Acceptance Rate",
-  "definition": "Percentage of decided claims that were accepted (not declined or walked away) = accepted claims / total decided claims x 100.",
-  "provenance": "IND",
-  "computation": "ratio"
- },
- {
-  "app": "A&H Claims Connect Database",
-  "sheet": "Conduct Risk",
-  "name": "Avarage Paid",
-  "definition": "Average amount paid per claim = total paid (indemnity + expense) / number of paid claims. (Source name misspelled 'Avarage'.)",
-  "provenance": "IND",
-  "computation": "sum"
- },
- {
-  "app": "A&H Claims Connect Database",
-  "sheet": "Cycle Time and Static Claims Report",
-  "name": "Average Cycle Time",
-  "definition": "Average elapsed days from claim reported (or opened) to closed, across claims closed in the period.",
-  "provenance": "IND",
-  "computation": "average"
- },
- {
-  "app": "A&H Claims Connect Database",
-  "sheet": "CSP Usage",
-  "name": "Claim Office Country",
-  "definition": "Country name of claim office",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "A&H Claims Connect Database",
-  "sheet": "Conduct Risk",
-  "name": "Claims",
-  "definition": "Count of claims meeting the selected criteria. Confirm whether this counts DISTINCT ClaimID (see business_rules.md).",
-  "provenance": "IND",
-  "computation": "sum_or_count"
- },
- {
-  "app": "A&H Claims Connect Database",
-  "sheet": "Conduct Risk",
-  "name": "Class 3 Check",
-  "definition": "An internal conduct-risk check tied to the 'Class 3' classification. Proprietary \u2014 confirm definition with the Conduct Risk team.",
-  "provenance": "PROP",
-  "computation": "unspecified"
- },
- {
-  "app": "A&H Claims Connect Database",
-  "sheet": "World Map and Summary",
-  "name": "Closed Claims",
-  "definition": "Total number of closed calims based on given criteria",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "A&H Claims Connect Database",
-  "sheet": "Conduct Risk",
-  "name": "Closed No Payment",
-  "definition": "Count of claims closed without any indemnity payment (closed at nil / no-pay).",
-  "provenance": "IND",
-  "computation": "unspecified"
- },
- {
-  "app": "A&H Claims Connect Database",
-  "sheet": "CSP Usage",
-  "name": "CSP Ingested Claims - Basic Book/Direct Marketing/NAC",
-  "definition": "Count of claims in the Basic Book / Direct Marketing / NAC books ingested via the CSP route. Proprietary segmentation \u2014 confirm with the A&H team.",
-  "provenance": "PROP",
-  "computation": "sum_or_count"
- },
- {
-  "app": "A&H Claims Connect Database",
-  "sheet": "Conduct Risk",
-  "name": "Declinature Rate",
-  "definition": "Percentage of decided (or new) claims that were declined = declined claims / total decided claims x 100.",
-  "provenance": "IND",
-  "computation": "ratio"
- },
- {
-  "app": "A&H Claims Connect Database",
-  "sheet": "World Map and Summary",
-  "name": "Declined Claims",
-  "definition": "Total number of claims declined",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "A&H Claims Connect Database",
-  "sheet": "Fast Track",
-  "name": "Fast Track Claims",
-  "definition": "Count of claims handled via the fast-track route in the period.",
-  "provenance": "IND",
-  "computation": "sum_or_count"
- },
- {
-  "app": "A&H Claims Connect Database",
-  "sheet": "Cycle Time and Static Claims Report",
-  "name": "Median Cycle Time",
-  "definition": "Median elapsed days from reported (or opened) to closed across closed claims; less sensitive to outliers than the average.",
-  "provenance": "IND",
-  "computation": "median"
- },
- {
-  "app": "A&H Claims Connect Database",
-  "sheet": "World Map and Summary",
-  "name": "New Claims",
-  "definition": "Total number of new claims based on criteria",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "A&H Claims Connect Database",
-  "sheet": "Declinature",
-  "name": "Declined Claims",
-  "definition": "Total number of claims declined in the period.",
-  "provenance": "IND",
-  "computation": "sum_or_count"
- },
- {
-  "app": "A&H Claims Connect Database",
-  "sheet": "Conduct Risk",
-  "name": "Policy Number",
-  "definition": "Policy number",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "A&H Claims Connect Database",
-  "sheet": "Conduct Risk",
-  "name": "Policy Ref",
-  "definition": "Policy reference number",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "A&H Claims Connect Database",
-  "sheet": "CSP Usage",
-  "name": "Total Claim - Basic Book/Direct Marketing/NAC",
-  "definition": "Total claim count across the Basic Book / Direct Marketing / NAC books. Proprietary segmentation \u2014 confirm with the A&H team.",
-  "provenance": "PROP",
-  "computation": "sum_or_count"
- },
- {
-  "app": "A&H Claims Connect Database",
-  "sheet": "Fast Track",
-  "name": "Total Closed Claims",
-  "definition": "Total number of claims closed in the period.",
-  "provenance": "IND",
-  "computation": "sum_or_count"
- },
- {
-  "app": "A&H Claims Connect Database",
-  "sheet": "Declinature",
-  "name": "Total Declined",
-  "definition": "Total number of claims declined in the period.",
-  "provenance": "IND",
-  "computation": "sum_or_count"
- },
- {
-  "app": "A&H Claims Connect Database",
-  "sheet": "Fast Track",
-  "name": "Total Fast Track Claims",
-  "definition": "Total number of claims handled via the fast-track route in the period.",
-  "provenance": "IND",
-  "computation": "sum_or_count"
- },
- {
-  "app": "A&H Claims Connect Database",
-  "sheet": "Declinature",
-  "name": "Total Opened",
-  "definition": "Total number of claims opened in the period.",
-  "provenance": "IND",
-  "computation": "sum_or_count"
- },
- {
-  "app": "CGM Claims Insight",
-  "sheet": "Caims Conduct Performance",
-  "name": "$ Claims Incurred",
-  "definition": "Total claim amount for selected filters in USD",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "CGM Claims Insight",
-  "sheet": "Caims Conduct Performance",
-  "name": "$ Expense & Fees Paid (CGM Share)",
-  "definition": "Total expense and fees paid for selected filters in USD",
-  "provenance": "OWNER",
-  "computation": "sum"
- },
- {
-  "app": "CGM Claims Insight",
-  "sheet": "Caims Conduct Performance",
-  "name": "$ Expense & Fees Reserve (CGM Share)",
-  "definition": "Total expense and fees reserve for selected filters in USD",
-  "provenance": "OWNER",
-  "computation": "sum"
- },
- {
-  "app": "CGM Claims Insight",
-  "sheet": "Caims Conduct Performance",
-  "name": "$ Indemnity Paid (CGM Share)",
-  "definition": "Total indemnity paid for selected filters in USD",
-  "provenance": "OWNER",
-  "computation": "sum"
- },
- {
-  "app": "CGM Claims Insight",
-  "sheet": "Caims Conduct Performance",
-  "name": "$ Indemnity Reserve (CGM Share)",
-  "definition": "Total indemnity reserve for selected filters in USD",
-  "provenance": "OWNER",
-  "computation": "sum"
- },
- {
-  "app": "CGM Claims Insight",
-  "sheet": "Pre - Renewal Report",
-  "name": "Account for Renewal",
-  "definition": "Total number of accounts for renewal",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "CGM Claims Insight",
-  "sheet": "Pre - Renewal Report",
-  "name": "Account value (CGM Share)",
-  "definition": "Total account value in USD (CGM only)",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "CGM Claims Insight",
-  "sheet": "Claim Movement Report",
-  "name": "Claim Count",
-  "definition": "Total claims count",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "CGM Claims Insight",
-  "sheet": "Claim Portfolio Performance",
-  "name": "Claims Count",
-  "definition": "Total claims Count",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "CGM Claims Insight",
-  "sheet": "Claim Portfolio Performance",
-  "name": "Claims Incurred",
-  "definition": "Total claims incurred",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "CGM Claims Insight",
-  "sheet": "Caims Conduct Performance",
-  "name": "Closed - Fees Only",
-  "definition": "Count and percentage of close claims with fees only",
-  "provenance": "OWNER",
-  "computation": "ratio"
- },
- {
-  "app": "CGM Claims Insight",
-  "sheet": "Caims Conduct Performance",
-  "name": "Closed - Indemnity Settlement",
-  "definition": "Count and percentage of closed claims with indemnity settlement",
-  "provenance": "OWNER",
-  "computation": "ratio"
- },
- {
-  "app": "CGM Claims Insight",
-  "sheet": "Caims Conduct Performance",
-  "name": "Closed - No Indemnity & Fees",
-  "definition": "Count and percentage of claim with no indemnity amount or fees",
-  "provenance": "OWNER",
-  "computation": "ratio"
- },
- {
-  "app": "CGM Claims Insight",
-  "sheet": "Pre - Renewal Report",
-  "name": "Closed Claim Count",
-  "definition": "Count on total closed claims based on selected criteria",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "CGM Claims Insight",
-  "sheet": "Claim Portfolio Performance",
-  "name": "Closed Claims Count",
-  "definition": "Total number of closed claims",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "CGM Claims Insight",
-  "sheet": "Caims Conduct Performance",
-  "name": "Closed Claims Lifecycle (Days)",
-  "definition": "Difference in number of working days between reported date and closed claims latest movement days",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "CGM Claims Insight",
-  "sheet": "Claim Portfolio Performance",
-  "name": "Expense and Fees Paid (CGM Share)",
-  "definition": "Total expense and other fees paid (CGM share only)",
-  "provenance": "OWNER",
-  "computation": "sum"
- },
- {
-  "app": "CGM Claims Insight",
-  "sheet": "Claim Portfolio Performance",
-  "name": "Expense and Fees Reserve (CGM Share)",
-  "definition": "Total expense and fees reserve (CGM only)",
-  "provenance": "OWNER",
-  "computation": "sum"
- },
- {
-  "app": "CGM Claims Insight",
-  "sheet": "Pre - Renewal Report",
-  "name": "First Time Renewal",
-  "definition": "Total first time renewal amount in USD",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "CGM Claims Insight",
-  "sheet": "Pre - Renewal Report",
-  "name": "GROSS WRITTEN PREMIUM",
-  "definition": "Gross written premium",
-  "provenance": "OWNER",
-  "computation": "sum"
- },
- {
-  "app": "CGM Claims Insight",
-  "sheet": "Pre - Renewal Report",
-  "name": "Incurred for Closed Claims (CGM Share)",
-  "definition": "Total incurred amount for closed claim in USD (CGM only)",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "CGM Claims Insight",
-  "sheet": "Open Claim Headlines",
-  "name": "Incurred for Open Claims (CGM Share)",
-  "definition": "Total incurred amount for open claims",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "CGM Claims Insight",
-  "sheet": "Claim Portfolio Performance",
-  "name": "Indemnity Paid (CGM Share)",
-  "definition": "Total Indemnity paid (For CGM only)",
-  "provenance": "OWNER",
-  "computation": "sum"
- },
- {
-  "app": "CGM Claims Insight",
-  "sheet": "Open Claim Headlines",
-  "name": "Indemnity Paid for Open Claims (CGM Share)",
-  "definition": "Total indemnity paid for open claims (CGM only)",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "CGM Claims Insight",
-  "sheet": "Claim Portfolio Performance",
-  "name": "Indemnity Reserve (CGM Share)",
-  "definition": "Total Indemnity reserve (CGM only)",
-  "provenance": "OWNER",
-  "computation": "sum"
- },
- {
-  "app": "CGM Claims Insight",
-  "sheet": "Pre - Renewal Report",
-  "name": "Long Standing Account",
-  "definition": "Total long standing amount in USD",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "CGM Claims Insight",
-  "sheet": "Pre - Renewal Report",
-  "name": "MAJOR LINE",
-  "definition": "Major Line of Business name",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "CGM Claims Insight",
-  "sheet": "Pre - Renewal Report",
-  "name": "MINOR LINE",
-  "definition": "Minor Line Of Business name",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "CGM Claims Insight",
-  "sheet": "Pre - Renewal Report",
-  "name": "NET WRITTEN PREMIUM",
-  "definition": "Net written premium",
-  "provenance": "OWNER",
-  "computation": "sum"
- },
- {
-  "app": "CGM Claims Insight",
-  "sheet": "Claim Movement Report",
-  "name": "O/S Reserve",
-  "definition": "Total outstanding reserve",
-  "provenance": "OWNER",
-  "computation": "sum"
- },
- {
-  "app": "CGM Claims Insight",
-  "sheet": "Caims Conduct Performance",
-  "name": "Open",
-  "definition": "Count and percentage of  open claims",
-  "provenance": "OWNER",
-  "computation": "ratio"
- },
- {
-  "app": "CGM Claims Insight",
-  "sheet": "Caims Conduct Performance",
-  "name": "Open - Declined",
-  "definition": "Count and percentage of declined claims",
-  "provenance": "OWNER",
-  "computation": "ratio"
- },
- {
-  "app": "CGM Claims Insight",
-  "sheet": "Open Claim Headlines",
-  "name": "Open Claims Count",
-  "definition": "Total number of open claims",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "CGM Claims Insight",
-  "sheet": "Caims Conduct Performance",
-  "name": "Open Claims Lifecycle (Days)",
-  "definition": "Difference in number of working days between reported date and open claims latest movement days",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "CGM Claims Insight",
-  "sheet": "Open Claim Headlines",
-  "name": "Outstanding Reserve for Open Claims (CGM Share)",
-  "definition": "Total outstanding loss reserve for CGM only",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "CGM Claims Insight",
-  "sheet": "Pre - Renewal Report",
-  "name": "POLICY ACCOUNT COUNT",
-  "definition": "Total number of policy count by major and minor LOB",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "CGM Claims Performance_UAT_Final",
-  "sheet": "Financials and MI for All Vendors at 13/12/2024",
-  "name": "Count of UCRs received monthly",
-  "definition": "Count of UCRs received monthly refers to the total number of Unreported Claims Reserves (UCRs) that are recorded or acknowledged by the insurance company within a given month.\nUCRs are estimates of the reserves set aside by an insurance company for claims that have occurred but have not yet been reported by policyholders.",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "CGM Claims Performance_UAT_Final",
-  "sheet": "Financials and MI for All Vendors at 13/12/2024",
-  "name": "Data Completeness",
-  "definition": "Data completeness refers to the extent to which all required data is present and accounted for in financial reports and MI systems. It ensures that no critical data is missing, which is essential for accurate analysis, decision-making, and regulatory compliance.\nWhy -This sheet has been created to provide a comprehensive view of all vendors, detailing the financials and management information (MI) of both closed and open claims, along with the monthly count of UCRs.",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "CGM Claims Performance_UAT_Final",
-  "sheet": "Financials and MI for All Vendors at 13/12/2024",
-  "name": "Incurred indemnity Vs Incurred fees",
-  "definition": "Incurred indemnity and incurred fees are terms used to describe different types of costs associated with insurance claims.\nIncurred indemnity refers to the total amount of money that an insurance company expects to pay out to policyholders for covered losses.\nIncurred fees refer to the expenses that an insurance company incurs in the process of handling and settling claims.",
-  "provenance": "OWNER",
-  "computation": "sum"
- },
- {
-  "app": "CGM Claims Performance_UAT_Final",
-  "sheet": "Financials and MI for All Vendors at 13/12/2024",
-  "name": "Open Vs Closed Claims",
-  "definition": "It refer to the status of an insurance claim during the claims process. \nAn open claim is one that has been reported to the insurance company but has not yet been fully resolved or settled. A closed claim is one that has been fully resolved and settled by the insurance company",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "CGM Claims Performance_UAT_Final",
-  "sheet": "Financials and MI for All Vendors at 13/12/2024",
-  "name": "Referrals",
-  "definition": "It refer to the process where an insurance agent or broker recommends a potential client to an insurance company or another agent. Referrals can also occur within the claims process when a claim is referred to a specialist or another department for further handling.",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "EMEA Explicit Consent",
-  "sheet": "Explicit Consent",
-  "name": "Count of Not Yet Determined Claims by Claim Type and Month Year",
-  "definition": "Count of Not Yet Determined Claims by Claim Type and Month Year",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "EMEA Explicit Consent",
-  "sheet": "Explicit Consent",
-  "name": "Count of Not Yet Determined Claims",
-  "definition": "Count of Not Yet Determined Claims by Policy Country and Month Year",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "Fraud Dashbord",
-  "sheet": "Suspected Fraud",
-  "name": "% Suspected of Fraud",
-  "definition": "Percentage of suspected fraud",
-  "provenance": "OWNER",
-  "computation": "ratio"
- },
- {
-  "app": "Fraud Dashbord",
-  "sheet": "Suspected Fraud",
-  "name": "Accepted for Investigation %",
-  "definition": "Percentage of suspected fraud accepted for investigation",
-  "provenance": "OWNER",
-  "computation": "ratio"
- },
- {
-  "app": "Fraud Dashbord",
-  "sheet": "Closed Fraud",
-  "name": "Closed No Impact",
-  "definition": "Closed without any saving",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Fraud Dashbord",
-  "sheet": "Closed Fraud",
-  "name": "Closed with Impact",
-  "definition": "Indicator to show Fraud claim records which are are closed and have a Savings assigned.",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Fraud Dashbord",
-  "sheet": "Closed Fraud",
-  "name": "Count of Claim Number",
-  "definition": "Total number of claims",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "Fraud Dashbord",
-  "sheet": "Suspected Fraud",
-  "name": "Country",
-  "definition": "Country Name",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "Fraud Dashbord",
-  "sheet": "Closed Fraud",
-  "name": "Fraud Expense (USD)",
-  "definition": "Fraud claim related expenses in USD",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Fraud Dashbord",
-  "sheet": "Closed Fraud",
-  "name": "Impact Rate",
-  "definition": "Close with Impact to Closed without impact ratio",
-  "provenance": "OWNER",
-  "computation": "ratio"
- },
- {
-  "app": "Fraud Dashbord",
-  "sheet": "Suspected Fraud",
-  "name": "Major LOB",
-  "definition": "Major LOB name",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Fraud Dashbord",
-  "sheet": "Closed Fraud",
-  "name": "Net Saving (USD)",
-  "definition": "Saving minus Expenses in USD",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Fraud Dashbord",
-  "sheet": "Suspected Fraud",
-  "name": "New Claims Count",
-  "definition": "Count of new claim within selected period",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "Fraud Dashbord",
-  "sheet": "Benefits Tracker",
-  "name": "Primary Referral Source",
-  "definition": "Category or Type of Primary Fraud threat Referral Source: Adjuster or third party etc",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Fraud Dashbord",
-  "sheet": "Suspected Fraud",
-  "name": "Region",
-  "definition": "Region as UKISA or CE or MENA",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Fraud Dashbord",
-  "sheet": "Closed Fraud",
-  "name": "Saving (USD)",
-  "definition": "Fraud claim savings in USD",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Fraud Dashbord",
-  "sheet": "Closed Fraud",
-  "name": "Saving Banding USD",
-  "definition": "Banding to group savings",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Fraud Dashbord",
-  "sheet": "Suspected Fraud",
-  "name": "Suspected Fraud",
-  "definition": "Count of suspected fraud",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Fraud Dashbord",
-  "sheet": "Closed Fraud",
-  "name": "Total Closed",
-  "definition": "Total number of fraud cases closed",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "Fraud Dashbord",
-  "sheet": "Closed Fraud",
-  "name": "Total Gross Reserved",
-  "definition": "Total gross reserved based on selected criteria",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "Fraud Dashbord",
-  "sheet": "Closed Fraud",
-  "name": "Year Closed",
-  "definition": "Year the fraud closed",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "MAR-Conduct",
-  "sheet": "Time to Acknowledge Loss",
-  "name": "% 5 Days and Under",
-  "definition": "Percentage of claims where time to acknowledge loss within 5 days",
-  "provenance": "OWNER",
-  "computation": "ratio"
- },
- {
-  "app": "MAR-Conduct",
-  "sheet": "Time to Effect Payment",
-  "name": "% Time to Effect Payment",
-  "definition": "% Time to Effect Payment \u00a0difference between recieved date and payment date",
-  "provenance": "OWNER",
-  "computation": "ratio"
- },
- {
-  "app": "MAR-Conduct",
-  "sheet": "Time to Respond to Correspondence",
-  "name": "5 Days and Under",
-  "definition": "Number of cases where all queries processed and responded to within 5 days of SLA standard",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "MAR-Conduct",
-  "sheet": "Time to Effect Payment",
-  "name": "5 Days and Under",
-  "definition": "Number of cases where all payment payments processed within 5 working days of SLA standard",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "MAR-Conduct",
-  "sheet": "Time to Acknowledge Loss",
-  "name": "5 Days and Under",
-  "definition": "Number of cases claims acknowledged within 5 days of SLA standard",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "MAR-Conduct",
-  "sheet": "Time to Acknowledge Loss",
-  "name": "Average Time to Acknowledge",
-  "definition": "Average days it took to acknowledge claim from reported date",
-  "provenance": "OWNER",
-  "computation": "average"
- },
- {
-  "app": "MAR-Conduct",
-  "sheet": "Time to Respond to Correspondence",
-  "name": "Avg Working Days",
-  "definition": "Average days to respond to the correspondence",
-  "provenance": "OWNER",
-  "computation": "average"
- },
- {
-  "app": "MAR-Conduct",
-  "sheet": "Complaints",
-  "name": "Complaints Received",
-  "definition": "Total number of complaint received based on criteria",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "MAR-Conduct",
-  "sheet": "Complaints",
-  "name": "Complaints to New Claims %",
-  "definition": "Percentage of complaints with resepct to new claim",
-  "provenance": "OWNER",
-  "computation": "ratio"
- },
- {
-  "app": "MAR-Conduct",
-  "sheet": "Declined Claims",
-  "name": "Declined Claims",
-  "definition": "Total number of claims declined",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "MAR-Conduct",
-  "sheet": "Declined Claims",
-  "name": "Declined Claims to New Claims %",
-  "definition": "Percentage of declined claims vs new claim",
-  "provenance": "OWNER",
-  "computation": "ratio"
- },
- {
-  "app": "MAR-Conduct",
-  "sheet": "Declined Claims",
-  "name": "New Claims",
-  "definition": "Total number of new claims based on criteria",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "MAR-Conduct",
-  "sheet": "Time to Respond to Correspondence",
-  "name": "Over 5 Days",
-  "definition": "Number of cases responded over 5 days",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "MAR-Conduct",
-  "sheet": "Time to Effect Payment",
-  "name": "Time to Effect Payment",
-  "definition": "Average days it took to complete payment from received date i.e. time to get payment processed",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "MAR-Conduct",
-  "sheet": "Time to Respond to Correspondence",
-  "name": "Time to Respond to Correspondence",
-  "definition": "Percentage of claims where time to respond to correspondence below 5 days  based on Workview arrival date",
-  "provenance": "OWNER",
-  "computation": "ratio"
- },
- {
-  "app": "MAR-Operational",
-  "sheet": "Score card",
-  "name": "Volume - 1 Year Static Claims",
-  "definition": "Claims that are opened or reopened in the accounting period where there has been no financial movement for 365 days",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "MAR-Operational",
-  "sheet": "Score card",
-  "name": "Value - 1 Year Static Claims",
-  "definition": "Incurred total of Claims that are opened or reopened in the accounting period where there has been no financial movement for 365 days",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "MAR-Operational",
-  "sheet": "Score card",
-  "name": "Time to Settle",
-  "definition": "Total time taken to settle claim",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "MAR-Operational",
-  "sheet": "Nominals",
-  "name": "Reserve ending in 001 for Local Regulatory Reason",
-  "definition": "Claims whose reserve amount ends in '001', used as an internal marker for a local regulatory reason. Proprietary convention \u2014 confirm with the reserving team.",
-  "provenance": "PROP",
-  "computation": "sum"
- },
- {
-  "app": "MAR-Operational",
-  "sheet": "Score card",
-  "name": "Reserve Completion (0-30 Calendar Days)",
-  "definition": "Percentage of cases reserve completed within 30 days",
-  "provenance": "OWNER",
-  "computation": "ratio"
- },
- {
-  "app": "MAR-Operational",
-  "sheet": "Score card",
-  "name": "Reopened Ratio",
-  "definition": "Claims/Claimants that have been reopened in the accounting period divided by the Claims/Claimants that have been closed in the accounting period",
-  "provenance": "OWNER",
-  "computation": "ratio"
- },
- {
-  "app": "MAR-Operational",
-  "sheet": "Europe Overview - Rolling Table View",
-  "name": "Reopened Claims Count",
-  "definition": "Count of reopened claims based on selected criteria",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "MAR-Operational",
-  "sheet": "New and Closed Volume",
-  "name": "Closing Ratio",
-  "definition": "Claims/Claimants that have been closed in the accounting period divided by the Claims/Claimants that have been opened in the accounting period",
-  "provenance": "OWNER",
-  "computation": "ratio"
- },
- {
-  "app": "MAR-Operational",
-  "sheet": "Score card",
-  "name": "Pending Claims",
-  "definition": "Number of pending claims for selected criteria",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "MAR-Operational",
-  "sheet": "Europe Overview - Rolling Table View",
-  "name": "Pending Claim Count",
-  "definition": "Total pending claim count",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "MAR-Operational",
-  "sheet": "Claim Movement",
-  "name": "OSLR Movement Paid in Period - USD",
-  "definition": "Total outstanding loss reserve paid in the selected period in USD",
-  "provenance": "OWNER",
-  "computation": "sum"
- },
- {
-  "app": "MAR-Operational",
-  "sheet": "Europe Overview - Rolling Table View",
-  "name": "OSLR Movement in Period - USD",
-  "definition": "Total outstanding loss reserve paid in the selected period in USD",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "MAR-Operational",
-  "sheet": "Nominals",
-  "name": "Open for Recoiveries",
-  "definition": "Number of open claims with recoveries expected // Number of claim with nominal value of 88",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "MAR-Operational",
-  "sheet": "Score card",
-  "name": "Nominal Reserve",
-  "definition": "The sum of reserves on any claim with cumulative gross (DACs 1&2), Original Currency reserve fitting logic outlined: Reserves = 77, 88, 99 or 123. Built into Broadview for 77 and 123. 88 and 99 is calculated in Qlik Sense",
-  "provenance": "OWNER",
-  "computation": "sum"
- },
- {
-  "app": "MAR-Operational",
-  "sheet": "Score card",
-  "name": "Nominal Age",
-  "definition": "The average of age of Claims/Claimants that hold a nominal reserve in the time period selected",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "MAR-Operational",
-  "sheet": "Nominals",
-  "name": "No financial exposure expected to Chubb",
-  "definition": "Claim with a nominal reserve of 77",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "MAR-Operational",
-  "sheet": "Score card",
-  "name": "New Volumes",
-  "definition": "Number of new claims for selected criteria",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "MAR-Operational",
-  "sheet": "Europe Overview - Rolling Table View",
-  "name": "New Claims 12 Month Rolling Avarage",
-  "definition": "Average new claims in last 12 months based on selected criteria",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "MAR-Operational",
-  "sheet": "Nominals",
-  "name": "New claim reserve uncertain - high value",
-  "definition": "Claim with a nominal reserve of 99",
-  "provenance": "OWNER",
-  "computation": "sum"
- },
- {
-  "app": "MAR-Operational",
-  "sheet": "Nominals",
-  "name": "New claim reserve uncertain",
-  "definition": "Claim with a nominal reserve of 123",
-  "provenance": "OWNER",
-  "computation": "sum"
- },
- {
-  "app": "MAR-Operational",
-  "sheet": "Europe Overview - Rolling Table View",
-  "name": "New Claim Count",
-  "definition": "Count of total new claims based on selected criteria",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "MAR-Operational",
-  "sheet": "Score card",
-  "name": "Net Closing Ratio",
-  "definition": "Claims/Claimants that have been closed in the accounting period divided by the Claims/Claimants that have been opened and reopened in the accounting period",
-  "provenance": "OWNER",
-  "computation": "ratio"
- },
- {
-  "app": "MAR-Operational",
-  "sheet": "Europe Overview - Rolling Table View",
-  "name": "Indemnity Paid in Period - USD",
-  "definition": "Total indemnity amount paid in the selected period in USD",
-  "provenance": "OWNER",
-  "computation": "sum"
- },
- {
-  "app": "MAR-Operational",
-  "sheet": "Claim Movement",
-  "name": "Incurred Movement Paid in Period - USD",
-  "definition": "Incurred Movement in Period - USD check with elise",
-  "provenance": "OWNER",
-  "computation": "sum"
- },
- {
-  "app": "MAR-Operational",
-  "sheet": "Europe Overview - Rolling Table View",
-  "name": "Incurred Movement in Period - USD",
-  "definition": "OSLR Movement in Period - USD \u00a0check with elise",
-  "provenance": "OWNER",
-  "computation": "sum"
- },
- {
-  "app": "MAR-Operational",
-  "sheet": "Score card",
-  "name": "Inactive Claims (>270 Days)",
-  "definition": "Number of claims inactive for more tha 270 days",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "MAR-Operational",
-  "sheet": "Europe Overview - Rolling Table View",
-  "name": "Expense to Indemnity Ratio",
-  "definition": "Ratio of indemnity by expense paid",
-  "provenance": "OWNER",
-  "computation": "ratio"
- },
- {
-  "app": "MAR-Operational",
-  "sheet": "Europe Overview - Rolling Table View",
-  "name": "Expense Paid in Period - USD",
-  "definition": "Total expense amount paid in the selected period in USD",
-  "provenance": "OWNER",
-  "computation": "sum"
- },
- {
-  "app": "MAR-Operational",
-  "sheet": "Score card",
-  "name": "Closed Volumes",
-  "definition": "Number of closed claims for selected criteria",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "MAR-Operational",
-  "sheet": "Europe Overview - Rolling Table View",
-  "name": "Closed No Payment Claim Count",
-  "definition": "Count of claims closed without any payment  based on selected criteria",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "MAR-Operational",
-  "sheet": "Europe Overview - Rolling Table View",
-  "name": "Closed Claims 12 Month Rolling Avarage",
-  "definition": "Average closed claims in last 12 months based on selected criteria",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "MAR-Operational",
-  "sheet": "Europe Overview - Rolling Table View",
-  "name": "Closed Claim Count",
-  "definition": "Count on total closed claims based on selected criteria",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "MAR-Operational",
-  "sheet": "New and Closed Volume",
-  "name": "Total New Claims",
-  "definition": "Total new claims based on selected criteria",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "MAR-Operational",
-  "sheet": "Reopened Volumes",
-  "name": "Total Reopened Claims",
-  "definition": "Total number of reopened claims",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "MAR-Operational",
-  "sheet": "Reopened Volumes",
-  "name": "Total Reopened Ratio",
-  "definition": "Ratio of reopened claims",
-  "provenance": "OWNER",
-  "computation": "ratio"
- },
- {
-  "app": "MAR-Operational",
-  "sheet": "Score card",
-  "name": "Average Time to Settle",
-  "definition": "Average number of days to settle claim",
-  "provenance": "OWNER",
-  "computation": "average"
- },
- {
-  "app": "MAR-Operational",
-  "sheet": "Score card",
-  "name": "Age Profile - Under 6 Months Old",
-  "definition": "Count of claims where the age of closed/Open & Reopen claim is less than 6 months old",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "MAR-Operational",
-  "sheet": "Score card",
-  "name": "Age Profile - 6 - 12 Months",
-  "definition": "Count of claims where the age of the closed/Open & Reopen claim is between 6 months old and 12 months old",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "MAR-Operational",
-  "sheet": "Score card",
-  "name": "Age Profile - 24 Months <",
-  "definition": "Count of claims where the age of the closed/Open & Reopen claim is less than 6 months old",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "MAR-Operational",
-  "sheet": "Score card",
-  "name": "Age Profile - 12 - 24 Months",
-  "definition": "Count of claims where the age of the closed/Open & Reopen claim is between 12 months old and 24 months old",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "MAR-Operational",
-  "sheet": "Score card",
-  "name": "ACPSC",
-  "definition": "The incurred value of all closed claims divided by the count of those claims selected",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "MAR-Operational",
-  "sheet": "Score card",
-  "name": "ACPOC",
-  "definition": "The incurred value of all open or reopened claims divided by the count of those claims selected",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Recovery Dashboard",
-  "sheet": "Unreserved Claims",
-  "name": "Adjuster",
-  "definition": "Adjuster name",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Recovery Dashboard",
-  "sheet": "New Claims Identified",
-  "name": "Claim Handler",
-  "definition": "Claims handler name",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Recovery Dashboard",
-  "sheet": "Pipeline",
-  "name": "Claim Number",
-  "definition": "Claim number",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Recovery Dashboard",
-  "sheet": "Pipeline",
-  "name": "Cluster",
-  "definition": "Country cluster",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Recovery Dashboard",
-  "sheet": "Pipeline",
-  "name": "COG Country",
-  "definition": "COG Country name",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "Recovery Dashboard",
-  "sheet": "Heatmap",
-  "name": "Country",
-  "definition": "Country Name",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "Recovery Dashboard",
-  "sheet": "Pipeline",
-  "name": "Est. Pipeline USD",
-  "definition": "This KPI header would be updated as Pending Recovery Est USD in new model. This shows the Pending aggregated Recovery Amounts in Pipeline.",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Recovery Dashboard",
-  "sheet": "Benefits Tracking Actuals by Claim Reported date",
-  "name": "Est. Recovery Pipeline USD",
-  "definition": "Estimated recovery pipeline by year in USD",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "Recovery Dashboard",
-  "sheet": "Actuals",
-  "name": "Gross Paid",
-  "definition": "Total amount paid for selected criteria in USD",
-  "provenance": "OWNER",
-  "computation": "sum"
- },
- {
-  "app": "Recovery Dashboard",
-  "sheet": "Benefits Tracking Actuals by Claim Reported date",
-  "name": "Gross paid",
-  "definition": "Total amount paid for selected criteria in USD",
-  "provenance": "OWNER",
-  "computation": "sum"
- },
- {
-  "app": "Recovery Dashboard",
-  "sheet": "Actuals",
-  "name": "Gross Recoveries",
-  "definition": "Total recoveries based on the selected crietria (filter)",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "Recovery Dashboard",
-  "sheet": "Quarterly Reporting",
-  "name": "Gross Recoveries",
-  "definition": "Total recoveries for the selected quarter",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "Recovery Dashboard",
-  "sheet": "Pipeline",
-  "name": "Insured Name",
-  "definition": "name of the insured person",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Recovery Dashboard",
-  "sheet": "Actuals",
-  "name": "Major LOB",
-  "definition": "Major LOB name",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Recovery Dashboard",
-  "sheet": "Heatmap",
-  "name": "Minor LOB",
-  "definition": "Minor LOB name",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Recovery Dashboard",
-  "sheet": "New Claims Identified",
-  "name": "New Claims Count",
-  "definition": "Count of new claim within selected period",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "Recovery Dashboard",
-  "sheet": "Benefits Tracking Actuals by Claim Reported date",
-  "name": "Paids and OSLR max month total",
-  "definition": "Paid and outstanding loss reserve monthly amount by year (same as gross paid)",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "Recovery Dashboard",
-  "sheet": "Actuals",
-  "name": "Paids Ratio",
-  "definition": "The ratio of Gross Paid Indemnity in a Period to Total Indemnity Paid through the year",
-  "provenance": "OWNER",
-  "computation": "ratio"
- },
- {
-  "app": "Recovery Dashboard",
-  "sheet": "Unreserved Claims",
-  "name": "Pending Claims Count",
-  "definition": "Total pending claims count",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "Recovery Dashboard",
-  "sheet": "Pipeline",
-  "name": "Pipeline Claims Count",
-  "definition": "This KPI header would be updated as Pending Recovery Claims Count in new model. This shows the Pending cont of Claims which have a potential Recovery oppurtunity.",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "Recovery Dashboard",
-  "sheet": "Heatmap",
-  "name": "QuarterYear",
-  "definition": "Quarter year is derived from claim accounting period",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Recovery Dashboard",
-  "sheet": "Actuals",
-  "name": "Recovery Ratio",
-  "definition": "Ratio of Total recovery to Total Indemnity paid in a  period",
-  "provenance": "OWNER",
-  "computation": "ratio"
- },
- {
-  "app": "Recovery Dashboard",
-  "sheet": "New Claims Identified",
-  "name": "Referral Ratio",
-  "definition": "Referral ration as total referrals by total new claims",
-  "provenance": "OWNER",
-  "computation": "ratio"
- },
- {
-  "app": "Recovery Dashboard",
-  "sheet": "New Claims Identified",
-  "name": "Referrals",
-  "definition": "Total number of referrals",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "Recovery Dashboard",
-  "sheet": "Unreserved Claims",
-  "name": "Unreserved %",
-  "definition": "This used to represent the % of Unresreved Claims but I don't think this would be included in new model",
-  "provenance": "OWNER",
-  "computation": "ratio"
- },
- {
-  "app": "Transactional App",
-  "sheet": "Office View",
-  "name": "Transaction Processed by Adjuster",
-  "definition": "Number of transactions processed by adjuster",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Transactional App",
-  "sheet": "Office View",
-  "name": "CGM Total Trasnaction Processed - Birmingham",
-  "definition": "Total number of CGM transaction processed inBirmingham",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "Transactional App",
-  "sheet": "Office View",
-  "name": "CGM Total Trasnaction Processed - Glasgow",
-  "definition": "Total number of CGM transaction processed in Glasgow",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "Transactional App",
-  "sheet": "Office View",
-  "name": "CGM Total Trasnaction Processed - London",
-  "definition": "Total number of CGM transaction processed in London",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "Transactional App",
-  "sheet": "Overall RT Summary",
-  "name": "Response Time Processed",
-  "definition": "Number of Transactions Processed",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Transactional App",
-  "sheet": "Office View",
-  "name": "Response Time in Days(London) - Both count and %",
-  "definition": "Response time in days and in percentage by year in London",
-  "provenance": "OWNER",
-  "computation": "ratio"
- },
- {
-  "app": "Transactional App",
-  "sheet": "Office View",
-  "name": "Response Time in Days(Glasgow) - Both count and %",
-  "definition": "Response time in days and in percentage by year in Glasgow",
-  "provenance": "OWNER",
-  "computation": "ratio"
- },
- {
-  "app": "Transactional App",
-  "sheet": "Office View",
-  "name": "Response Time in Days(Birmingham) - Both count and %",
-  "definition": "Response time in days and in percentage by year in Birmingham",
-  "provenance": "OWNER",
-  "computation": "ratio"
- },
- {
-  "app": "Transactional App",
-  "sheet": "Overall RT Summary",
-  "name": "Count of Response Time Days",
-  "definition": "Count of transaction by response time days",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "Transactional App",
-  "sheet": "Overall RT Summary",
-  "name": "Number on Month",
-  "definition": "Number of YTD month",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Transactional App",
-  "sheet": "Overall RT Summary",
-  "name": "Monthly Caseload",
-  "definition": "Total casesd in a month",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Transactional App",
-  "sheet": "Overall RT Summary",
-  "name": "In SLA",
-  "definition": "Percetage of transactions within SLA",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Transactional App",
-  "sheet": "Overall RT Summary",
-  "name": "FTE",
-  "definition": "Total FTE",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Transactional App",
-  "sheet": "Overall RT Summary",
-  "name": "Out SLA",
-  "definition": "Percetage of transactions taken more time than SLA",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Transactional App",
-  "sheet": "Overall",
-  "name": "Total Transaction",
-  "definition": "Total number of Transactions",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "Transactional App",
-  "sheet": "Overall",
-  "name": "Total Transaction Processed by - CUAL Vs CEG",
-  "definition": "Number of Transactions based on Entity",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "Transactional App",
-  "sheet": "Overall",
-  "name": "Total Transaction Processed by - London, Glasgow and Birmingham",
-  "definition": "Number of Transactions based on Office Location",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "Transactional App",
-  "sheet": "Overall",
-  "name": "Transaction Processed by LOB",
-  "definition": "Number of Transaction by Lines of Business",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Transactional App",
-  "sheet": "Overall RT Summary",
-  "name": "Annual Caseload",
-  "definition": "Total cases in a yeat",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Transactional App",
-  "sheet": "Overall",
-  "name": "Year Month",
-  "definition": "Year Month for Lloyd's and LIRMA",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Transactional App",
-  "sheet": "Broker RT Summary",
-  "name": "Response Times Per Business Unit",
-  "definition": "Response Time Within SLA and Outside SLA",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Transactional App",
-  "sheet": "Broker RT Summary",
-  "name": "ECF Queried Response Type per Total Adviced per Business Unit",
-  "definition": "ECF Response time for Queries and Rejections Volume and Queries and Rejections %age per Total Adviced Response Type",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "Transactional App",
-  "sheet": "Broker RT Summary",
-  "name": "Transaction Processed by Broker",
-  "definition": "Transactions Processed count of Response Time Days",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Transactional App",
-  "sheet": "Broker RT Summary",
-  "name": "Transaction Volumes & Speed of Performance",
-  "definition": "Count of Response Time Days and Within SLA % Broker wise",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "Transactional App",
-  "sheet": "Broker Claims Volume and Value View",
-  "name": "New Claim Indicator",
-  "definition": "Total Number of New claims",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Transactional App",
-  "sheet": "Broker Claims Volume and Value View",
-  "name": "Closed Claim Indicator",
-  "definition": "Total Number of Closed claims",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Transactional App",
-  "sheet": "Broker Claims Volume and Value View",
-  "name": "Pending Claims Indicator",
-  "definition": "Total Number of Pending Claims",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "Transactional App",
-  "sheet": "Broker Claims Volume and Value View",
-  "name": "Open Claim Volume by LOB & CGM Entity",
-  "definition": "Total Number of Open Claim Volume by LOB & CGM Entity",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "Transactional App",
-  "sheet": "Broker Claims Volume and Value View",
-  "name": "Open Claim Incurred Value by LOB & CGM Entity",
-  "definition": "Total Number of Open Claim Incurred Value by LOB & CGM Entity",
-  "provenance": "OWNER",
-  "computation": "sum"
- },
- {
-  "app": "Transactional App",
-  "sheet": "Broker Claims Volume and Value View",
-  "name": "New & Closed Claim Volumes Last 12 Months by LOB - Lead Only",
-  "definition": "Total number of New & Closed Claim Volumes Last 12 Months by LOB - Lead Only",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "Transactional App",
-  "sheet": "Broker Claims Volume and Value View",
-  "name": "New & Closed Claim Volumes Last 12 Months - Lead Only",
-  "definition": "Total number of New & Closed Claim Volumes Last 12 Months - Lead Only",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "Transactional App",
-  "sheet": "Broker Claims Volume and Value View",
-  "name": "Static Claims Portfolio by Business Unit and by LOB",
-  "definition": "Total Number of Static Volumes, Static Volume % of Total Pending, Static Reserve and Static Reserve % of Total Pending Reserve by Business unit and by LOB",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "Transactional App",
-  "sheet": "Broker Claims Volume and Value View",
-  "name": "Table View",
-  "definition": "Provides the Tabular view of Broker Claims Volume and Vlaue view",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Transactional App",
-  "sheet": "ECF Weekly Reports",
-  "name": "Overall Volume Month to Date",
-  "definition": "Total number of Overall Volume Month to date for Within SLA , Outside SLA and Grand Total by LOB and Participant role wise",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "Transactional App",
-  "sheet": "ECF Weekly Reports",
-  "name": "Overall Volume % Month to Date",
-  "definition": "Total number of Overall Volume % Month to date for Within SLA , Outside SLA and Grand Total by LOB and Participant role wise",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "Transactional App",
-  "sheet": "ECF Weekly Reports",
-  "name": "Detailed Chart",
-  "definition": "Provides the Tabular view",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Transactional App",
-  "sheet": "ECF Weekly Reports",
-  "name": "Overall Volume Month to Date",
-  "definition": "Total number of Overall Volume Month to date for Within SLA , Outside SLA and Grand Total by Participant role, Office and Bureau Lead Adjuster Name wise",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "Transactional App",
-  "sheet": "ECF Weekly Reports",
-  "name": "Overall Volume % Month to Date",
-  "definition": "Total number of Overall Volume % Month to date for Within SLA , Outside SLA and Grand Total by Participant role, Office and Bureau Lead Adjuster Name wise",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "Transactional App",
-  "sheet": "ECF Weekly Reports",
-  "name": "Overall Month to date - Overall",
-  "definition": "Provides Overall Month to Date by Participant role wise",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Transactional App",
-  "sheet": "ECF Weekly Reports",
-  "name": "Overall % Month to date - Overall",
-  "definition": "Provides Overall % Month to Date by Participant role wise",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Transactional App",
-  "sheet": "ECF Weekly Reports",
-  "name": "Average Response Time in Working Days Where We are Lead",
-  "definition": "Provides Average Response Time in Working Days Where We are Lead by Bureau Lead Adjuster Name wise",
-  "provenance": "OWNER",
-  "computation": "average"
- },
- {
-  "app": "Transactional App",
-  "sheet": "ECF Weekly Reports",
-  "name": "CGM Company",
-  "definition": "Provides Volume of transactions processed within 4 days and Volume of transactions processed Outside 4 days for CGM Company for Rollimg 4 months",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Transactional App",
-  "sheet": "ECF Weekly Reports",
-  "name": "CGM Syndicate",
-  "definition": "Provides Volume of transactions processed within 4 days and Volume of transactions processed Outside 4 days for CGM Syndicate for rolling 4 months",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Transactional App",
-  "sheet": "ECF Weekly Reports",
-  "name": "Rolling 4 months by LOB",
-  "definition": "Provides With SLA and Outside SLA count for Rolling 4 months by LOB wise",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Transactional App",
-  "sheet": "ECF Weekly Reports",
-  "name": "Rolling 4 months by LOB and Month wise( Bar Chart)",
-  "definition": "Provides Rolling 4 months by LOB and Month wise for within SLA and Outside SLA",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Transactional App",
-  "sheet": "ECF Weekly Reports",
-  "name": "Rolling 4 months by Month wise",
-  "definition": "Provides Rolling 4 months by Month wise for within SLA and Outside SLA",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Transactional App",
-  "sheet": "ECF Weekly Reports",
-  "name": "Rolling 4 months by Month wise(both count and %)",
-  "definition": "Provides Rolling 4 months by Month wise for within SLA(Count), Within SLA(%), Outside SLA(Count) and Outside SLA(%)",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "Cladding Report Company",
-  "sheet": "My New Sheet",
-  "name": "Claim Number",
-  "definition": "Claim number",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Cladding Report Company",
-  "sheet": "My New Sheet",
-  "name": "Policy Number",
-  "definition": "Policy number",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Cladding Report Company",
-  "sheet": "My New Sheet",
-  "name": "Responsible Adjuster Code",
-  "definition": "Adjuster code handling the claim",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Cladding Report Company",
-  "sheet": "My New Sheet",
-  "name": "Adjuster Name",
-  "definition": "Name of the adjuster for the claim",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Cladding Report Company",
-  "sheet": "My New Sheet",
-  "name": "Reported Date",
-  "definition": "Claim reported date",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Cladding Report Company",
-  "sheet": "My New Sheet",
-  "name": "Claim Event Date",
-  "definition": "Not available",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Cladding Report Company",
-  "sheet": "My New Sheet",
-  "name": "Claim Opened Date",
-  "definition": "Date when claim opened",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Cladding Report Company",
-  "sheet": "My New Sheet",
-  "name": "Claim Closed Date",
-  "definition": "Date when claim closed",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Cladding Report Company",
-  "sheet": "My New Sheet",
-  "name": "Underwriting Year",
-  "definition": "Year of policy underwriting",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Cladding Report Company",
-  "sheet": "My New Sheet",
-  "name": "Accident Year",
-  "definition": "Year of accident",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Cladding Report Company",
-  "sheet": "My New Sheet",
-  "name": "Claim Status",
-  "definition": "Status of the claim",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Cladding Report Company",
-  "sheet": "My New Sheet",
-  "name": "Insured Name",
-  "definition": "Name of insured person / entity",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Cladding Report Company",
-  "sheet": "My New Sheet",
-  "name": "Broker",
-  "definition": "Name of broker of the policy associated to the claim",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Cladding Report Company",
-  "sheet": "My New Sheet",
-  "name": "Claim CAT Code",
-  "definition": "Not available",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Cladding Report Company",
-  "sheet": "My New Sheet",
-  "name": "Claim Type Code",
-  "definition": "Not available",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Cladding Report Company",
-  "sheet": "My New Sheet",
-  "name": "Primary / Excess",
-  "definition": "Not available",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Cladding Report Company",
-  "sheet": "My New Sheet",
-  "name": "Coinsurance Indicator",
-  "definition": "Exclusive/Lead/Follow",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Cladding Report Company",
-  "sheet": "My New Sheet",
-  "name": "Expense Paid (USD)",
-  "definition": "Expense paid in USD",
-  "provenance": "OWNER",
-  "computation": "sum"
- },
- {
-  "app": "Cladding Report Company",
-  "sheet": "My New Sheet",
-  "name": "Expense Reserved (USD)",
-  "definition": "The total reserve for every claim that is open, reopened or closed in the maximum selected accounting period - in USD",
-  "provenance": "OWNER",
-  "computation": "sum"
- },
- {
-  "app": "Cladding Report Company",
-  "sheet": "My New Sheet",
-  "name": "Incurred (USD)",
-  "definition": "Total Incurred in USD",
-  "provenance": "OWNER",
-  "computation": "sum"
- },
- {
-  "app": "Cladding Report Company",
-  "sheet": "My New Sheet",
-  "name": "Indemnity Paid (USD)",
-  "definition": "Indemnity paid in USD",
-  "provenance": "OWNER",
-  "computation": "sum"
- },
- {
-  "app": "Cladding Report Company",
-  "sheet": "My New Sheet",
-  "name": "Indemnity Reserved (USD)",
-  "definition": "Indemnity reserve in USD",
-  "provenance": "OWNER",
-  "computation": "sum"
- },
- {
-  "app": "Cladding Report Company",
-  "sheet": "My New Sheet",
-  "name": "Recovery (USD)",
-  "definition": "Recovery in USD",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "Case Analysis & Data Quality",
-  "name": "Vendor Performance Management Levels",
-  "definition": "The internal tiering/levels framework used to manage TPA/vendor performance. Proprietary \u2014 confirm with vendor management.",
-  "provenance": "PROP",
-  "computation": "unspecified"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "Complaints",
-  "name": "Complaints % Against New Cases In The Month",
-  "definition": "Complaints received in the month / new cases (claims) in the month x 100.",
-  "provenance": "IND",
-  "computation": "sum_or_count"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "Complaints",
-  "name": "Complaints As A % Of New Claims",
-  "definition": "Complaints received / new claims in the period x 100.",
-  "provenance": "IND",
-  "computation": "sum_or_count"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "Complaints",
-  "name": "Complaints As A % Of New Claims By Vendor",
-  "definition": "Complaints as a percentage of new claims, broken down by TPA/vendor.",
-  "provenance": "IND",
-  "computation": "ratio"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "Complaints",
-  "name": "Total Complaints",
-  "definition": "Total number of complaints received in the period.",
-  "provenance": "IND",
-  "computation": "sum_or_count"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "Declinature",
-  "name": "Declinatures % Of New Claims In Reporting Period",
-  "definition": "Declined claims / new claims in the reporting period x 100.",
-  "provenance": "IND",
-  "computation": "sum_or_count"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "Declinature",
-  "name": "Walkaway Claims",
-  "definition": "Count of claims the claimant withdrew or abandoned before a decision was reached.",
-  "provenance": "IND",
-  "computation": "sum_or_count"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "Declinature",
-  "name": "Walkaways As % Of New Claims In Reporting Period",
-  "definition": "Walkaway claims / new claims in the reporting period x 100.",
-  "provenance": "IND",
-  "computation": "sum_or_count"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "Declinature Detailed Charts",
-  "name": "Declinatures As % Of New Claims In Reporting Period",
-  "definition": "Declined claims / new claims in the reporting period x 100.",
-  "provenance": "IND",
-  "computation": "sum_or_count"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "Fraud",
-  "name": "Fraud Referrals % Of New Claims",
-  "definition": "Fraud referrals / new claims in the period x 100.",
-  "provenance": "IND",
-  "computation": "sum_or_count"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "Recoveries",
-  "name": "Recoveries % Of New Claims",
-  "definition": "Claims with an identified recovery / new claims in the period x 100.",
-  "provenance": "IND",
-  "computation": "sum_or_count"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "Service & Performance",
-  "name": "% Acknowledgements Issued Within SLA",
-  "definition": "Percentage of claims acknowledged within the SLA standard (commonly 5 working days).",
-  "provenance": "IND",
-  "computation": "ratio"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "Service & Performance",
-  "name": "% Claim Reserves Registered Within SLA",
-  "definition": "Percentage of claims where the reserve was registered within the SLA standard.",
-  "provenance": "IND",
-  "computation": "ratio"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "Service & Performance",
-  "name": "% Correspondence Answered Within SLA",
-  "definition": "Percentage of correspondence answered within the SLA standard.",
-  "provenance": "IND",
-  "computation": "ratio"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "Service & Performance",
-  "name": "% Payments Issued Within SLA",
-  "definition": "Percentage of payments processed/issued within the SLA standard.",
-  "provenance": "IND",
-  "computation": "ratio"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "Service & Performance",
-  "name": "Average Days To Acknowledge Claims",
-  "definition": "Mean working days from claim reported to acknowledged.",
-  "provenance": "IND",
-  "computation": "average"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "Service & Performance",
-  "name": "Average Days To Answer Comms",
-  "definition": "Mean working days to respond to correspondence/queries.",
-  "provenance": "IND",
-  "computation": "average"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "Service & Performance",
-  "name": "Average Days To Issue Payment",
-  "definition": "Mean working days from payment received/approved to payment issued.",
-  "provenance": "IND",
-  "computation": "average"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "Service & Performance",
-  "name": "Average Days To Register Claim Reserve",
-  "definition": "Mean working days from claim open to reserve registered.",
-  "provenance": "IND",
-  "computation": "average"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "Service/Performance \u2013 Detailed Graphs",
-  "name": "Average Days To Answer Communication",
-  "definition": "Mean working days to respond to correspondence/queries.",
-  "provenance": "IND",
-  "computation": "average"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "Service/Performance \u2013 Detailed Graphs",
-  "name": "Average Days To Issue Payment'",
-  "definition": "Mean working days from payment received/approved to payment issued. (Trailing quote is a source typo.)",
-  "provenance": "IND",
-  "computation": "average"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "Telephony  Detailed Charts",
-  "name": "% Of Cases Answered Within SLA",
-  "definition": "Percentage of telephony cases answered within the SLA target time = answered within SLA / calls offered x 100.",
-  "provenance": "IND",
-  "computation": "ratio"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "Telephony  Detailed Charts",
-  "name": "No Of Calls Answered Within SLA",
-  "definition": "Number of calls answered within the SLA target time.",
-  "provenance": "IND",
-  "computation": "unspecified"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "Telephony Stat",
-  "name": "% Of Abandoned Calls",
-  "definition": "Abandoned calls / calls offered x 100.",
-  "provenance": "IND",
-  "computation": "ratio"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "Telephony Stat",
-  "name": "Volume Of Calls Abandoned",
-  "definition": "Number of calls abandoned (caller hung up before being answered).",
-  "provenance": "IND",
-  "computation": "sum_or_count"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "Telephony Stat",
-  "name": "Volume Of Calls Answered",
-  "definition": "Number of calls answered.",
-  "provenance": "IND",
-  "computation": "sum_or_count"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "Telephony Stat",
-  "name": "Volume Of Calls Answered Within SLA",
-  "definition": "Number of calls answered within the SLA target time.",
-  "provenance": "IND",
-  "computation": "sum_or_count"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "Telephony Stat",
-  "name": "Volume Of Calls Offered",
-  "definition": "Total number of inbound calls presented to the queue.",
-  "provenance": "IND",
-  "computation": "sum_or_count"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "TPA score card recent level",
-  "name": "% Against New Cases In The Month",
-  "definition": "Generic ratio of the subject count to new cases (claims) opened in the month x 100. Confirm the numerator in context.",
-  "provenance": "IND",
-  "computation": "ratio"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "TPA score card recent level",
-  "name": "Average Claims Cost",
-  "definition": "Average total cost per claim = total (indemnity + expense) / number of claims.",
-  "provenance": "IND",
-  "computation": "average"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "TPA score card recent level",
-  "name": "Average Days Open - Closed Claims",
-  "definition": "Average number of days a closed claim was open (reported/opened to closed).",
-  "provenance": "IND",
-  "computation": "average"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "TPA score card recent level",
-  "name": "Complaints In Month",
-  "definition": "Number of complaints received in the month.",
-  "provenance": "IND",
-  "computation": "sum_or_count"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "TPA score card recent level",
-  "name": "Declinature Review Fails",
-  "definition": "Number of declinature decisions that failed QA review.",
-  "provenance": "IND",
-  "computation": "unspecified"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "TPA score card recent level",
-  "name": "Declinature Review 'Passed",
-  "definition": "Number of declinature decisions that passed QA review. (Stray quote is a source typo.)",
-  "provenance": "IND",
-  "computation": "unspecified"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "TPA score card recent level",
-  "name": "Number Of Cases In Litigation",
-  "definition": "Count of claims currently in litigation.",
-  "provenance": "IND",
-  "computation": "sum_or_count"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "TPA score card recent level",
-  "name": "Number Of Fraud Referrals",
-  "definition": "Count of claims referred for fraud investigation.",
-  "provenance": "IND",
-  "computation": "sum_or_count"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "TPA score card recent level",
-  "name": "Number Of Identified Recoveries",
-  "definition": "Count of claims with an identified recovery opportunity.",
-  "provenance": "IND",
-  "computation": "sum_or_count"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "TPA score card recent level",
-  "name": "Quality Check '- Passed",
-  "definition": "Number of claim QA checks passed. (Stray quote is a source typo.)",
-  "provenance": "IND",
-  "computation": "unspecified"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "TPA score card recent level",
-  "name": "Quality Check'- Failed",
-  "definition": "Number of claim QA checks failed. (Stray quote is a source typo.)",
-  "provenance": "IND",
-  "computation": "unspecified"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "TPA score card recent level",
-  "name": "Quality Check- Failed (Month) %",
-  "definition": "Percentage of claim QA checks failed in the month = failed / total checked x 100.",
-  "provenance": "IND",
-  "computation": "ratio"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "TPA score card recent level",
-  "name": "Quality Check'- Passed (Month) %",
-  "definition": "Percentage of claim QA checks passed in the month = passed / total checked x 100. (Stray quote is a source typo.)",
-  "provenance": "IND",
-  "computation": "ratio"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "TPA score card recent level",
-  "name": "SLA Declinatures In Reporting Period",
-  "definition": "Number of declinatures issued within SLA in the reporting period.",
-  "provenance": "IND",
-  "computation": "unspecified"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "TPA score card recent level",
-  "name": "Telephony - % Of Cases Answered Within SLA",
-  "definition": "Percentage of telephony cases answered within SLA = answered within SLA / offered x 100.",
-  "provenance": "IND",
-  "computation": "ratio"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "TPA score card recent level",
-  "name": "Telephony - Abandoned Ratio",
-  "definition": "Abandoned calls / calls offered x 100.",
-  "provenance": "IND",
-  "computation": "ratio"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "TPA score card recent level",
-  "name": "Telephony - No Of Calls Answered Within SLA",
-  "definition": "Number of calls answered within the SLA target time.",
-  "provenance": "IND",
-  "computation": "unspecified"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "TPA score card recent level",
-  "name": "Telephony - No. Of Abandoned Calls",
-  "definition": "Number of calls abandoned before being answered.",
-  "provenance": "IND",
-  "computation": "unspecified"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "TPA score card recent level",
-  "name": "Total Paid - Indemnity & Expenses",
-  "definition": "Sum of indemnity paid plus expense paid in the period.",
-  "provenance": "IND",
-  "computation": "sum_or_count"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "TPA score card recent level",
-  "name": "Total Upheld",
-  "definition": "Number of complaints upheld (decided in the complainant's favour).",
-  "provenance": "IND",
-  "computation": "sum_or_count"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "TPA score card recent level",
-  "name": "TPA Handling Fee",
-  "definition": "Fee paid to the TPA for handling claims in the period.",
-  "provenance": "IND",
-  "computation": "sum"
- },
- {
-  "app": "TPA Performance Dashboard",
-  "sheet": "TPA score card recent level",
-  "name": "Volume Of New Claims>5 Days",
-  "definition": "Number of new claims not acknowledged/actioned within 5 days.",
-  "provenance": "IND",
-  "computation": "sum_or_count"
- },
- {
-  "app": "M7 Pipeline Report Issue Tracker",
-  "sheet": "My New Sheet",
-  "name": "Count",
-  "definition": "Generic count of records meeting the selected criteria.",
-  "provenance": "IND",
-  "computation": "sum_or_count"
- },
- {
-  "app": "Claims Assistance Provider Scorecard",
-  "sheet": "Case Analysis",
-  "name": "New Cases",
-  "definition": "New Assistance Cases Received",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Claims Assistance Provider Scorecard",
-  "sheet": "Case Analysis",
-  "name": "Total Opened Cases",
-  "definition": "Opened Cases in a Period",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "Claims Assistance Provider Scorecard",
-  "sheet": "Case Analysis",
-  "name": "Total Operationally Closed",
-  "definition": "Total Operationally Closed",
-  "provenance": "OWNER",
-  "computation": "ratio"
- },
- {
-  "app": "Claims Assistance Provider Scorecard",
-  "sheet": "Case Analysis",
-  "name": "Declined Cases",
-  "definition": "Cases Declined",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Claims Assistance Provider Scorecard",
-  "sheet": "Case Analysis",
-  "name": "Declined to New Cases",
-  "definition": "Declined Cases against New Cases Received",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Claims Assistance Provider Scorecard",
-  "sheet": "Case Analysis",
-  "name": "Total Invoice Value",
-  "definition": "Total Invoice Value paid in \u20ac",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "Claims Assistance Provider Scorecard",
-  "sheet": "Case Analysis",
-  "name": "Average Case Cost",
-  "definition": "Total Invoice Value paid over Total Operationally Closed Cases",
-  "provenance": "OWNER",
-  "computation": "average"
- },
- {
-  "app": "Claims Assistance Provider Scorecard",
-  "sheet": "Telephony",
-  "name": "Calls Offered",
-  "definition": "Total Calls Offered",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Claims Assistance Provider Scorecard",
-  "sheet": "Telephony",
-  "name": "Calls Answered",
-  "definition": "Total Calls Answered",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Claims Assistance Provider Scorecard",
-  "sheet": "Telephony",
-  "name": "Calls Abandoned",
-  "definition": "Total Calls Offered minus Total Calls Answered",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Claims Assistance Provider Scorecard",
-  "sheet": "Telephony",
-  "name": "Calls Abandoned Rate %",
-  "definition": "Number of abandoned over the Total Calls Offered",
-  "provenance": "OWNER",
-  "computation": "ratio"
- },
- {
-  "app": "Claims Assistance Provider Scorecard",
-  "sheet": "Telephony",
-  "name": "Calls Answered Rate %",
-  "definition": "Total Calls Answered over Total Calls Offered",
-  "provenance": "OWNER",
-  "computation": "ratio"
- },
- {
-  "app": "Claims Assistance Provider Scorecard",
-  "sheet": "Telephony",
-  "name": "Average Abandonment Time",
-  "definition": "Average Time to Abandon in HH MM SS",
-  "provenance": "OWNER",
-  "computation": "average"
- },
- {
-  "app": "Claims Assistance Provider Scorecard",
-  "sheet": "Telephony",
-  "name": "Average Speed of Answer",
-  "definition": "Average Speed of Answer in HH MM SS",
-  "provenance": "OWNER",
-  "computation": "average"
- },
- {
-  "app": "Claims Assistance Provider Scorecard",
-  "sheet": "Quality Checks",
-  "name": "Number of Checked Cases",
-  "definition": "Number of checked cases",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "Claims Assistance Provider Scorecard",
-  "sheet": "Quality Checks",
-  "name": "Quality Checked %",
-  "definition": "Number of checked cases over New Assistance Cases Received",
-  "provenance": "OWNER",
-  "computation": "ratio"
- },
- {
-  "app": "Claims Assistance Provider Scorecard",
-  "sheet": "Quality Checks",
-  "name": "Outcome-Passed",
-  "definition": "Outcome minus Passed",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Claims Assistance Provider Scorecard",
-  "sheet": "Cost Containment",
-  "name": "USA Net Savings Current'",
-  "definition": "Net Savings Value for USA for reporting Month",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Claims Assistance Provider Scorecard",
-  "sheet": "Cost Containment",
-  "name": "EUR Net Savings Current'",
-  "definition": "Net Savings Value for EUR for reporting Month",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Claims Assistance Provider Scorecard",
-  "sheet": "Cost Containment",
-  "name": "ROW Net Savings Current'",
-  "definition": "Net Savings Value for ROW for reporting Month",
-  "provenance": "OWNER",
-  "computation": "unspecified"
- },
- {
-  "app": "Claims Assistance Provider Scorecard",
-  "sheet": "Cost Containment",
-  "name": "Total Net Savings Current'",
-  "definition": "Total Net Savings Value for reporting Month",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "Claims Assistance Provider Scorecard",
-  "sheet": "Cost Containment",
-  "name": "Total USA Net Savings",
-  "definition": "Total Net Savings Value for USA",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "Claims Assistance Provider Scorecard",
-  "sheet": "Cost Containment",
-  "name": "Total EUR Net Savings",
-  "definition": "Total Net Savings Value for EUR",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "Claims Assistance Provider Scorecard",
-  "sheet": "Cost Containment",
-  "name": "Total ROW Net Savings",
-  "definition": "Total Net Savings Value for ROW",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- },
- {
-  "app": "Claims Assistance Provider Scorecard",
-  "sheet": "Cost Containment",
-  "name": "Total Net Savings",
-  "definition": "Total Net Savings",
-  "provenance": "OWNER",
-  "computation": "sum_or_count"
- }
-]
+{
+ "_doc": "Metric catalogue plus an app registry (where each metric lives, with link placeholders) and owner-documented RAG thresholds. 'metrics' is the list the engine iterates; 'apps' and 'rag_thresholds' are lookups for the answer layer.",
+ "apps": {
+  "MAR-Operational": {
+   "display": "MAR - Operational",
+   "url": "PLACEHOLDER \u2014 set this dashboard's URL",
+   "team": "EMEA Claims Data & Insight Team",
+   "purpose": "Operational claims KPIs \u2014 new/closed/pending/reopened, ratios, reserves (incl. nominals), incurred, OSLR, age profiles, time-to-settle, static & inactive claims.",
+   "data_sources": [
+    "PCW (Genius)",
+    "EMIR (Echo)",
+    "CRS (Exchanging)"
+   ],
+   "refresh": "PCW updated the following weekend; other sources loaded on the 5th of each month.",
+   "coverage": "5 years of financial transactions. Counts are distinct claim numbers in a group.",
+   "note": "Each claim is mapped to a business unit (defines Country) and a product (defines Line of Business)."
+  },
+  "MAR-Conduct": {
+   "display": "MAR Conduct Dashboard",
+   "url": "PLACEHOLDER \u2014 set this dashboard's URL",
+   "team": "Claims MI team",
+   "purpose": "TCF / conduct reporting \u2014 complaints, declinatures, time to acknowledge, time to effect payment (GPI), time to respond to correspondence.",
+   "data_sources": [
+    "Work View",
+    "ClaimsConnect",
+    "Respond (Complaints Dashboard)",
+    "MAR Operational"
+   ],
+   "refresh": "\u2014",
+   "coverage": "Conduct metrics with Red/Amber/Green targets."
+  },
+  "Portfolio Insight": {
+   "display": "Portfolio Insight",
+   "url": "PLACEHOLDER \u2014 set this dashboard's URL",
+   "team": "EMEA Claims Data & Insight Team (EU.Claims.MI@Chubb.com)",
+   "purpose": "Portfolio & claims trends by country and line of business across EMEA; one-stop for policy data used in staffing models.",
+   "data_sources": [
+    "PCW"
+   ],
+   "refresh": "\u2014",
+   "coverage": "Policies underwritten 2005 onwards; claims for the most recent six years (from 2020)."
+  },
+  "Claim One Stop": {
+   "display": "Claim One Stop",
+   "url": "PLACEHOLDER \u2014 set this dashboard's URL",
+   "team": "EMEA Claims Data & Insight Team",
+   "purpose": "Latest view of claims across the EMEA region.",
+   "data_sources": [
+    "Company \u2014 PCW",
+    "CGM \u2014 Subscribe"
+   ],
+   "refresh": "Daily.",
+   "coverage": "Each claim mapped to a Business Unit (Country) and a Product (Line of Business)."
+  },
+  "A&H Claims Connect Database": {
+   "display": "A&H Claims Connect Database",
+   "url": "PLACEHOLDER \u2014 set this dashboard's URL",
+   "purpose": "(add description)",
+   "data_sources": [],
+   "refresh": "\u2014",
+   "coverage": "\u2014"
+  },
+  "CGM Claims Insight": {
+   "display": "CGM Claims Insight",
+   "url": "PLACEHOLDER \u2014 set this dashboard's URL",
+   "purpose": "(add description)",
+   "data_sources": [],
+   "refresh": "\u2014",
+   "coverage": "\u2014"
+  },
+  "CGM Claims Performance_UAT_Final": {
+   "display": "CGM Claims Performance_UAT_Final",
+   "url": "PLACEHOLDER \u2014 set this dashboard's URL",
+   "purpose": "(add description)",
+   "data_sources": [],
+   "refresh": "\u2014",
+   "coverage": "\u2014"
+  },
+  "Cladding Report Company": {
+   "display": "Cladding Report Company",
+   "url": "PLACEHOLDER \u2014 set this dashboard's URL",
+   "purpose": "(add description)",
+   "data_sources": [],
+   "refresh": "\u2014",
+   "coverage": "\u2014"
+  },
+  "Claims Assistance Provider Scorecard": {
+   "display": "Claims Assistance Provider Scorecard",
+   "url": "PLACEHOLDER \u2014 set this dashboard's URL",
+   "purpose": "(add description)",
+   "data_sources": [],
+   "refresh": "\u2014",
+   "coverage": "\u2014"
+  },
+  "EMEA Explicit Consent": {
+   "display": "EMEA Explicit Consent",
+   "url": "PLACEHOLDER \u2014 set this dashboard's URL",
+   "purpose": "(add description)",
+   "data_sources": [],
+   "refresh": "\u2014",
+   "coverage": "\u2014"
+  },
+  "Fraud Dashbord": {
+   "display": "Fraud Dashbord",
+   "url": "PLACEHOLDER \u2014 set this dashboard's URL",
+   "purpose": "(add description)",
+   "data_sources": [],
+   "refresh": "\u2014",
+   "coverage": "\u2014"
+  },
+  "M7 Pipeline Report Issue Tracker": {
+   "display": "M7 Pipeline Report Issue Tracker",
+   "url": "PLACEHOLDER \u2014 set this dashboard's URL",
+   "purpose": "(add description)",
+   "data_sources": [],
+   "refresh": "\u2014",
+   "coverage": "\u2014"
+  },
+  "Recovery Dashboard": {
+   "display": "Recovery Dashboard",
+   "url": "PLACEHOLDER \u2014 set this dashboard's URL",
+   "purpose": "(add description)",
+   "data_sources": [],
+   "refresh": "\u2014",
+   "coverage": "\u2014"
+  },
+  "TPA Performance Dashboard": {
+   "display": "TPA Performance Dashboard",
+   "url": "PLACEHOLDER \u2014 set this dashboard's URL",
+   "purpose": "(add description)",
+   "data_sources": [],
+   "refresh": "\u2014",
+   "coverage": "\u2014"
+  },
+  "Transactional App": {
+   "display": "Transactional App",
+   "url": "PLACEHOLDER \u2014 set this dashboard's URL",
+   "purpose": "(add description)",
+   "data_sources": [],
+   "refresh": "\u2014",
+   "coverage": "\u2014"
+  }
+ },
+ "rag_thresholds": {
+  "acpoc": {
+   "label": "ACPOC",
+   "red": ">10%",
+   "amber": "5-10%",
+   "green": "<5%"
+  },
+  "acpsc": {
+   "label": "ACPSC",
+   "red": ">10%",
+   "amber": "5-10%",
+   "green": "<5%"
+  },
+  "closedclaims": {
+   "label": "Closed Claims",
+   "red": "<10%",
+   "amber": "10-15%",
+   "green": ">15%"
+  },
+  "closingratio": {
+   "label": "Closing Ratio",
+   "red": "<85%",
+   "amber": "85-100%",
+   "green": ">100%"
+  },
+  "netclosingratio": {
+   "label": "Net Closing Ratio",
+   "red": "<85%",
+   "amber": "85-100%",
+   "green": ">100%"
+  },
+  "newclaims": {
+   "label": "New Claims",
+   "red": "<10%",
+   "amber": "10-15%",
+   "green": ">15%"
+  },
+  "pendingclaims": {
+   "label": "Pending Claims",
+   "red": "<10%",
+   "amber": "10-15%",
+   "green": ">15%"
+  },
+  "nominalage": {
+   "label": "Nominal Age",
+   "red": "<200",
+   "amber": "200-220",
+   "green": ">220"
+  },
+  "nominalreserves": {
+   "label": "Nominal Reserves",
+   "red": ">15%",
+   "amber": "10-15%",
+   "green": "<10%"
+  },
+  "reopenedratio": {
+   "label": "Reopened Ratio",
+   "red": ">5%",
+   "amber": "-",
+   "green": "<5%"
+  },
+  "1yearstatic": {
+   "label": "1 year Static",
+   "red": "<0%",
+   "amber": "-",
+   "green": ">=0%"
+  },
+  "90daysstatic": {
+   "label": "90 days Static",
+   "red": "<0%",
+   "amber": "-",
+   "green": ">=0%"
+  },
+  "180daysstatic": {
+   "label": "180 days Static",
+   "red": "<0%",
+   "amber": "-",
+   "green": ">=0%"
+  },
+  "value1yearstaticclaims": {
+   "label": "Value - 1 Year Static Claims",
+   "red": ">7.5%",
+   "amber": "5-7.5%",
+   "green": "<5%"
+  },
+  "volume1yearstaticclaims": {
+   "label": "Volume - 1 Year Static Claims",
+   "red": ">10%",
+   "amber": "5-10%",
+   "green": "<5%"
+  },
+  "reservecompletion020days": {
+   "label": "Reserve Completion (0-20 days)",
+   "red": "<80%",
+   "amber": "80-85%",
+   "green": ">=85%"
+  },
+  "reservedinunder5businessdaystonewclaims": {
+   "label": "Reserved in under 5 business days to New Claims",
+   "red": "<80%",
+   "amber": "80-85%",
+   "green": ">=85%"
+  },
+  "reservedinunder30daystonewclaims": {
+   "label": "Reserved in under 30 days to New Claims",
+   "red": "<80%",
+   "amber": "80-85%",
+   "green": ">=85%"
+  },
+  "declinatures": {
+   "label": "Declinatures",
+   "red": ">2%",
+   "amber": "1-2%",
+   "green": "<=1%"
+  },
+  "timetoacknowledge": {
+   "label": "Time to Acknowledge",
+   "red": ">10 days",
+   "amber": "6-10 days",
+   "green": "<=5 days"
+  },
+  "timetoeffectpaymentingpi": {
+   "label": "Time to Effect Payment in GPI",
+   "red": ">10 days",
+   "amber": "6-10 days",
+   "green": "<=5 days"
+  },
+  "timetorespondtocorrespondence5days": {
+   "label": "Time to Respond to Correspondence (% < 5 days)",
+   "red": "<80%",
+   "amber": "80-85%",
+   "green": ">=85%"
+  }
+ },
+ "metrics": [
+  {
+   "app": "A&H Claims Connect Database",
+   "sheet": "CSP Usage",
+   "name": "% CSP Achieved - Basic Book/Direct Marketing/NAC",
+   "definition": "Percentage of claims in the Basic Book / Direct Marketing / NAC books that were handled via the CSP (Claims Service Provider) route. CSP, NAC and the book segments are internal definitions \u2014 confirm exact numerator/denominator with the A&H team.",
+   "provenance": "PROP",
+   "computation": "ratio"
+  },
+  {
+   "app": "A&H Claims Connect Database",
+   "sheet": "Fast Track",
+   "name": "% Fast Track Acieved",
+   "definition": "Percentage of claims handled through the fast-track (simplified, low-touch) route in the period = Fast Track Claims / total eligible claims x 100. (Source name misspelled 'Acieved'.)",
+   "provenance": "IND",
+   "computation": "ratio"
+  },
+  {
+   "app": "A&H Claims Connect Database",
+   "sheet": "Fast Track",
+   "name": "% Fast Track Target",
+   "definition": "The target/benchmark percentage of claims that should be handled via fast track in the period.",
+   "provenance": "IND",
+   "computation": "ratio"
+  },
+  {
+   "app": "A&H Claims Connect Database",
+   "sheet": "Fast Track",
+   "name": "% Fast Track Throughput",
+   "definition": "Percentage of fast-track claims completed (closed) relative to fast-track claims entering the route in the period.",
+   "provenance": "IND",
+   "computation": "ratio"
+  },
+  {
+   "app": "A&H Claims Connect Database",
+   "sheet": "Conduct Risk",
+   "name": "Acceptance Rate",
+   "definition": "Percentage of decided claims that were accepted (not declined or walked away) = accepted claims / total decided claims x 100.",
+   "provenance": "IND",
+   "computation": "ratio"
+  },
+  {
+   "app": "A&H Claims Connect Database",
+   "sheet": "Conduct Risk",
+   "name": "Avarage Paid",
+   "definition": "Average amount paid per claim = total paid (indemnity + expense) / number of paid claims. (Source name misspelled 'Avarage'.)",
+   "provenance": "IND",
+   "computation": "sum"
+  },
+  {
+   "app": "A&H Claims Connect Database",
+   "sheet": "Cycle Time and Static Claims Report",
+   "name": "Average Cycle Time",
+   "definition": "Average elapsed days from claim reported (or opened) to closed, across claims closed in the period.",
+   "provenance": "IND",
+   "computation": "average"
+  },
+  {
+   "app": "A&H Claims Connect Database",
+   "sheet": "CSP Usage",
+   "name": "Claim Office Country",
+   "definition": "Country name of claim office",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "A&H Claims Connect Database",
+   "sheet": "Conduct Risk",
+   "name": "Claims",
+   "definition": "Count of claims meeting the selected criteria. Confirm whether this counts DISTINCT ClaimID (see business_rules.md).",
+   "provenance": "IND",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "A&H Claims Connect Database",
+   "sheet": "Conduct Risk",
+   "name": "Class 3 Check",
+   "definition": "An internal conduct-risk check tied to the 'Class 3' classification. Proprietary \u2014 confirm definition with the Conduct Risk team.",
+   "provenance": "PROP",
+   "computation": "unspecified"
+  },
+  {
+   "app": "A&H Claims Connect Database",
+   "sheet": "World Map and Summary",
+   "name": "Closed Claims",
+   "definition": "Claims closed in one accounting period.",
+   "provenance": "OWNER-DEFINED",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "A&H Claims Connect Database",
+   "sheet": "Conduct Risk",
+   "name": "Closed No Payment",
+   "definition": "Count of claims closed without any indemnity payment (closed at nil / no-pay).",
+   "provenance": "IND",
+   "computation": "unspecified"
+  },
+  {
+   "app": "A&H Claims Connect Database",
+   "sheet": "CSP Usage",
+   "name": "CSP Ingested Claims - Basic Book/Direct Marketing/NAC",
+   "definition": "Count of claims in the Basic Book / Direct Marketing / NAC books ingested via the CSP route. Proprietary segmentation \u2014 confirm with the A&H team.",
+   "provenance": "PROP",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "A&H Claims Connect Database",
+   "sheet": "Conduct Risk",
+   "name": "Declinature Rate",
+   "definition": "Percentage of decided (or new) claims that were declined = declined claims / total decided claims x 100.",
+   "provenance": "IND",
+   "computation": "ratio"
+  },
+  {
+   "app": "A&H Claims Connect Database",
+   "sheet": "World Map and Summary",
+   "name": "Declined Claims",
+   "definition": "Total number of claims declined",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "A&H Claims Connect Database",
+   "sheet": "Fast Track",
+   "name": "Fast Track Claims",
+   "definition": "Count of claims handled via the fast-track route in the period.",
+   "provenance": "IND",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "A&H Claims Connect Database",
+   "sheet": "Cycle Time and Static Claims Report",
+   "name": "Median Cycle Time",
+   "definition": "Median elapsed days from reported (or opened) to closed across closed claims; less sensitive to outliers than the average.",
+   "provenance": "IND",
+   "computation": "median"
+  },
+  {
+   "app": "A&H Claims Connect Database",
+   "sheet": "World Map and Summary",
+   "name": "New Claims",
+   "definition": "Claims opened in one accounting period.",
+   "provenance": "OWNER-DEFINED",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "A&H Claims Connect Database",
+   "sheet": "Declinature",
+   "name": "Declined Claims",
+   "definition": "Total number of claims declined in the period.",
+   "provenance": "IND",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "A&H Claims Connect Database",
+   "sheet": "Conduct Risk",
+   "name": "Policy Number",
+   "definition": "Policy number",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "A&H Claims Connect Database",
+   "sheet": "Conduct Risk",
+   "name": "Policy Ref",
+   "definition": "Policy reference number",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "A&H Claims Connect Database",
+   "sheet": "CSP Usage",
+   "name": "Total Claim - Basic Book/Direct Marketing/NAC",
+   "definition": "Total claim count across the Basic Book / Direct Marketing / NAC books. Proprietary segmentation \u2014 confirm with the A&H team.",
+   "provenance": "PROP",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "A&H Claims Connect Database",
+   "sheet": "Fast Track",
+   "name": "Total Closed Claims",
+   "definition": "Total number of claims closed in the period.",
+   "provenance": "IND",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "A&H Claims Connect Database",
+   "sheet": "Declinature",
+   "name": "Total Declined",
+   "definition": "Total number of claims declined in the period.",
+   "provenance": "IND",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "A&H Claims Connect Database",
+   "sheet": "Fast Track",
+   "name": "Total Fast Track Claims",
+   "definition": "Total number of claims handled via the fast-track route in the period.",
+   "provenance": "IND",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "A&H Claims Connect Database",
+   "sheet": "Declinature",
+   "name": "Total Opened",
+   "definition": "Total number of claims opened in the period.",
+   "provenance": "IND",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "CGM Claims Insight",
+   "sheet": "Caims Conduct Performance",
+   "name": "$ Claims Incurred",
+   "definition": "Total claim amount for selected filters in USD",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "CGM Claims Insight",
+   "sheet": "Caims Conduct Performance",
+   "name": "$ Expense & Fees Paid (CGM Share)",
+   "definition": "Total expense and fees paid for selected filters in USD",
+   "provenance": "OWNER",
+   "computation": "sum"
+  },
+  {
+   "app": "CGM Claims Insight",
+   "sheet": "Caims Conduct Performance",
+   "name": "$ Expense & Fees Reserve (CGM Share)",
+   "definition": "Total expense and fees reserve for selected filters in USD",
+   "provenance": "OWNER",
+   "computation": "sum"
+  },
+  {
+   "app": "CGM Claims Insight",
+   "sheet": "Caims Conduct Performance",
+   "name": "$ Indemnity Paid (CGM Share)",
+   "definition": "Total indemnity paid for selected filters in USD",
+   "provenance": "OWNER",
+   "computation": "sum"
+  },
+  {
+   "app": "CGM Claims Insight",
+   "sheet": "Caims Conduct Performance",
+   "name": "$ Indemnity Reserve (CGM Share)",
+   "definition": "Total indemnity reserve for selected filters in USD",
+   "provenance": "OWNER",
+   "computation": "sum"
+  },
+  {
+   "app": "CGM Claims Insight",
+   "sheet": "Pre - Renewal Report",
+   "name": "Account for Renewal",
+   "definition": "Total number of accounts for renewal",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "CGM Claims Insight",
+   "sheet": "Pre - Renewal Report",
+   "name": "Account value (CGM Share)",
+   "definition": "Total account value in USD (CGM only)",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "CGM Claims Insight",
+   "sheet": "Claim Movement Report",
+   "name": "Claim Count",
+   "definition": "Total claims count",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "CGM Claims Insight",
+   "sheet": "Claim Portfolio Performance",
+   "name": "Claims Count",
+   "definition": "Total claims Count",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "CGM Claims Insight",
+   "sheet": "Claim Portfolio Performance",
+   "name": "Claims Incurred",
+   "definition": "Total claims incurred",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "CGM Claims Insight",
+   "sheet": "Caims Conduct Performance",
+   "name": "Closed - Fees Only",
+   "definition": "Count and percentage of close claims with fees only",
+   "provenance": "OWNER",
+   "computation": "ratio"
+  },
+  {
+   "app": "CGM Claims Insight",
+   "sheet": "Caims Conduct Performance",
+   "name": "Closed - Indemnity Settlement",
+   "definition": "Count and percentage of closed claims with indemnity settlement",
+   "provenance": "OWNER",
+   "computation": "ratio"
+  },
+  {
+   "app": "CGM Claims Insight",
+   "sheet": "Caims Conduct Performance",
+   "name": "Closed - No Indemnity & Fees",
+   "definition": "Count and percentage of claim with no indemnity amount or fees",
+   "provenance": "OWNER",
+   "computation": "ratio"
+  },
+  {
+   "app": "CGM Claims Insight",
+   "sheet": "Pre - Renewal Report",
+   "name": "Closed Claim Count",
+   "definition": "Count on total closed claims based on selected criteria",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "CGM Claims Insight",
+   "sheet": "Claim Portfolio Performance",
+   "name": "Closed Claims Count",
+   "definition": "Total number of closed claims",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "CGM Claims Insight",
+   "sheet": "Caims Conduct Performance",
+   "name": "Closed Claims Lifecycle (Days)",
+   "definition": "Difference in number of working days between reported date and closed claims latest movement days",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "CGM Claims Insight",
+   "sheet": "Claim Portfolio Performance",
+   "name": "Expense and Fees Paid (CGM Share)",
+   "definition": "Total expense and other fees paid (CGM share only)",
+   "provenance": "OWNER",
+   "computation": "sum"
+  },
+  {
+   "app": "CGM Claims Insight",
+   "sheet": "Claim Portfolio Performance",
+   "name": "Expense and Fees Reserve (CGM Share)",
+   "definition": "Total expense and fees reserve (CGM only)",
+   "provenance": "OWNER",
+   "computation": "sum"
+  },
+  {
+   "app": "CGM Claims Insight",
+   "sheet": "Pre - Renewal Report",
+   "name": "First Time Renewal",
+   "definition": "Total first time renewal amount in USD",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "CGM Claims Insight",
+   "sheet": "Pre - Renewal Report",
+   "name": "GROSS WRITTEN PREMIUM",
+   "definition": "Gross written premium",
+   "provenance": "OWNER",
+   "computation": "sum"
+  },
+  {
+   "app": "CGM Claims Insight",
+   "sheet": "Pre - Renewal Report",
+   "name": "Incurred for Closed Claims (CGM Share)",
+   "definition": "Total incurred amount for closed claim in USD (CGM only)",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "CGM Claims Insight",
+   "sheet": "Open Claim Headlines",
+   "name": "Incurred for Open Claims (CGM Share)",
+   "definition": "Total incurred amount for open claims",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "CGM Claims Insight",
+   "sheet": "Claim Portfolio Performance",
+   "name": "Indemnity Paid (CGM Share)",
+   "definition": "Total Indemnity paid (For CGM only)",
+   "provenance": "OWNER",
+   "computation": "sum"
+  },
+  {
+   "app": "CGM Claims Insight",
+   "sheet": "Open Claim Headlines",
+   "name": "Indemnity Paid for Open Claims (CGM Share)",
+   "definition": "Total indemnity paid for open claims (CGM only)",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "CGM Claims Insight",
+   "sheet": "Claim Portfolio Performance",
+   "name": "Indemnity Reserve (CGM Share)",
+   "definition": "Total Indemnity reserve (CGM only)",
+   "provenance": "OWNER",
+   "computation": "sum"
+  },
+  {
+   "app": "CGM Claims Insight",
+   "sheet": "Pre - Renewal Report",
+   "name": "Long Standing Account",
+   "definition": "Total long standing amount in USD",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "CGM Claims Insight",
+   "sheet": "Pre - Renewal Report",
+   "name": "MAJOR LINE",
+   "definition": "Major Line of Business name",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "CGM Claims Insight",
+   "sheet": "Pre - Renewal Report",
+   "name": "MINOR LINE",
+   "definition": "Minor Line Of Business name",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "CGM Claims Insight",
+   "sheet": "Pre - Renewal Report",
+   "name": "NET WRITTEN PREMIUM",
+   "definition": "Net written premium",
+   "provenance": "OWNER",
+   "computation": "sum"
+  },
+  {
+   "app": "CGM Claims Insight",
+   "sheet": "Claim Movement Report",
+   "name": "O/S Reserve",
+   "definition": "Total outstanding reserve",
+   "provenance": "OWNER",
+   "computation": "sum"
+  },
+  {
+   "app": "CGM Claims Insight",
+   "sheet": "Caims Conduct Performance",
+   "name": "Open",
+   "definition": "Count and percentage of  open claims",
+   "provenance": "OWNER",
+   "computation": "ratio"
+  },
+  {
+   "app": "CGM Claims Insight",
+   "sheet": "Caims Conduct Performance",
+   "name": "Open - Declined",
+   "definition": "Count and percentage of declined claims",
+   "provenance": "OWNER",
+   "computation": "ratio"
+  },
+  {
+   "app": "CGM Claims Insight",
+   "sheet": "Open Claim Headlines",
+   "name": "Open Claims Count",
+   "definition": "Total number of open claims",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "CGM Claims Insight",
+   "sheet": "Caims Conduct Performance",
+   "name": "Open Claims Lifecycle (Days)",
+   "definition": "Difference in number of working days between reported date and open claims latest movement days",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "CGM Claims Insight",
+   "sheet": "Open Claim Headlines",
+   "name": "Outstanding Reserve for Open Claims (CGM Share)",
+   "definition": "Total outstanding loss reserve for CGM only",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "CGM Claims Insight",
+   "sheet": "Pre - Renewal Report",
+   "name": "POLICY ACCOUNT COUNT",
+   "definition": "Total number of policy count by major and minor LOB",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "CGM Claims Performance_UAT_Final",
+   "sheet": "Financials and MI for All Vendors at 13/12/2024",
+   "name": "Count of UCRs received monthly",
+   "definition": "Count of UCRs received monthly refers to the total number of Unreported Claims Reserves (UCRs) that are recorded or acknowledged by the insurance company within a given month.\nUCRs are estimates of the reserves set aside by an insurance company for claims that have occurred but have not yet been reported by policyholders.",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "CGM Claims Performance_UAT_Final",
+   "sheet": "Financials and MI for All Vendors at 13/12/2024",
+   "name": "Data Completeness",
+   "definition": "Data completeness refers to the extent to which all required data is present and accounted for in financial reports and MI systems. It ensures that no critical data is missing, which is essential for accurate analysis, decision-making, and regulatory compliance.\nWhy -This sheet has been created to provide a comprehensive view of all vendors, detailing the financials and management information (MI) of both closed and open claims, along with the monthly count of UCRs.",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "CGM Claims Performance_UAT_Final",
+   "sheet": "Financials and MI for All Vendors at 13/12/2024",
+   "name": "Incurred indemnity Vs Incurred fees",
+   "definition": "Incurred indemnity and incurred fees are terms used to describe different types of costs associated with insurance claims.\nIncurred indemnity refers to the total amount of money that an insurance company expects to pay out to policyholders for covered losses.\nIncurred fees refer to the expenses that an insurance company incurs in the process of handling and settling claims.",
+   "provenance": "OWNER",
+   "computation": "sum"
+  },
+  {
+   "app": "CGM Claims Performance_UAT_Final",
+   "sheet": "Financials and MI for All Vendors at 13/12/2024",
+   "name": "Open Vs Closed Claims",
+   "definition": "It refer to the status of an insurance claim during the claims process. \nAn open claim is one that has been reported to the insurance company but has not yet been fully resolved or settled. A closed claim is one that has been fully resolved and settled by the insurance company",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "CGM Claims Performance_UAT_Final",
+   "sheet": "Financials and MI for All Vendors at 13/12/2024",
+   "name": "Referrals",
+   "definition": "It refer to the process where an insurance agent or broker recommends a potential client to an insurance company or another agent. Referrals can also occur within the claims process when a claim is referred to a specialist or another department for further handling.",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "EMEA Explicit Consent",
+   "sheet": "Explicit Consent",
+   "name": "Count of Not Yet Determined Claims by Claim Type and Month Year",
+   "definition": "Count of Not Yet Determined Claims by Claim Type and Month Year",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "EMEA Explicit Consent",
+   "sheet": "Explicit Consent",
+   "name": "Count of Not Yet Determined Claims",
+   "definition": "Count of Not Yet Determined Claims by Policy Country and Month Year",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "Fraud Dashbord",
+   "sheet": "Suspected Fraud",
+   "name": "% Suspected of Fraud",
+   "definition": "Percentage of suspected fraud",
+   "provenance": "OWNER",
+   "computation": "ratio"
+  },
+  {
+   "app": "Fraud Dashbord",
+   "sheet": "Suspected Fraud",
+   "name": "Accepted for Investigation %",
+   "definition": "Percentage of suspected fraud accepted for investigation",
+   "provenance": "OWNER",
+   "computation": "ratio"
+  },
+  {
+   "app": "Fraud Dashbord",
+   "sheet": "Closed Fraud",
+   "name": "Closed No Impact",
+   "definition": "Closed without any saving",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Fraud Dashbord",
+   "sheet": "Closed Fraud",
+   "name": "Closed with Impact",
+   "definition": "Indicator to show Fraud claim records which are are closed and have a Savings assigned.",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Fraud Dashbord",
+   "sheet": "Closed Fraud",
+   "name": "Count of Claim Number",
+   "definition": "Total number of claims",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "Fraud Dashbord",
+   "sheet": "Suspected Fraud",
+   "name": "Country",
+   "definition": "Country Name",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "Fraud Dashbord",
+   "sheet": "Closed Fraud",
+   "name": "Fraud Expense (USD)",
+   "definition": "Fraud claim related expenses in USD",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Fraud Dashbord",
+   "sheet": "Closed Fraud",
+   "name": "Impact Rate",
+   "definition": "Close with Impact to Closed without impact ratio",
+   "provenance": "OWNER",
+   "computation": "ratio"
+  },
+  {
+   "app": "Fraud Dashbord",
+   "sheet": "Suspected Fraud",
+   "name": "Major LOB",
+   "definition": "Major LOB name",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Fraud Dashbord",
+   "sheet": "Closed Fraud",
+   "name": "Net Saving (USD)",
+   "definition": "Saving minus Expenses in USD",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Fraud Dashbord",
+   "sheet": "Suspected Fraud",
+   "name": "New Claims Count",
+   "definition": "Count of new claim within selected period",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "Fraud Dashbord",
+   "sheet": "Benefits Tracker",
+   "name": "Primary Referral Source",
+   "definition": "Category or Type of Primary Fraud threat Referral Source: Adjuster or third party etc",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Fraud Dashbord",
+   "sheet": "Suspected Fraud",
+   "name": "Region",
+   "definition": "Region as UKISA or CE or MENA",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Fraud Dashbord",
+   "sheet": "Closed Fraud",
+   "name": "Saving (USD)",
+   "definition": "Fraud claim savings in USD",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Fraud Dashbord",
+   "sheet": "Closed Fraud",
+   "name": "Saving Banding USD",
+   "definition": "Banding to group savings",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Fraud Dashbord",
+   "sheet": "Suspected Fraud",
+   "name": "Suspected Fraud",
+   "definition": "Count of suspected fraud",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Fraud Dashbord",
+   "sheet": "Closed Fraud",
+   "name": "Total Closed",
+   "definition": "Total number of fraud cases closed",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "Fraud Dashbord",
+   "sheet": "Closed Fraud",
+   "name": "Total Gross Reserved",
+   "definition": "Total gross reserved based on selected criteria",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "Fraud Dashbord",
+   "sheet": "Closed Fraud",
+   "name": "Year Closed",
+   "definition": "Year the fraud closed",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "MAR-Conduct",
+   "sheet": "Time to Acknowledge Loss",
+   "name": "% 5 Days and Under",
+   "definition": "Percentage of claims where time to acknowledge loss within 5 days",
+   "provenance": "OWNER",
+   "computation": "ratio"
+  },
+  {
+   "app": "MAR-Conduct",
+   "sheet": "Time to Effect Payment",
+   "name": "% Time to Effect Payment",
+   "definition": "% Time to Effect Payment \u00a0difference between recieved date and payment date",
+   "provenance": "OWNER",
+   "computation": "ratio"
+  },
+  {
+   "app": "MAR-Conduct",
+   "sheet": "Time to Respond to Correspondence",
+   "name": "5 Days and Under",
+   "definition": "Number of cases where all queries processed and responded to within 5 days of SLA standard",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "MAR-Conduct",
+   "sheet": "Time to Effect Payment",
+   "name": "5 Days and Under",
+   "definition": "Number of cases where all payment payments processed within 5 working days of SLA standard",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "MAR-Conduct",
+   "sheet": "Time to Acknowledge Loss",
+   "name": "5 Days and Under",
+   "definition": "Number of cases claims acknowledged within 5 days of SLA standard",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "MAR-Conduct",
+   "sheet": "Time to Acknowledge Loss",
+   "name": "Average Time to Acknowledge",
+   "definition": "Average days it took to acknowledge claim from reported date",
+   "provenance": "OWNER",
+   "computation": "average"
+  },
+  {
+   "app": "MAR-Conduct",
+   "sheet": "Time to Respond to Correspondence",
+   "name": "Avg Working Days",
+   "definition": "Average days to respond to the correspondence",
+   "provenance": "OWNER",
+   "computation": "average"
+  },
+  {
+   "app": "MAR-Conduct",
+   "sheet": "Complaints",
+   "name": "Complaints Received",
+   "definition": "Total number of complaint received based on criteria",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "MAR-Conduct",
+   "sheet": "Complaints",
+   "name": "Complaints to New Claims %",
+   "definition": "Percentage of complaints with resepct to new claim",
+   "provenance": "OWNER",
+   "computation": "ratio"
+  },
+  {
+   "app": "MAR-Conduct",
+   "sheet": "Declined Claims",
+   "name": "Declined Claims",
+   "definition": "Total number of claims declined",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "MAR-Conduct",
+   "sheet": "Declined Claims",
+   "name": "Declined Claims to New Claims %",
+   "definition": "Percentage of declined claims vs new claim",
+   "provenance": "OWNER",
+   "computation": "ratio"
+  },
+  {
+   "app": "MAR-Conduct",
+   "sheet": "Declined Claims",
+   "name": "New Claims",
+   "definition": "Claims opened in one accounting period.",
+   "provenance": "OWNER-DEFINED",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "MAR-Conduct",
+   "sheet": "Time to Respond to Correspondence",
+   "name": "Over 5 Days",
+   "definition": "Number of cases responded over 5 days",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "MAR-Conduct",
+   "sheet": "Time to Effect Payment",
+   "name": "Time to Effect Payment",
+   "definition": "Average days it took to complete payment from received date i.e. time to get payment processed",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "MAR-Conduct",
+   "sheet": "Time to Respond to Correspondence",
+   "name": "Time to Respond to Correspondence",
+   "definition": "Percentage of claims where time to respond to correspondence below 5 days  based on Workview arrival date",
+   "provenance": "OWNER",
+   "computation": "ratio"
+  },
+  {
+   "app": "MAR-Operational",
+   "sheet": "Score card",
+   "name": "Volume - 1 Year Static Claims",
+   "definition": "Claims opened or reopened in the accounting period with no financial movement for 365 days.",
+   "provenance": "OWNER-DEFINED",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "MAR-Operational",
+   "sheet": "Score card",
+   "name": "Value - 1 Year Static Claims",
+   "definition": "Incurred total of claims opened or reopened in the accounting period with no financial movement for 365 days.",
+   "provenance": "OWNER-DEFINED",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "MAR-Operational",
+   "sheet": "Score card",
+   "name": "Time to Settle",
+   "definition": "The average claim life days for all closed claims selected.",
+   "provenance": "OWNER-DEFINED",
+   "computation": "unspecified"
+  },
+  {
+   "app": "MAR-Operational",
+   "sheet": "Nominals",
+   "name": "Reserve ending in 001 for Local Regulatory Reason",
+   "definition": "Claims whose reserve amount ends in '001', used as an internal marker for a local regulatory reason. Proprietary convention \u2014 confirm with the reserving team.",
+   "provenance": "PROP",
+   "computation": "sum"
+  },
+  {
+   "app": "MAR-Operational",
+   "sheet": "Score card",
+   "name": "Reserve Completion (0-30 Calendar Days)",
+   "definition": "Percentage of cases reserve completed within 30 days",
+   "provenance": "OWNER",
+   "computation": "ratio"
+  },
+  {
+   "app": "MAR-Operational",
+   "sheet": "Score card",
+   "name": "Reopened Ratio",
+   "definition": "Claims reopened in the accounting period divided by claims closed in the accounting period.",
+   "provenance": "OWNER-DEFINED",
+   "computation": "ratio"
+  },
+  {
+   "app": "MAR-Operational",
+   "sheet": "Europe Overview - Rolling Table View",
+   "name": "Reopened Claims Count",
+   "definition": "Count of reopened claims based on selected criteria",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "MAR-Operational",
+   "sheet": "New and Closed Volume",
+   "name": "Closing Ratio",
+   "definition": "Claims closed in the accounting period divided by claims opened in the accounting period.",
+   "provenance": "OWNER-DEFINED",
+   "computation": "ratio"
+  },
+  {
+   "app": "MAR-Operational",
+   "sheet": "Score card",
+   "name": "Pending Claims",
+   "definition": "Claims with a status of open or reopened at the end of an accounting period.",
+   "provenance": "OWNER-DEFINED",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "MAR-Operational",
+   "sheet": "Europe Overview - Rolling Table View",
+   "name": "Pending Claim Count",
+   "definition": "Total pending claim count",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "MAR-Operational",
+   "sheet": "Claim Movement",
+   "name": "OSLR Movement Paid in Period - USD",
+   "definition": "Total outstanding loss reserve paid in the selected period in USD",
+   "provenance": "OWNER",
+   "computation": "sum"
+  },
+  {
+   "app": "MAR-Operational",
+   "sheet": "Europe Overview - Rolling Table View",
+   "name": "OSLR Movement in Period - USD",
+   "definition": "Total outstanding loss reserve paid in the selected period in USD",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "MAR-Operational",
+   "sheet": "Nominals",
+   "name": "Open for Recoiveries",
+   "definition": "Number of open claims with recoveries expected // Number of claim with nominal value of 88",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "MAR-Operational",
+   "sheet": "Score card",
+   "name": "Nominal Reserve",
+   "definition": "The sum of reserves on any claim with cumulative gross (DACs 1&2), Original Currency reserve fitting logic outlined: Reserves = 77, 88, 99 or 123. Built into Broadview for 77 and 123. 88 and 99 is calculated in Qlik Sense",
+   "provenance": "OWNER",
+   "computation": "sum"
+  },
+  {
+   "app": "MAR-Operational",
+   "sheet": "Score card",
+   "name": "Nominal Age",
+   "definition": "The average age of claims holding a nominal reserve in the period selected.",
+   "provenance": "OWNER-DEFINED",
+   "computation": "unspecified"
+  },
+  {
+   "app": "MAR-Operational",
+   "sheet": "Nominals",
+   "name": "No financial exposure expected to Chubb",
+   "definition": "Claim with a nominal reserve of 77",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "MAR-Operational",
+   "sheet": "Score card",
+   "name": "New Volumes",
+   "definition": "Number of new claims for selected criteria",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "MAR-Operational",
+   "sheet": "Europe Overview - Rolling Table View",
+   "name": "New Claims 12 Month Rolling Avarage",
+   "definition": "Average new claims in last 12 months based on selected criteria",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "MAR-Operational",
+   "sheet": "Nominals",
+   "name": "New claim reserve uncertain - high value",
+   "definition": "Claim with a nominal reserve of 99",
+   "provenance": "OWNER",
+   "computation": "sum"
+  },
+  {
+   "app": "MAR-Operational",
+   "sheet": "Nominals",
+   "name": "New claim reserve uncertain",
+   "definition": "Claim with a nominal reserve of 123",
+   "provenance": "OWNER",
+   "computation": "sum"
+  },
+  {
+   "app": "MAR-Operational",
+   "sheet": "Europe Overview - Rolling Table View",
+   "name": "New Claim Count",
+   "definition": "Count of total new claims based on selected criteria",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "MAR-Operational",
+   "sheet": "Score card",
+   "name": "Net Closing Ratio",
+   "definition": "Claims closed in the accounting period divided by claims opened and reopened in the accounting period.",
+   "provenance": "OWNER-DEFINED",
+   "computation": "ratio"
+  },
+  {
+   "app": "MAR-Operational",
+   "sheet": "Europe Overview - Rolling Table View",
+   "name": "Indemnity Paid in Period - USD",
+   "definition": "Total indemnity amount paid in the selected period in USD",
+   "provenance": "OWNER",
+   "computation": "sum"
+  },
+  {
+   "app": "MAR-Operational",
+   "sheet": "Claim Movement",
+   "name": "Incurred Movement Paid in Period - USD",
+   "definition": "Incurred Movement in Period - USD check with elise",
+   "provenance": "OWNER",
+   "computation": "sum"
+  },
+  {
+   "app": "MAR-Operational",
+   "sheet": "Europe Overview - Rolling Table View",
+   "name": "Incurred Movement in Period - USD",
+   "definition": "OSLR Movement in Period - USD \u00a0check with elise",
+   "provenance": "OWNER",
+   "computation": "sum"
+  },
+  {
+   "app": "MAR-Operational",
+   "sheet": "Score card",
+   "name": "Inactive Claims (>270 Days)",
+   "definition": "Count of open or reopened claims with no financial transaction for 270 days or more.",
+   "provenance": "OWNER-DEFINED",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "MAR-Operational",
+   "sheet": "Europe Overview - Rolling Table View",
+   "name": "Expense to Indemnity Ratio",
+   "definition": "Ratio of indemnity by expense paid",
+   "provenance": "OWNER",
+   "computation": "ratio"
+  },
+  {
+   "app": "MAR-Operational",
+   "sheet": "Europe Overview - Rolling Table View",
+   "name": "Expense Paid in Period - USD",
+   "definition": "Total expense amount paid in the selected period in USD",
+   "provenance": "OWNER",
+   "computation": "sum"
+  },
+  {
+   "app": "MAR-Operational",
+   "sheet": "Score card",
+   "name": "Closed Volumes",
+   "definition": "Number of closed claims for selected criteria",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "MAR-Operational",
+   "sheet": "Europe Overview - Rolling Table View",
+   "name": "Closed No Payment Claim Count",
+   "definition": "Count of claims closed without any payment  based on selected criteria",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "MAR-Operational",
+   "sheet": "Europe Overview - Rolling Table View",
+   "name": "Closed Claims 12 Month Rolling Avarage",
+   "definition": "Average closed claims in last 12 months based on selected criteria",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "MAR-Operational",
+   "sheet": "Europe Overview - Rolling Table View",
+   "name": "Closed Claim Count",
+   "definition": "Count on total closed claims based on selected criteria",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "MAR-Operational",
+   "sheet": "New and Closed Volume",
+   "name": "Total New Claims",
+   "definition": "Total new claims based on selected criteria",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "MAR-Operational",
+   "sheet": "Reopened Volumes",
+   "name": "Total Reopened Claims",
+   "definition": "Total number of reopened claims",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "MAR-Operational",
+   "sheet": "Reopened Volumes",
+   "name": "Total Reopened Ratio",
+   "definition": "Ratio of reopened claims",
+   "provenance": "OWNER",
+   "computation": "ratio"
+  },
+  {
+   "app": "MAR-Operational",
+   "sheet": "Score card",
+   "name": "Average Time to Settle",
+   "definition": "Average number of days to settle claim",
+   "provenance": "OWNER",
+   "computation": "average"
+  },
+  {
+   "app": "MAR-Operational",
+   "sheet": "Score card",
+   "name": "Age Profile - Under 6 Months Old",
+   "definition": "Count of claims where the age of closed/Open & Reopen claim is less than 6 months old",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "MAR-Operational",
+   "sheet": "Score card",
+   "name": "Age Profile - 6 - 12 Months",
+   "definition": "Count of claims where the age of the closed/Open & Reopen claim is between 6 months old and 12 months old",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "MAR-Operational",
+   "sheet": "Score card",
+   "name": "Age Profile - 24 Months <",
+   "definition": "Count of claims where the age of the closed/Open & Reopen claim is less than 6 months old",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "MAR-Operational",
+   "sheet": "Score card",
+   "name": "Age Profile - 12 - 24 Months",
+   "definition": "Count of claims where the age of the closed/Open & Reopen claim is between 12 months old and 24 months old",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "MAR-Operational",
+   "sheet": "Score card",
+   "name": "ACPSC",
+   "definition": "The incurred value of all closed claims divided by the count of closed claims (Average Cost per Settled Claims).",
+   "provenance": "OWNER-DEFINED",
+   "computation": "unspecified"
+  },
+  {
+   "app": "MAR-Operational",
+   "sheet": "Score card",
+   "name": "ACPOC",
+   "definition": "The incurred value of all open or reopened claims divided by the count of those claims (Average Cost per Outstanding Claims).",
+   "provenance": "OWNER-DEFINED",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Recovery Dashboard",
+   "sheet": "Unreserved Claims",
+   "name": "Adjuster",
+   "definition": "Adjuster name",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Recovery Dashboard",
+   "sheet": "New Claims Identified",
+   "name": "Claim Handler",
+   "definition": "Claims handler name",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Recovery Dashboard",
+   "sheet": "Pipeline",
+   "name": "Claim Number",
+   "definition": "Claim number",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Recovery Dashboard",
+   "sheet": "Pipeline",
+   "name": "Cluster",
+   "definition": "Country cluster",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Recovery Dashboard",
+   "sheet": "Pipeline",
+   "name": "COG Country",
+   "definition": "COG Country name",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "Recovery Dashboard",
+   "sheet": "Heatmap",
+   "name": "Country",
+   "definition": "Country Name",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "Recovery Dashboard",
+   "sheet": "Pipeline",
+   "name": "Est. Pipeline USD",
+   "definition": "This KPI header would be updated as Pending Recovery Est USD in new model. This shows the Pending aggregated Recovery Amounts in Pipeline.",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Recovery Dashboard",
+   "sheet": "Benefits Tracking Actuals by Claim Reported date",
+   "name": "Est. Recovery Pipeline USD",
+   "definition": "Estimated recovery pipeline by year in USD",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "Recovery Dashboard",
+   "sheet": "Actuals",
+   "name": "Gross Paid",
+   "definition": "Total amount paid for selected criteria in USD",
+   "provenance": "OWNER",
+   "computation": "sum"
+  },
+  {
+   "app": "Recovery Dashboard",
+   "sheet": "Benefits Tracking Actuals by Claim Reported date",
+   "name": "Gross paid",
+   "definition": "Total amount paid for selected criteria in USD",
+   "provenance": "OWNER",
+   "computation": "sum"
+  },
+  {
+   "app": "Recovery Dashboard",
+   "sheet": "Actuals",
+   "name": "Gross Recoveries",
+   "definition": "Total recoveries based on the selected crietria (filter)",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "Recovery Dashboard",
+   "sheet": "Quarterly Reporting",
+   "name": "Gross Recoveries",
+   "definition": "Total recoveries for the selected quarter",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "Recovery Dashboard",
+   "sheet": "Pipeline",
+   "name": "Insured Name",
+   "definition": "name of the insured person",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Recovery Dashboard",
+   "sheet": "Actuals",
+   "name": "Major LOB",
+   "definition": "Major LOB name",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Recovery Dashboard",
+   "sheet": "Heatmap",
+   "name": "Minor LOB",
+   "definition": "Minor LOB name",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Recovery Dashboard",
+   "sheet": "New Claims Identified",
+   "name": "New Claims Count",
+   "definition": "Count of new claim within selected period",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "Recovery Dashboard",
+   "sheet": "Benefits Tracking Actuals by Claim Reported date",
+   "name": "Paids and OSLR max month total",
+   "definition": "Paid and outstanding loss reserve monthly amount by year (same as gross paid)",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "Recovery Dashboard",
+   "sheet": "Actuals",
+   "name": "Paids Ratio",
+   "definition": "The ratio of Gross Paid Indemnity in a Period to Total Indemnity Paid through the year",
+   "provenance": "OWNER",
+   "computation": "ratio"
+  },
+  {
+   "app": "Recovery Dashboard",
+   "sheet": "Unreserved Claims",
+   "name": "Pending Claims Count",
+   "definition": "Total pending claims count",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "Recovery Dashboard",
+   "sheet": "Pipeline",
+   "name": "Pipeline Claims Count",
+   "definition": "This KPI header would be updated as Pending Recovery Claims Count in new model. This shows the Pending cont of Claims which have a potential Recovery oppurtunity.",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "Recovery Dashboard",
+   "sheet": "Heatmap",
+   "name": "QuarterYear",
+   "definition": "Quarter year is derived from claim accounting period",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Recovery Dashboard",
+   "sheet": "Actuals",
+   "name": "Recovery Ratio",
+   "definition": "Ratio of Total recovery to Total Indemnity paid in a  period",
+   "provenance": "OWNER",
+   "computation": "ratio"
+  },
+  {
+   "app": "Recovery Dashboard",
+   "sheet": "New Claims Identified",
+   "name": "Referral Ratio",
+   "definition": "Referral ration as total referrals by total new claims",
+   "provenance": "OWNER",
+   "computation": "ratio"
+  },
+  {
+   "app": "Recovery Dashboard",
+   "sheet": "New Claims Identified",
+   "name": "Referrals",
+   "definition": "Total number of referrals",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "Recovery Dashboard",
+   "sheet": "Unreserved Claims",
+   "name": "Unreserved %",
+   "definition": "This used to represent the % of Unresreved Claims but I don't think this would be included in new model",
+   "provenance": "OWNER",
+   "computation": "ratio"
+  },
+  {
+   "app": "Transactional App",
+   "sheet": "Office View",
+   "name": "Transaction Processed by Adjuster",
+   "definition": "Number of transactions processed by adjuster",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Transactional App",
+   "sheet": "Office View",
+   "name": "CGM Total Trasnaction Processed - Birmingham",
+   "definition": "Total number of CGM transaction processed inBirmingham",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "Transactional App",
+   "sheet": "Office View",
+   "name": "CGM Total Trasnaction Processed - Glasgow",
+   "definition": "Total number of CGM transaction processed in Glasgow",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "Transactional App",
+   "sheet": "Office View",
+   "name": "CGM Total Trasnaction Processed - London",
+   "definition": "Total number of CGM transaction processed in London",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "Transactional App",
+   "sheet": "Overall RT Summary",
+   "name": "Response Time Processed",
+   "definition": "Number of Transactions Processed",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Transactional App",
+   "sheet": "Office View",
+   "name": "Response Time in Days(London) - Both count and %",
+   "definition": "Response time in days and in percentage by year in London",
+   "provenance": "OWNER",
+   "computation": "ratio"
+  },
+  {
+   "app": "Transactional App",
+   "sheet": "Office View",
+   "name": "Response Time in Days(Glasgow) - Both count and %",
+   "definition": "Response time in days and in percentage by year in Glasgow",
+   "provenance": "OWNER",
+   "computation": "ratio"
+  },
+  {
+   "app": "Transactional App",
+   "sheet": "Office View",
+   "name": "Response Time in Days(Birmingham) - Both count and %",
+   "definition": "Response time in days and in percentage by year in Birmingham",
+   "provenance": "OWNER",
+   "computation": "ratio"
+  },
+  {
+   "app": "Transactional App",
+   "sheet": "Overall RT Summary",
+   "name": "Count of Response Time Days",
+   "definition": "Count of transaction by response time days",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "Transactional App",
+   "sheet": "Overall RT Summary",
+   "name": "Number on Month",
+   "definition": "Number of YTD month",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Transactional App",
+   "sheet": "Overall RT Summary",
+   "name": "Monthly Caseload",
+   "definition": "Total casesd in a month",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Transactional App",
+   "sheet": "Overall RT Summary",
+   "name": "In SLA",
+   "definition": "Percetage of transactions within SLA",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Transactional App",
+   "sheet": "Overall RT Summary",
+   "name": "FTE",
+   "definition": "Total FTE",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Transactional App",
+   "sheet": "Overall RT Summary",
+   "name": "Out SLA",
+   "definition": "Percetage of transactions taken more time than SLA",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Transactional App",
+   "sheet": "Overall",
+   "name": "Total Transaction",
+   "definition": "Total number of Transactions",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "Transactional App",
+   "sheet": "Overall",
+   "name": "Total Transaction Processed by - CUAL Vs CEG",
+   "definition": "Number of Transactions based on Entity",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "Transactional App",
+   "sheet": "Overall",
+   "name": "Total Transaction Processed by - London, Glasgow and Birmingham",
+   "definition": "Number of Transactions based on Office Location",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "Transactional App",
+   "sheet": "Overall",
+   "name": "Transaction Processed by LOB",
+   "definition": "Number of Transaction by Lines of Business",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Transactional App",
+   "sheet": "Overall RT Summary",
+   "name": "Annual Caseload",
+   "definition": "Total cases in a yeat",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Transactional App",
+   "sheet": "Overall",
+   "name": "Year Month",
+   "definition": "Year Month for Lloyd's and LIRMA",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Transactional App",
+   "sheet": "Broker RT Summary",
+   "name": "Response Times Per Business Unit",
+   "definition": "Response Time Within SLA and Outside SLA",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Transactional App",
+   "sheet": "Broker RT Summary",
+   "name": "ECF Queried Response Type per Total Adviced per Business Unit",
+   "definition": "ECF Response time for Queries and Rejections Volume and Queries and Rejections %age per Total Adviced Response Type",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "Transactional App",
+   "sheet": "Broker RT Summary",
+   "name": "Transaction Processed by Broker",
+   "definition": "Transactions Processed count of Response Time Days",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Transactional App",
+   "sheet": "Broker RT Summary",
+   "name": "Transaction Volumes & Speed of Performance",
+   "definition": "Count of Response Time Days and Within SLA % Broker wise",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "Transactional App",
+   "sheet": "Broker Claims Volume and Value View",
+   "name": "New Claim Indicator",
+   "definition": "Total Number of New claims",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Transactional App",
+   "sheet": "Broker Claims Volume and Value View",
+   "name": "Closed Claim Indicator",
+   "definition": "Total Number of Closed claims",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Transactional App",
+   "sheet": "Broker Claims Volume and Value View",
+   "name": "Pending Claims Indicator",
+   "definition": "Total Number of Pending Claims",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "Transactional App",
+   "sheet": "Broker Claims Volume and Value View",
+   "name": "Open Claim Volume by LOB & CGM Entity",
+   "definition": "Total Number of Open Claim Volume by LOB & CGM Entity",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "Transactional App",
+   "sheet": "Broker Claims Volume and Value View",
+   "name": "Open Claim Incurred Value by LOB & CGM Entity",
+   "definition": "Total Number of Open Claim Incurred Value by LOB & CGM Entity",
+   "provenance": "OWNER",
+   "computation": "sum"
+  },
+  {
+   "app": "Transactional App",
+   "sheet": "Broker Claims Volume and Value View",
+   "name": "New & Closed Claim Volumes Last 12 Months by LOB - Lead Only",
+   "definition": "Total number of New & Closed Claim Volumes Last 12 Months by LOB - Lead Only",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "Transactional App",
+   "sheet": "Broker Claims Volume and Value View",
+   "name": "New & Closed Claim Volumes Last 12 Months - Lead Only",
+   "definition": "Total number of New & Closed Claim Volumes Last 12 Months - Lead Only",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "Transactional App",
+   "sheet": "Broker Claims Volume and Value View",
+   "name": "Static Claims Portfolio by Business Unit and by LOB",
+   "definition": "Total Number of Static Volumes, Static Volume % of Total Pending, Static Reserve and Static Reserve % of Total Pending Reserve by Business unit and by LOB",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "Transactional App",
+   "sheet": "Broker Claims Volume and Value View",
+   "name": "Table View",
+   "definition": "Provides the Tabular view of Broker Claims Volume and Vlaue view",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Transactional App",
+   "sheet": "ECF Weekly Reports",
+   "name": "Overall Volume Month to Date",
+   "definition": "Total number of Overall Volume Month to date for Within SLA , Outside SLA and Grand Total by LOB and Participant role wise",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "Transactional App",
+   "sheet": "ECF Weekly Reports",
+   "name": "Overall Volume % Month to Date",
+   "definition": "Total number of Overall Volume % Month to date for Within SLA , Outside SLA and Grand Total by LOB and Participant role wise",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "Transactional App",
+   "sheet": "ECF Weekly Reports",
+   "name": "Detailed Chart",
+   "definition": "Provides the Tabular view",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Transactional App",
+   "sheet": "ECF Weekly Reports",
+   "name": "Overall Volume Month to Date",
+   "definition": "Total number of Overall Volume Month to date for Within SLA , Outside SLA and Grand Total by Participant role, Office and Bureau Lead Adjuster Name wise",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "Transactional App",
+   "sheet": "ECF Weekly Reports",
+   "name": "Overall Volume % Month to Date",
+   "definition": "Total number of Overall Volume % Month to date for Within SLA , Outside SLA and Grand Total by Participant role, Office and Bureau Lead Adjuster Name wise",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "Transactional App",
+   "sheet": "ECF Weekly Reports",
+   "name": "Overall Month to date - Overall",
+   "definition": "Provides Overall Month to Date by Participant role wise",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Transactional App",
+   "sheet": "ECF Weekly Reports",
+   "name": "Overall % Month to date - Overall",
+   "definition": "Provides Overall % Month to Date by Participant role wise",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Transactional App",
+   "sheet": "ECF Weekly Reports",
+   "name": "Average Response Time in Working Days Where We are Lead",
+   "definition": "Provides Average Response Time in Working Days Where We are Lead by Bureau Lead Adjuster Name wise",
+   "provenance": "OWNER",
+   "computation": "average"
+  },
+  {
+   "app": "Transactional App",
+   "sheet": "ECF Weekly Reports",
+   "name": "CGM Company",
+   "definition": "Provides Volume of transactions processed within 4 days and Volume of transactions processed Outside 4 days for CGM Company for Rollimg 4 months",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Transactional App",
+   "sheet": "ECF Weekly Reports",
+   "name": "CGM Syndicate",
+   "definition": "Provides Volume of transactions processed within 4 days and Volume of transactions processed Outside 4 days for CGM Syndicate for rolling 4 months",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Transactional App",
+   "sheet": "ECF Weekly Reports",
+   "name": "Rolling 4 months by LOB",
+   "definition": "Provides With SLA and Outside SLA count for Rolling 4 months by LOB wise",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Transactional App",
+   "sheet": "ECF Weekly Reports",
+   "name": "Rolling 4 months by LOB and Month wise( Bar Chart)",
+   "definition": "Provides Rolling 4 months by LOB and Month wise for within SLA and Outside SLA",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Transactional App",
+   "sheet": "ECF Weekly Reports",
+   "name": "Rolling 4 months by Month wise",
+   "definition": "Provides Rolling 4 months by Month wise for within SLA and Outside SLA",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Transactional App",
+   "sheet": "ECF Weekly Reports",
+   "name": "Rolling 4 months by Month wise(both count and %)",
+   "definition": "Provides Rolling 4 months by Month wise for within SLA(Count), Within SLA(%), Outside SLA(Count) and Outside SLA(%)",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "Cladding Report Company",
+   "sheet": "My New Sheet",
+   "name": "Claim Number",
+   "definition": "Claim number",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Cladding Report Company",
+   "sheet": "My New Sheet",
+   "name": "Policy Number",
+   "definition": "Policy number",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Cladding Report Company",
+   "sheet": "My New Sheet",
+   "name": "Responsible Adjuster Code",
+   "definition": "Adjuster code handling the claim",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Cladding Report Company",
+   "sheet": "My New Sheet",
+   "name": "Adjuster Name",
+   "definition": "Name of the adjuster for the claim",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Cladding Report Company",
+   "sheet": "My New Sheet",
+   "name": "Reported Date",
+   "definition": "Claim reported date",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Cladding Report Company",
+   "sheet": "My New Sheet",
+   "name": "Claim Event Date",
+   "definition": "Not available",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Cladding Report Company",
+   "sheet": "My New Sheet",
+   "name": "Claim Opened Date",
+   "definition": "Date when claim opened",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Cladding Report Company",
+   "sheet": "My New Sheet",
+   "name": "Claim Closed Date",
+   "definition": "Date when claim closed",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Cladding Report Company",
+   "sheet": "My New Sheet",
+   "name": "Underwriting Year",
+   "definition": "Year of policy underwriting",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Cladding Report Company",
+   "sheet": "My New Sheet",
+   "name": "Accident Year",
+   "definition": "Year of accident",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Cladding Report Company",
+   "sheet": "My New Sheet",
+   "name": "Claim Status",
+   "definition": "Status of the claim",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Cladding Report Company",
+   "sheet": "My New Sheet",
+   "name": "Insured Name",
+   "definition": "Name of insured person / entity",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Cladding Report Company",
+   "sheet": "My New Sheet",
+   "name": "Broker",
+   "definition": "Name of broker of the policy associated to the claim",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Cladding Report Company",
+   "sheet": "My New Sheet",
+   "name": "Claim CAT Code",
+   "definition": "Not available",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Cladding Report Company",
+   "sheet": "My New Sheet",
+   "name": "Claim Type Code",
+   "definition": "Not available",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Cladding Report Company",
+   "sheet": "My New Sheet",
+   "name": "Primary / Excess",
+   "definition": "Not available",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Cladding Report Company",
+   "sheet": "My New Sheet",
+   "name": "Coinsurance Indicator",
+   "definition": "Exclusive/Lead/Follow",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Cladding Report Company",
+   "sheet": "My New Sheet",
+   "name": "Expense Paid (USD)",
+   "definition": "Expense paid in USD",
+   "provenance": "OWNER",
+   "computation": "sum"
+  },
+  {
+   "app": "Cladding Report Company",
+   "sheet": "My New Sheet",
+   "name": "Expense Reserved (USD)",
+   "definition": "The total reserve for every claim that is open, reopened or closed in the maximum selected accounting period - in USD",
+   "provenance": "OWNER",
+   "computation": "sum"
+  },
+  {
+   "app": "Cladding Report Company",
+   "sheet": "My New Sheet",
+   "name": "Incurred (USD)",
+   "definition": "Total Incurred in USD",
+   "provenance": "OWNER",
+   "computation": "sum"
+  },
+  {
+   "app": "Cladding Report Company",
+   "sheet": "My New Sheet",
+   "name": "Indemnity Paid (USD)",
+   "definition": "Indemnity paid in USD",
+   "provenance": "OWNER",
+   "computation": "sum"
+  },
+  {
+   "app": "Cladding Report Company",
+   "sheet": "My New Sheet",
+   "name": "Indemnity Reserved (USD)",
+   "definition": "Indemnity reserve in USD",
+   "provenance": "OWNER",
+   "computation": "sum"
+  },
+  {
+   "app": "Cladding Report Company",
+   "sheet": "My New Sheet",
+   "name": "Recovery (USD)",
+   "definition": "Recovery in USD",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "Case Analysis & Data Quality",
+   "name": "Vendor Performance Management Levels",
+   "definition": "The internal tiering/levels framework used to manage TPA/vendor performance. Proprietary \u2014 confirm with vendor management.",
+   "provenance": "PROP",
+   "computation": "unspecified"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "Complaints",
+   "name": "Complaints % Against New Cases In The Month",
+   "definition": "Complaints received in the month / new cases (claims) in the month x 100.",
+   "provenance": "IND",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "Complaints",
+   "name": "Complaints As A % Of New Claims",
+   "definition": "Complaints received / new claims in the period x 100.",
+   "provenance": "IND",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "Complaints",
+   "name": "Complaints As A % Of New Claims By Vendor",
+   "definition": "Complaints as a percentage of new claims, broken down by TPA/vendor.",
+   "provenance": "IND",
+   "computation": "ratio"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "Complaints",
+   "name": "Total Complaints",
+   "definition": "Total number of complaints received in the period.",
+   "provenance": "IND",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "Declinature",
+   "name": "Declinatures % Of New Claims In Reporting Period",
+   "definition": "Declined claims / new claims in the reporting period x 100.",
+   "provenance": "IND",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "Declinature",
+   "name": "Walkaway Claims",
+   "definition": "Count of claims the claimant withdrew or abandoned before a decision was reached.",
+   "provenance": "IND",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "Declinature",
+   "name": "Walkaways As % Of New Claims In Reporting Period",
+   "definition": "Walkaway claims / new claims in the reporting period x 100.",
+   "provenance": "IND",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "Declinature Detailed Charts",
+   "name": "Declinatures As % Of New Claims In Reporting Period",
+   "definition": "Declined claims / new claims in the reporting period x 100.",
+   "provenance": "IND",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "Fraud",
+   "name": "Fraud Referrals % Of New Claims",
+   "definition": "Fraud referrals / new claims in the period x 100.",
+   "provenance": "IND",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "Recoveries",
+   "name": "Recoveries % Of New Claims",
+   "definition": "Claims with an identified recovery / new claims in the period x 100.",
+   "provenance": "IND",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "Service & Performance",
+   "name": "% Acknowledgements Issued Within SLA",
+   "definition": "Percentage of claims acknowledged within the SLA standard (commonly 5 working days).",
+   "provenance": "IND",
+   "computation": "ratio"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "Service & Performance",
+   "name": "% Claim Reserves Registered Within SLA",
+   "definition": "Percentage of claims where the reserve was registered within the SLA standard.",
+   "provenance": "IND",
+   "computation": "ratio"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "Service & Performance",
+   "name": "% Correspondence Answered Within SLA",
+   "definition": "Percentage of correspondence answered within the SLA standard.",
+   "provenance": "IND",
+   "computation": "ratio"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "Service & Performance",
+   "name": "% Payments Issued Within SLA",
+   "definition": "Percentage of payments processed/issued within the SLA standard.",
+   "provenance": "IND",
+   "computation": "ratio"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "Service & Performance",
+   "name": "Average Days To Acknowledge Claims",
+   "definition": "Mean working days from claim reported to acknowledged.",
+   "provenance": "IND",
+   "computation": "average"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "Service & Performance",
+   "name": "Average Days To Answer Comms",
+   "definition": "Mean working days to respond to correspondence/queries.",
+   "provenance": "IND",
+   "computation": "average"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "Service & Performance",
+   "name": "Average Days To Issue Payment",
+   "definition": "Mean working days from payment received/approved to payment issued.",
+   "provenance": "IND",
+   "computation": "average"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "Service & Performance",
+   "name": "Average Days To Register Claim Reserve",
+   "definition": "Mean working days from claim open to reserve registered.",
+   "provenance": "IND",
+   "computation": "average"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "Service/Performance \u2013 Detailed Graphs",
+   "name": "Average Days To Answer Communication",
+   "definition": "Mean working days to respond to correspondence/queries.",
+   "provenance": "IND",
+   "computation": "average"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "Service/Performance \u2013 Detailed Graphs",
+   "name": "Average Days To Issue Payment'",
+   "definition": "Mean working days from payment received/approved to payment issued. (Trailing quote is a source typo.)",
+   "provenance": "IND",
+   "computation": "average"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "Telephony  Detailed Charts",
+   "name": "% Of Cases Answered Within SLA",
+   "definition": "Percentage of telephony cases answered within the SLA target time = answered within SLA / calls offered x 100.",
+   "provenance": "IND",
+   "computation": "ratio"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "Telephony  Detailed Charts",
+   "name": "No Of Calls Answered Within SLA",
+   "definition": "Number of calls answered within the SLA target time.",
+   "provenance": "IND",
+   "computation": "unspecified"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "Telephony Stat",
+   "name": "% Of Abandoned Calls",
+   "definition": "Abandoned calls / calls offered x 100.",
+   "provenance": "IND",
+   "computation": "ratio"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "Telephony Stat",
+   "name": "Volume Of Calls Abandoned",
+   "definition": "Number of calls abandoned (caller hung up before being answered).",
+   "provenance": "IND",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "Telephony Stat",
+   "name": "Volume Of Calls Answered",
+   "definition": "Number of calls answered.",
+   "provenance": "IND",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "Telephony Stat",
+   "name": "Volume Of Calls Answered Within SLA",
+   "definition": "Number of calls answered within the SLA target time.",
+   "provenance": "IND",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "Telephony Stat",
+   "name": "Volume Of Calls Offered",
+   "definition": "Total number of inbound calls presented to the queue.",
+   "provenance": "IND",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "TPA score card recent level",
+   "name": "% Against New Cases In The Month",
+   "definition": "Generic ratio of the subject count to new cases (claims) opened in the month x 100. Confirm the numerator in context.",
+   "provenance": "IND",
+   "computation": "ratio"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "TPA score card recent level",
+   "name": "Average Claims Cost",
+   "definition": "Average total cost per claim = total (indemnity + expense) / number of claims.",
+   "provenance": "IND",
+   "computation": "average"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "TPA score card recent level",
+   "name": "Average Days Open - Closed Claims",
+   "definition": "Average number of days a closed claim was open (reported/opened to closed).",
+   "provenance": "IND",
+   "computation": "average"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "TPA score card recent level",
+   "name": "Complaints In Month",
+   "definition": "Number of complaints received in the month.",
+   "provenance": "IND",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "TPA score card recent level",
+   "name": "Declinature Review Fails",
+   "definition": "Number of declinature decisions that failed QA review.",
+   "provenance": "IND",
+   "computation": "unspecified"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "TPA score card recent level",
+   "name": "Declinature Review 'Passed",
+   "definition": "Number of declinature decisions that passed QA review. (Stray quote is a source typo.)",
+   "provenance": "IND",
+   "computation": "unspecified"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "TPA score card recent level",
+   "name": "Number Of Cases In Litigation",
+   "definition": "Count of claims currently in litigation.",
+   "provenance": "IND",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "TPA score card recent level",
+   "name": "Number Of Fraud Referrals",
+   "definition": "Count of claims referred for fraud investigation.",
+   "provenance": "IND",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "TPA score card recent level",
+   "name": "Number Of Identified Recoveries",
+   "definition": "Count of claims with an identified recovery opportunity.",
+   "provenance": "IND",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "TPA score card recent level",
+   "name": "Quality Check '- Passed",
+   "definition": "Number of claim QA checks passed. (Stray quote is a source typo.)",
+   "provenance": "IND",
+   "computation": "unspecified"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "TPA score card recent level",
+   "name": "Quality Check'- Failed",
+   "definition": "Number of claim QA checks failed. (Stray quote is a source typo.)",
+   "provenance": "IND",
+   "computation": "unspecified"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "TPA score card recent level",
+   "name": "Quality Check- Failed (Month) %",
+   "definition": "Percentage of claim QA checks failed in the month = failed / total checked x 100.",
+   "provenance": "IND",
+   "computation": "ratio"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "TPA score card recent level",
+   "name": "Quality Check'- Passed (Month) %",
+   "definition": "Percentage of claim QA checks passed in the month = passed / total checked x 100. (Stray quote is a source typo.)",
+   "provenance": "IND",
+   "computation": "ratio"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "TPA score card recent level",
+   "name": "SLA Declinatures In Reporting Period",
+   "definition": "Number of declinatures issued within SLA in the reporting period.",
+   "provenance": "IND",
+   "computation": "unspecified"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "TPA score card recent level",
+   "name": "Telephony - % Of Cases Answered Within SLA",
+   "definition": "Percentage of telephony cases answered within SLA = answered within SLA / offered x 100.",
+   "provenance": "IND",
+   "computation": "ratio"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "TPA score card recent level",
+   "name": "Telephony - Abandoned Ratio",
+   "definition": "Abandoned calls / calls offered x 100.",
+   "provenance": "IND",
+   "computation": "ratio"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "TPA score card recent level",
+   "name": "Telephony - No Of Calls Answered Within SLA",
+   "definition": "Number of calls answered within the SLA target time.",
+   "provenance": "IND",
+   "computation": "unspecified"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "TPA score card recent level",
+   "name": "Telephony - No. Of Abandoned Calls",
+   "definition": "Number of calls abandoned before being answered.",
+   "provenance": "IND",
+   "computation": "unspecified"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "TPA score card recent level",
+   "name": "Total Paid - Indemnity & Expenses",
+   "definition": "Sum of indemnity paid plus expense paid in the period.",
+   "provenance": "IND",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "TPA score card recent level",
+   "name": "Total Upheld",
+   "definition": "Number of complaints upheld (decided in the complainant's favour).",
+   "provenance": "IND",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "TPA score card recent level",
+   "name": "TPA Handling Fee",
+   "definition": "Fee paid to the TPA for handling claims in the period.",
+   "provenance": "IND",
+   "computation": "sum"
+  },
+  {
+   "app": "TPA Performance Dashboard",
+   "sheet": "TPA score card recent level",
+   "name": "Volume Of New Claims>5 Days",
+   "definition": "Number of new claims not acknowledged/actioned within 5 days.",
+   "provenance": "IND",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "M7 Pipeline Report Issue Tracker",
+   "sheet": "My New Sheet",
+   "name": "Count",
+   "definition": "Generic count of records meeting the selected criteria.",
+   "provenance": "IND",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "Claims Assistance Provider Scorecard",
+   "sheet": "Case Analysis",
+   "name": "New Cases",
+   "definition": "New Assistance Cases Received",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Claims Assistance Provider Scorecard",
+   "sheet": "Case Analysis",
+   "name": "Total Opened Cases",
+   "definition": "Opened Cases in a Period",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "Claims Assistance Provider Scorecard",
+   "sheet": "Case Analysis",
+   "name": "Total Operationally Closed",
+   "definition": "Total Operationally Closed",
+   "provenance": "OWNER",
+   "computation": "ratio"
+  },
+  {
+   "app": "Claims Assistance Provider Scorecard",
+   "sheet": "Case Analysis",
+   "name": "Declined Cases",
+   "definition": "Cases Declined",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Claims Assistance Provider Scorecard",
+   "sheet": "Case Analysis",
+   "name": "Declined to New Cases",
+   "definition": "Declined Cases against New Cases Received",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Claims Assistance Provider Scorecard",
+   "sheet": "Case Analysis",
+   "name": "Total Invoice Value",
+   "definition": "Total Invoice Value paid in \u20ac",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "Claims Assistance Provider Scorecard",
+   "sheet": "Case Analysis",
+   "name": "Average Case Cost",
+   "definition": "Total Invoice Value paid over Total Operationally Closed Cases",
+   "provenance": "OWNER",
+   "computation": "average"
+  },
+  {
+   "app": "Claims Assistance Provider Scorecard",
+   "sheet": "Telephony",
+   "name": "Calls Offered",
+   "definition": "Total Calls Offered",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Claims Assistance Provider Scorecard",
+   "sheet": "Telephony",
+   "name": "Calls Answered",
+   "definition": "Total Calls Answered",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Claims Assistance Provider Scorecard",
+   "sheet": "Telephony",
+   "name": "Calls Abandoned",
+   "definition": "Total Calls Offered minus Total Calls Answered",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Claims Assistance Provider Scorecard",
+   "sheet": "Telephony",
+   "name": "Calls Abandoned Rate %",
+   "definition": "Number of abandoned over the Total Calls Offered",
+   "provenance": "OWNER",
+   "computation": "ratio"
+  },
+  {
+   "app": "Claims Assistance Provider Scorecard",
+   "sheet": "Telephony",
+   "name": "Calls Answered Rate %",
+   "definition": "Total Calls Answered over Total Calls Offered",
+   "provenance": "OWNER",
+   "computation": "ratio"
+  },
+  {
+   "app": "Claims Assistance Provider Scorecard",
+   "sheet": "Telephony",
+   "name": "Average Abandonment Time",
+   "definition": "Average Time to Abandon in HH MM SS",
+   "provenance": "OWNER",
+   "computation": "average"
+  },
+  {
+   "app": "Claims Assistance Provider Scorecard",
+   "sheet": "Telephony",
+   "name": "Average Speed of Answer",
+   "definition": "Average Speed of Answer in HH MM SS",
+   "provenance": "OWNER",
+   "computation": "average"
+  },
+  {
+   "app": "Claims Assistance Provider Scorecard",
+   "sheet": "Quality Checks",
+   "name": "Number of Checked Cases",
+   "definition": "Number of checked cases",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "Claims Assistance Provider Scorecard",
+   "sheet": "Quality Checks",
+   "name": "Quality Checked %",
+   "definition": "Number of checked cases over New Assistance Cases Received",
+   "provenance": "OWNER",
+   "computation": "ratio"
+  },
+  {
+   "app": "Claims Assistance Provider Scorecard",
+   "sheet": "Quality Checks",
+   "name": "Outcome-Passed",
+   "definition": "Outcome minus Passed",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Claims Assistance Provider Scorecard",
+   "sheet": "Cost Containment",
+   "name": "USA Net Savings Current'",
+   "definition": "Net Savings Value for USA for reporting Month",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Claims Assistance Provider Scorecard",
+   "sheet": "Cost Containment",
+   "name": "EUR Net Savings Current'",
+   "definition": "Net Savings Value for EUR for reporting Month",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Claims Assistance Provider Scorecard",
+   "sheet": "Cost Containment",
+   "name": "ROW Net Savings Current'",
+   "definition": "Net Savings Value for ROW for reporting Month",
+   "provenance": "OWNER",
+   "computation": "unspecified"
+  },
+  {
+   "app": "Claims Assistance Provider Scorecard",
+   "sheet": "Cost Containment",
+   "name": "Total Net Savings Current'",
+   "definition": "Total Net Savings Value for reporting Month",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "Claims Assistance Provider Scorecard",
+   "sheet": "Cost Containment",
+   "name": "Total USA Net Savings",
+   "definition": "Total Net Savings Value for USA",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "Claims Assistance Provider Scorecard",
+   "sheet": "Cost Containment",
+   "name": "Total EUR Net Savings",
+   "definition": "Total Net Savings Value for EUR",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "Claims Assistance Provider Scorecard",
+   "sheet": "Cost Containment",
+   "name": "Total ROW Net Savings",
+   "definition": "Total Net Savings Value for ROW",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  },
+  {
+   "app": "Claims Assistance Provider Scorecard",
+   "sheet": "Cost Containment",
+   "name": "Total Net Savings",
+   "definition": "Total Net Savings",
+   "provenance": "OWNER",
+   "computation": "sum_or_count"
+  }
+ ]
+}

@@ -88,7 +88,7 @@ Column synonyms live in `assets/column_synonyms.json`:
 | Condition Injury Damage | Condition / injury / damage classification of the loss. **[CONFIRM]** |
 | Conditional Damage | No standard term 'Conditional Damage' found online; nearest is 'Consequential Damage' (indirect loss following a primary insured event). Likely a variant or internal field. **[CONFIRM]** |
 | Contributing Factor | Contributing factor to the loss. **[CONFIRM]** |
-| Country | Country associated with the claim. |
+| Country | Country (owner-confirmed same as `Policy Country` / `COG_COUNTRY`). |
 | Coverage | Coverage on the claim. |
 | Currency Code (Ledger) | Original/ledger currency code. |
 | Current Global Producer | Current global producer for the account. |
@@ -127,7 +127,7 @@ Column synonyms live in `assets/column_synonyms.json`:
 | Nominal Reserve | Nominal reserve code (77/88/99/123 logic). |
 | Plant Division | Plant/division (energy context). **[CONFIRM]** |
 | Policy Cluster | Regional cluster by policy. |
-| Policy Country | Country of the policy. |
+| Policy Country | Country (owner-confirmed same as `Country` / `COG_COUNTRY`). |
 | Policy Holder Name | Name of the policy holder. |
 | Policy Source | System the policy was extracted from. |
 | Producer Name | Producer name. |
