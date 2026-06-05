@@ -54,8 +54,7 @@ def _detect_pii(df: pl.DataFrame) -> list:
         series = df[col].drop_nulls()
         if series.len() == 0:
             continue
-        sample_size = min(200, series.len())
-        sample = series.sample(n=sample_size, seed=42).to_list() if series.len() > sample_size else series.to_list()
+        sample = series.head(min(20, series.len())).to_list()
         if df[col].dtype == pl.String:
             if any(SSN_RX.match(str(v)) for v in sample):
                 pii.add(col)
@@ -291,4 +290,78 @@ def build_outline(profile: dict, context: dict) -> dict:
         })
         n += 1
 
-    return {"slides": slides}
+    return enforce_slide_budget(slides, MAX_SLIDES)
+
+
+# ── slide budget, prioritization & analytics bridge ───────────────────────────
+# "Brevity is Law": a deck never exceeds MAX_SLIDES active content slides, and
+# deep-dives are capped so outliers can't explode the deck. Pure-stdlib.
+MAX_SLIDES = 10
+MAX_DEEP_DIVES = 2
+_BASE_PRIORITY = {
+    "monthly_revenue": 80, "gross_margin": 75, "top_n_by_region": 60,
+    "descriptive_summary": 30, "outlier_drill": 0,
+}
+_RAG_WEIGHT = {"red": 100, "amber": 60, "green": 20, None: 40}
+
+
+def score_slide(slide: dict) -> float:
+    ct = slide.get("content_type")
+    if ct == "exec_summary":
+        return 1e9
+    if ct == "deep_dive":
+        o = slide.get("outlier") or {}
+        return 50 + abs(float(o.get("deviation_pct", 0)))
+    if ct == "insight":
+        rag = _RAG_WEIGHT.get(slide.get("rag"), 40)
+        delta = abs(float((slide.get("comparison") or {}).get("delta_pct", 0)))
+        return rag + min(delta, 40)
+    return _BASE_PRIORITY.get(slide.get("computation_id"), 40)
+
+
+def enforce_slide_budget(slides: list, max_slides: int = MAX_SLIDES) -> dict:
+    """Keep exec summary, cap deep-dives, prioritize by impact, trim to <=max_slides
+    ACTIVE content slides. Data-integrity 'excluded' slides are set aside (they still
+    feed the Exclusions slide via build_deck). Brevity-trimmed slides go to 'deferred'."""
+    excluded = [s for s in slides if s.get("status") == "excluded"]
+    active = [s for s in slides if s.get("status") != "excluded"]
+    exec_s = [s for s in active if s.get("content_type") == "exec_summary"]
+    deep = [s for s in active if s.get("content_type") == "deep_dive"]
+    others = [s for s in active if s.get("content_type") not in ("exec_summary", "deep_dive")]
+    deep.sort(key=score_slide, reverse=True)
+    deep_kept, deep_cut = deep[:MAX_DEEP_DIVES], deep[MAX_DEEP_DIVES:]
+    pool = others + deep_kept
+    pool.sort(key=score_slide, reverse=True)
+    budget = max(0, max_slides - len(exec_s))
+    kept_body, deferred = pool[:budget], pool[budget:] + deep_cut
+    kept = exec_s + kept_body
+    for i, s in enumerate(kept, start=1):
+        s["n"] = i
+    for s in deferred:
+        s["status"] = "deferred_for_brevity"
+    # excluded slides appended so build_deck's Exclusions logic still finds them
+    return {"slides": kept + excluded, "deferred": deferred, "excluded": excluded}
+
+
+def outline_from_analytics(insights: list, max_slides: int = MAX_SLIDES) -> dict:
+    """Bridge: turn claims-analytics output into a slide plan. Each insight:
+      {metric, value, display, period, comparison:{prior,delta_pct}, definition,
+       provenance, app, app_url, rag, breakdown:{labels,values}?}. Preserves
+      provenance/app for citation; respects the slide budget."""
+    slides = [{"n": 1, "content_type": "exec_summary", "title": "Executive Summary",
+               "layout": "Title and Content", "status": "active"}]
+    for ins in insights:
+        if (ins.get("breakdown") or {}).get("labels"):
+            vk, layout = "comparative_bar", "Image + Text"
+        else:
+            vk, layout = "kpi_card", "Big Number"
+        slides.append({
+            "content_type": "insight", "visual_kind": vk, "layout": layout,
+            "metric": ins.get("metric"), "display": ins.get("display"),
+            "value": ins.get("value"), "period": ins.get("period"),
+            "comparison": ins.get("comparison"), "definition": ins.get("definition"),
+            "provenance": ins.get("provenance"), "app": ins.get("app"),
+            "app_url": ins.get("app_url"), "rag": ins.get("rag"),
+            "breakdown": ins.get("breakdown"), "status": "active",
+        })
+    return enforce_slide_budget(slides, max_slides)

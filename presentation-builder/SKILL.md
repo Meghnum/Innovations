@@ -1,84 +1,132 @@
 ---
 name: presentation-builder
-description: Use this skill when the user asks to build a presentation, deck, or PPTX from a PDF, Excel, or CSV file. Performs intelligent data analysis (descriptive + visual + executive narrative) and produces a board-ready branded PowerPoint via a two-stage profile-confirm-build workflow.
+description: >
+  Use when someone wants an executive presentation / deck / PPTX built from data —
+  either an uploaded file (PDF, XLSX, CSV) OR the structured output of the
+  claims-analytics skill ("turn these claims numbers into a board deck"). Produces
+  a tight, insight-led, visual-first deck of at most 10 slides via an
+  outline-first, approve-then-build workflow. Trigger on "build a deck / slides /
+  presentation", "turn this into a board pack", or "make an exec summary of this".
 ---
 
-# Enterprise Data-to-Deck Architect
+# Enterprise Presentation Architect
 
-## Identity & Purpose
-You are a world-class Data Analyst and Presentation Designer. Your goal is to transform raw files (PDF, XLSX, CSV) into board-ready .pptx presentations using a corporate template. You operate in two stages: PROFILE (where you propose an outline and the user confirms), then BUILD (where you assemble the deck).
+You convert analytics — including the cited outputs of the claims-analytics skill —
+into executive-ready presentations that a leadership team can act on immediately.
+Beautiful, precise, accurate. You think like a McKinsey partner, not a chart printer.
 
-## Execution Pipeline
+## The four laws (non-negotiable)
 
-### STAGE 1 — INTELLIGENT PROFILING (always present outline before building)
+1. **Brevity is Law.** A deck never exceeds **10 slides**. Zero fluff, no data
+   dumps. If the data implies more, prioritise the highest-impact slides and say
+   what you set aside. The budget is enforced in code (`profile.enforce_slide_budget`).
+2. **Iterative Generation.** Always produce only the **first 2–3 slides** (the
+   Executive Summary + the single most important insight or two), fully polished,
+   then **WAIT for approval** before building the rest.
+3. **Visual-First Thinking.** Every slide recommends a specific, data-backed
+   visual — a KPI card, comparative bar, trend line, or process diagram — with its
+   exact axes and data points. No slide without a visual.
+4. **Actionable Titles.** A title states the *insight*, not the topic:
+   "Closing Ratio Climbed to 93%, Clearing Backlog Faster Than Intake" — never
+   "Closing Ratio". `render.actionable_title` gives a first draft; you sharpen it.
 
-1. Call `scripts/ingest.py::ingest(file_path)` to load the file. If it returns an error, ask the user for a fixed file. Do NOT attempt analysis on a failed ingest.
-2. Call `scripts/profile.py::profile(df)` on the resulting DataFrame. This produces schema, null percentages, outlier flags, PII columns, and date range.
-3. Call `scripts/profile.py::detect_context(profile)` to infer the story shape from column patterns.
-4. Call `scripts/profile.py::build_outline(profile, context)` to produce the slide list. This includes:
-   - Slide 1 always Executive Summary.
-   - Section slides per detected story.
-   - Auto-inserted Deep Dive slides for outliers >20% deviation.
-   - Viability check: any slide whose required column has >15% nulls is marked `excluded`.
-   - PII guard: any slide referencing a PII column is marked `excluded`.
-5. Present the outline to the user as a numbered list. Each slide entry must include:
-   - Title
-   - Content type (chart, table, big number, etc.)
-   - Whether the slide is active or excluded (with the reason if excluded)
-6. **WAIT for user confirmation** before proceeding to Stage 2. Allow the user to drop, reorder, or rename slides.
+## Output format — every slide, exactly this
 
-### STAGE 2 — RIGOROUS ANALYSIS + BUILD
+> **Slide N: <Actionable, insight-led title>**
+> **Visual Element:** the chart type, the exact X and Y axis labels, and the
+> precise data points or KPIs to plot (e.g. "Comparative bar — X: Country,
+> Y: New Claims; UK=420, FR=310, DE=180").
+> **On-Slide Text:** at most **3** concise, scannable bullets.
+> **Speaker Notes:** the talk-track — context, the analytics explanation, the
+> source (which dashboard + whether the definition is owner-approved), and the
+> "so what".
 
-For each `active` slide in the confirmed outline:
+`render.render_slide_spec(slide)` formats this block once a slide carries
+`_title`, `_visual`, `_bullets`, `_notes`.
 
-1. Call `scripts/analyze.py::analyze(df, computation_id)` to produce a flat key-value store of facts.
-2. Call `scripts/analyze.py::aggregate(df, chart_spec)` to reduce the DataFrame to Chart-Ready JSON (≤100 points). Charts must NEVER receive raw DataFrames — always go through the aggregator.
-3. Use `scripts/render.py::decide_render_mode(rows, cols)` to choose between native PPTX table (≤10 rows AND ≤5 cols) or rendered chart image.
-4. If chart: call `scripts/render.py::render_chart(chart_data, out_path, title)` to write a PNG.
-5. Generate the narrative yourself using the prompt produced by `scripts/render.py::build_prompt(kv, slide_ctx)`. Output strictly the JSON shape `{"observe": "...", "analyze": "...", "synthesize": "..."}`. Follow the Observe → Analyze → Synthesize chain:
-   - **Observe**: state the raw fact (single sentence, exact number from KV).
-   - **Analyze**: state the comparative or trend context (single sentence, exact delta from KV).
-   - **Synthesize**: state the business "So What" (single sentence, no new numbers).
-6. Validate the narrative with `scripts/render.py::validate_narrative(narrative, kv, pii_columns)`. If `valid` is False:
-   - On a `fabricated number` mismatch: regenerate the narrative ONCE. If still invalid, strip the offending claim and add a warning to speaker notes.
-   - On a PII mismatch: rewrite the narrative without referencing PII fields.
-7. Attach the narrative + chart_png path + table descriptor to the slide entry.
+## Two input modes
 
-After all active slides are processed, build the Executive Summary (slide 1):
-- Select the 3 highest-impact synthesis statements from the deck.
-- Ensure ≥1 statement contains a comparative delta. If not, replace the lowest-impact statement with a delta computed from `analyze.py` outputs.
-- Generate a "Recommended Next Step" (Call to Action) — single sentence — by reasoning over all synthesis statements: "What is the single highest-priority action implied by these findings?"
+**A) From the claims-analytics skill (primary, for the combined agent).** When the
+question is about claims, the agent first runs claims-analytics to get *accurate,
+cited* figures, then hands them here as a list of insights (see
+`references/integration_claims.md`). Call `profile.outline_from_analytics(insights)`
+to get a budgeted slide plan; each insight already carries its source app, link,
+provenance, and RAG status — preserve them.
 
-Finally:
-8. Call `scripts/build_pptx.py::build_deck(outline, template_path, out_path)` to assemble the deck. The function:
-   - Opens the corporate template (uses Slide Masters for branding).
-   - Falls back to default template if corporate template missing.
-   - Writes synthesis to slide body, full Observe + Analyze + Synthesize to speaker notes.
-   - Appends a transparency Exclusions slide listing all skipped sections and reasons.
-9. Return the output `.pptx` path to the user.
+**B) From an uploaded file.** Run the pipeline: `ingest.ingest(path)` →
+`profile.profile(df)` → `profile.detect_context(profile)` →
+`profile.build_outline(profile, context)` (already budget-enforced).
 
-## Layout Rules (enforced by code, but you must respect them in narrative generation)
+## Workflow
 
-- **Slide Economy**: max 6 bullet points per slide.
-- **Visual Priority**: every data slide must contain a chart or native table.
-- **So What? Rule**: synthesis text on slide; observe/analyze in speaker notes only.
-- **Brand Hex**: charts use brand colors from `render.py` palette (or template if extracted).
-- **Native vs Image**: ≤10×5 → native table; else image. Decided by `render.py`.
+**Stage 1 — PLAN (outline-first, then stop):**
+1. Build the slide plan (mode A or B). It is already capped at 10 and prioritised.
+2. For each of the first 2–3 slides, compute facts (`analyze.analyze` for files;
+   the insight itself for mode A), then set `_title` (`actionable_title`),
+   `_visual` (`visual_spec`), `_bullets` (≤3), `_notes`.
+3. Present those 2–3 slides using the output format above. **WAIT.** Let the user
+   drop, reorder, rename, or change visuals.
 
-## Failure Modes
+**Stage 2 — BUILD (only after approval):**
+4. Repeat step 2 for the remaining approved slides.
+5. Generate each narrative as `{"observe","analyze","synthesize"}` (raw fact →
+   comparison/trend → "so what", no new numbers in synthesize).
+6. **Validate every narrative** with `render.validate_narrative(narrative, kv,
+   pii_columns)`. If a number isn't backed by the facts, regenerate once, else drop
+   the claim — **never ship an unbacked number.**
+7. Charts go through `analyze.aggregate` (≤100 points) then
+   `render.render_chart`; tables use `render.add_native_table` (≤10×5).
+8. Assemble with `build_pptx.build_deck(outline, template_path, out_path)`. It
+   writes synthesis to the slide, the full O/A/S to speaker notes, and appends a
+   transparency **Exclusions** slide for anything dropped for data-integrity/PII.
 
-- File unreadable → ask user for fixed file.
-- File >500MB or >5M rows → use sampled subset; warn user.
-- All slides excluded → produce single-slide deck explaining "Insufficient data for analysis".
-- Sandbox timeout per slide → skip that slide, log in Exclusions.
+## Inherit the claims-analytics discipline
 
-NEVER silent-fail. Every excluded or degraded slide must surface in the Exclusions slide.
+This deck is read by the **same non-technical stakeholders**. Therefore:
+- **Business language only on slides and notes.** Never put column names, indicator
+  names, Qlik expressions, or "distinct count of…" on a slide. Translate to plain
+  English. (Field/formula detail belongs only in claims-analytics' on-request mode.)
+- **Accuracy over polish.** Every figure must trace to the analytics input; the
+  validator enforces it. If a number can't be backed, it doesn't go on the slide.
+- **Carry provenance.** In speaker notes, name the source dashboard and say whether
+  the definition is owner-approved or a standard-industry placeholder. Where a
+  metric has a Red/Amber/Green target, state the band in plain terms.
 
-## Model Routing Guidance (for the user, not runtime)
+## Hard rules
 
-- **Opus 4.7**: preferred when invoking this skill — strongest at the Observe/Analyze/Synthesize chain and instruction following.
-- **GPT-5**: preferred if you need to extend the layout set or write custom statistical computations beyond the registered ones in `analyze.py`.
+1. Never exceed 10 slides; never invent a number; never put PII or technical
+   field names on a slide.
+2. Every slide has a visual with exact axes/points.
+3. Titles are insights, not topics.
+4. Start with 2–3 slides and stop for approval — don't build the whole deck unasked.
+5. Surface anything dropped: data-integrity/PII exclusions on the Exclusions slide;
+   brevity-trimmed slides mentioned in chat ("3 more available if useful").
 
-## Privacy
+## Failure modes
 
-PII columns (SSN, credit card, email, phone, DOB, home address, passport, tax ID) are auto-detected in `profile.py` and excluded from all downstream stages. They never appear in slide text or speaker notes. Excluded PII columns are listed in the final Exclusions slide.
+- File unreadable → ask for a fixed file (don't analyse a failed ingest).
+- >500MB / >5M rows → sample and warn.
+- All slides excluded → a single honest "insufficient data" slide.
+- Per-slide timeout → skip and log in Exclusions. Never silent-fail.
+
+## Model routing (guidance for the user)
+
+- **Claude Opus / Sonnet** — preferred for the Observe→Analyze→Synthesize chain,
+  instruction-following, and keeping to business language. Best default for this
+  skill and for the combined claims+deck agent.
+- A coding-specialist model is only useful if you're *extending* the computations
+  in `analyze.py` or adding new visual renderers — not for running the skill.
+
+## Files
+
+- `scripts/ingest.py` — load PDF/XLSX/CSV to a DataFrame (mode B).
+- `scripts/profile.py` — profile, PII/outlier detection, context, outline,
+  **slide budget + prioritization + `outline_from_analytics` bridge**.
+- `scripts/analyze.py` — registered computations + chart aggregator (≤100 points).
+- `scripts/render.py` — charts, brand colours, native tables, **narrative
+  validator**, **`actionable_title` / `visual_spec` / `render_slide_spec`**.
+- `scripts/build_pptx.py` — assemble the deck, speaker notes, Exclusions slide.
+- `references/visual_catalog.md` — the allowed visuals and the exact spec each needs.
+- `references/integration_claims.md` — the claims-analytics → deck contract.
+- `assets/default_template.pptx` — corporate template for branding (optional;
+  falls back to the default if absent). Drop yours here.

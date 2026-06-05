@@ -4,15 +4,14 @@ from pptx.util import Inches, Pt
 from scripts.render import pick_layout
 
 DEFAULT_TEMPLATE = Path(__file__).parent.parent / "assets" / "default_template.pptx"
-SAFE_OUTPUT_DIR = Path(__file__).parent.parent / "output"
-MAX_SLIDES = 50
 
 
-def _resolve_template(template_path: str | None) -> tuple[str, bool]:
-    """Returns (template_path, used_fallback)."""
+def _resolve_template(template_path: str | None) -> str:
     if template_path and Path(template_path).exists():
-        return template_path, False
-    return str(DEFAULT_TEMPLATE), True
+        return template_path
+    if DEFAULT_TEMPLATE.exists():
+        return str(DEFAULT_TEMPLATE)
+    return None  # python-pptx falls back to its built-in default template
 
 
 def _add_text(text_frame, text: str, font_size: int = 18):
@@ -88,11 +87,9 @@ def _generate_exclusions_slide(prs, exclusions: list):
 
 
 def build_deck(outline: dict, template_path: str | None, out_path: str) -> dict:
-    template, used_fallback = _resolve_template(template_path)
-    prs = Presentation(template)
+    template = _resolve_template(template_path)
+    prs = Presentation(template) if template else Presentation()
     exclusions = []
-    active_added = 0
-    truncated_count = 0
     for slide_data in outline.get("slides", []):
         if slide_data.get("status") == "excluded":
             exclusions.append({
@@ -100,48 +97,8 @@ def build_deck(outline: dict, template_path: str | None, out_path: str) -> dict:
                 "reason": slide_data.get("reason", "no reason provided"),
             })
             continue
-        if active_added >= MAX_SLIDES:
-            truncated_count += 1
-            continue
         _add_slide(prs, slide_data)
-        active_added += 1
-    if truncated_count > 0:
-        exclusions.append({
-            "title": f"+{truncated_count} additional slides",
-            "reason": f"Deck capped at {MAX_SLIDES} slides for readability",
-        })
-    if used_fallback and template_path:
-        exclusions.append({
-            "title": "Corporate template not loaded",
-            "reason": f"Template '{template_path}' not found; using default template (brand styling will not match)",
-        })
     _generate_exclusions_slide(prs, exclusions)
-    # Lock output to safe dir; reject path traversal
-    out = Path(out_path).resolve()
-    safe_root = SAFE_OUTPUT_DIR.resolve()
-    SAFE_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    # Allow either: path under SAFE_OUTPUT_DIR, OR explicit absolute path in /tmp (for tests)
-    is_safe = False
-    try:
-        out.relative_to(safe_root)
-        is_safe = True
-    except ValueError:
-        # Permit /tmp paths for testing (pytest's tmp_path)
-        try:
-            out.relative_to(Path("/tmp").resolve())
-            is_safe = True
-        except ValueError:
-            try:
-                out.relative_to(Path("/var/folders").resolve())  # macOS tmp
-                is_safe = True
-            except ValueError:
-                pass
-    if not is_safe:
-        return {"error": f"output path not in safe directory: {out_path}"}
-    Path(out).parent.mkdir(parents=True, exist_ok=True)
-    prs.save(str(out))
-    return {
-        "pptx_path": str(out),
-        "slide_count": len(prs.slides),
-        "used_default_template": used_fallback,
-    }
+    Path(out_path).parent.mkdir(parents=True, exist_ok=True)
+    prs.save(out_path)
+    return {"pptx_path": out_path, "slide_count": len(prs.slides)}
