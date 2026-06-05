@@ -1,0 +1,20 @@
+{
+  "_doc": "Keyword hints for the catalogue-driven fallback in engine._infer(). Maintain HERE, not in Python. Matching is case-insensitive substring; order matters (first match wins). Each pair is [keyword, target].",
+  "population_hints": [
+    ["closed", "closed"],
+    ["new", "new"],
+    ["reopen", "reopened"],
+    ["pending", "pending"],
+    ["open", "open"],
+    ["declin", "declined"]
+  ],
+  "measure_hints": [
+    ["incurred", "incurred_usd"],
+    ["indemnity", "indemnity_paid_usd"],
+    ["expense", "expense_paid_usd"],
+    ["recover", "recovery_usd"],
+    ["outstanding reserve", "oslr_usd"],
+    ["oslr", "oslr_usd"]
+  ],
+  "life_keywords": ["cycle time", "time to settle", "claim life", "days to settle", "age "]
+}
