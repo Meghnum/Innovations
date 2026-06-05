@@ -1,0 +1,7 @@
+# Runtime dependencies for the presentation-builder skill scripts.
+# Install in the skill's execution environment (see note about polars/PyMuPDF).
+polars>=0.20         # ingest.py, profile.py, analyze.py, render.py
+PyMuPDF>=1.23        # ingest.py — provides `import fitz` (PDF table/text extraction)
+python-pptx>=0.6.21  # build_pptx.py, render.py — provides `import pptx`
+matplotlib>=3.7      # render.py — chart rendering
+seaborn>=0.12        # render.py — chart styling
