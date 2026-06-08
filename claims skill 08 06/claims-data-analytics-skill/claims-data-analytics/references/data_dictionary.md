@@ -1,0 +1,578 @@
+# Data Dictionary
+
+Raw fields per app. Resolve names through the live config, not memory.
+
+## A&H Claims Connect Database
+
+- **Adjuster** — Adjuster name
+- **Broker** — Broker name
+- **CLAIM_NUMBER** — (no description)
+- **CLAIM_TYPE** — (no description)
+- **CL_POLICY_NUMBER** — (no description)
+- **COUNTRY** — Country
+- **Certificate Number** — (no description)
+- **Claim Closure Reason** — (no description)
+- **Claim Level** — (no description)
+- **Claim Number** — Claim number
+- **Claim Office** — Claim office location
+- **Claim Source** — (no description)
+- **Claim Status** — Status of the claim
+- **Claim Type** — Type of claim
+- **Claims Connect Product** — (no description)
+- **Class 3 Description** — (no description)
+- **Closed Date** — Date claim closed
+- **Conditional Damage** — (no description)
+- **DS_STATUS** — (no description)
+- **Detailed LOB** — Detail line of business
+- **Event Code** — (no description)
+- **Fast Track Flag** — If it is a fast track claim
+- **First Declinature** — (no description)
+- **First Payment** — (no description)
+- **Genius Coverage Code** — (no description)
+- **Genius Coverage Description** — (no description)
+- **INSURED_NAME** — (no description)
+- **Last Activity Date** — Last date activity performed on the claim
+- **Last Document Received** — (no description)
+- **Last Payment** — (no description)
+- **Line Type** — (no description)
+- **Loss Description** — Description of loss
+- **Master Policy Number** — (no description)
+- **Misc 3** — (no description)
+- **Misc 4** — (no description)
+- **Multinational Account Code** — (no description)
+- **Name Insured** — (no description)
+- **Opened Date** — Date claim opened
+- **POL_JOIN** — Concat of PolicyNumber+Country
+- **Policy Cluster** — Region Cluster by Policy
+- **Policy Country** — Country of the policy
+- **Policy Number** — Policy number
+- **Policy Reference** — Policy reference number
+- **Policy Source** — System where the policy is extracted
+- **Recovery Flag** — Whether any possible recovery flagged for the claim
+- **Reopened Date** — Last Reopen Date
+- **Reported Date** — Claim reported date
+- **SECONDARY_STATUS** — (no description)
+- **SOURCE** — Data Source: Eg. Genius, Lloyds etc.
+- **Secondary Claim Status** — (no description)
+- **Static Claim Banding** — Banding based on age of Claim for statis claims
+- **TRANS_TYPE** — (no description)
+- **USD Expense Paid** — Expense paid in USD
+- **USD Expense Reserve** — The total reserve for every claim that is open, reopened or closed in the maximum selected accounting period - in USD
+- **USD Incurred** — The aggregation of all financials on a claim i.e. (Indemnity + Expenses + Reserves - Recoveries) in USD
+- **USD Indemnity Paid** — Indemnity paid in USD
+- **USD Indemnity Reserve** — Indemnity reserve in USD
+- **USD Recovery** — Recovery in USD
+- **YEAR_MONTH** — (no description)
+
+## CGM Claims Insight
+
+- **ACCOUNTING MONTH** — Accounting month
+- **ACCOUNTING PERIOD** — Accounting Period
+- **ACCOUNTING YEAR** — Accounting year is dervied from UWYEAR
+- **ADJUSTER NAME** — Name of the adjuster
+- **BLOCK IND** — Block indicator as Yes or No
+- **BROKER** — Broker name
+- **BUEREAU SHARE** — Percentage share of bureau
+- **Business Interruption Gross Costs (Original)** — Cost of business interruption in original currency
+- **Business Interruption Gross Costs (USD)** — Cost of business interruption in USD
+- **CAT CODE** — Catastrophe code (for claim groups)
+- **CLAIM REFERENCE** — Claim reference number
+- **CLAIM STATUS** — Status of the claim
+- **CLAIM STATUS FLAG** — Claim status
+- **CLAIMS LIFECYCLE (IN DAYS)** — Number of days in claim lifecycle
+- **CLAIMS STATUS** — Claim Status
+- **COINSURANCE INDICATOR** — Exclusive/Lead/Follow
+- **COR (LLOYDS)/CLMREF (LIRMA)** — Claim reference number
+- **COR(LLOYDS)** — Original Currency reference
+- **COR(LLOYDS)/CLAIM REF(LIRMA)** — Claim reference number
+- **DATE OF LOSS** — Date of loss
+- **DECLINE FLAG** — If claim is declined or not
+- **DECLINE REASON** — Reason for claim decline
+- **DOMICILE** — USA or Rest of the World
+- **ENTITY** — Company/Lloyds…
+- **EXCESS AMOUNT** — Excess currency amount
+- **EXCESS CCY** — Excess currency type
+- **EXPENSE & FEE PAID** — Expense & fees paid
+- **EXPENSE & FEE PAID (100%)** — Total expense and fees paid amount
+- **EXPENSE & FEE PAID (USD)** — Expense and fees paid in USD
+- **EXPENSE & FEE RESERVE** — Expense and fees reserve
+- **EXPENSE & FEE RESERVE (100%)** — Total expense and fees reserve amount
+- **EXPENSE & FEE RESERVE (USD)** — Expense and fees reserve in USD
+- **EXPIRY DATE** — Policy end date
+- **Entity** — Company/Lloyds…
+- **Equipement Manufacturer** — Manufacturer of the equipement
+- **Equipement Type** — Type of equipement
+- **Expert Individual Name** — Name of the individual Loss Adjusting Expert
+- **Expert Name** — Name of the appointed Loss Adjusting firm
+- **Failure Mechanism** — What was the basic cause of the failure
+- **GEOCODE** — Geographical code of area
+- **GROSS WRITTEN PREMIUM** — Gross written premium
+- **INCEPTION DATE** — Policy start date
+- **INCURRED** — Total incurred amount
+- **INCURRED (100%)** — Total incurred amount
+- **INCURRED (USD)** — Total Incurred in USD
+- **INCURRED FROM (USD)** — Total incurred up until the first day in the “Date Range” selection criteria
+- **INCURRED TO (USD)** — Total incurred up until the last day in the “Date Range” selection criteria
+- **INDEMNITY PAID** — Indemnity paid
+- **INDEMNITY PAID (100%)** — Total indemnity paid amount
+- **INDEMNITY PAID (USD)** — Indemnity paid in USD
+- **INDEMNITY RESERVE** — Indemnity reserve amount
+- **INDEMNITY RESERVE (100%)** — Total indemnity reserve amount
+- **INDEMNITY RESERVE (USD)** — Indemnity reserve in USD
+- **INDEMNITY RESERVED (USD)** — Indemnity reserve in USD
+- **INSURED** — Insured name
+- **INSURED NAME** — name of the insured person
+- **LATEST MOVEMENT DATE** — Latest trabsaction date for the record
+- **LIFECYCLE BANDINGS** — Banding based on claim lifecycle days
+- **LIMIT AMOUNT** — Limit amount
+- **LIMIT CCY** — Limit currency type
+- **LIRMA CATEGORY SUBCODE DESCRIPTION** — LIRMA loss description
+- **LLOYDS CAUSE OF LOSS CODE** — Cause of loss code from Lloyds
+- **LLOYDS CAUSE OF LOSS CODE DESCRIPTION** — Cause of loss description from Lloyds
+- **LOSS DT** — Date of loss
+- **LOSS NAME** — Type of loss name
+- **LOSS NAME** — Name of the loss
+- **LOSS NARATIVE** — Brief detail of loss
+- **Location of Build** — Locatipon country name
+- **Loss Description Summary (Executive Summary)** — Brief description of loss
+- **Loss type** — Type of Loss
+- **MAJOR LINE** — Major Line of Business name
+- **MANUAL PAYMENT INDICATOR (LIRMA)** — Manual payment indicator from LIRMA
+- **MATCHED/UNMATCHED STATUS** — This staus columns shows if energy excel sheet UCR is available in subscribe or not
+- **MINOR LINE** — Minor Line Of Business name
+- **MOVEMENT (USD)** — Net change in total incurred within the specified “Date Range” selection criteria
+- **MOVEMENT BANDING** — Banding based on total amount paid
+- **MOVEMENT DATE RANGE** — Movement start and end date range
+- **MOVEMENT TYPE** — Amount paid
+- **Maximum indemnity period** — Business interruption limit, usually described as a period of time (i.e. 12, 24 or 36 months)
+- **NET WRITTEN PREMIUM** — Net written premium
+- **Occupancy** — Type of energy sector like refinery or wind turbine or plant etc
+- **Occupancy Details** — More detail on type of occupancy
+- **POLICY KEY** — Policy key
+- **POLID** — Policy ID
+- **Physical Damages Gross Costs (Original)** — Cost of physical damage in original currency
+- **Physical Damages Gross Costs (USD)** — Cost of physical damage in USD
+- **REPORRTED DATE** — Claims reported date
+- **RESERVE CLASS** — Reserve class of line of business for loss
+- **RESERVE DEPARTMENT** — Detail reserve department for the loss
+- **RISK CODE** — Risk code
+- **RISK DESCRIPTION** — Risk description
+- **Reported Date** — Claim reported date
+- **SIGNED LINE** — The portion of total risk an underwriter agrees to cover
+- **Settlement Currency** — Stettlement curremncy type
+- **UCR** — Unique claim referece number
+- **UCR** — Claim Ref
+- **UCR_ENERGY** — Unique claim reference number for energy
+- **UCR_SUBSCRIBE** — Unique claim reference number for energy
+- **UMR** — Unique Market Reference number
+- **VESSEL DETAILS** — Vessel details for marine
+- **Waiting Period** — Business interruption deductible, usually described by a number of days (i.e. 30, 45, 60 etc.)
+
+## Consumer Line
+
+- **Account Type** — Account type
+- **Claimant_Name** — Name of the claimant
+- **Claimed Coverage** — Claim coverage description
+- **Date Incident Closed** — Date when the claim incident closed
+- **Date Incident Notified to Claims Handlers** — Date loss reported to claim handler
+- **Date Incident Opened** — Date when the claim incident opened
+- **Denial Category** — If claim declined then category of denial
+- **Event/CAT Code** — Event/claim group code (applicable for claim groups)
+- **File Handler** — Claim owner as file handler
+- **File Handler Country of Residence** — Country of claim handler
+- **Genius Opened Date** — Claim opened in Genius
+- **Incident Country** — Country of loss
+- **Incident Date** — Date of loss as incident date
+- **Incident Description** — Loss description
+- **Incident Location** — City of loss
+- **Incident Status** — Incident status
+- **Insurer** — Chubb' as Insurer
+- **Liability Code** — Liability code or secondary claim status
+- **Miscellaneous 4** — Car plate number
+- **Policy Country** — Country of the policy
+- **Policy Currency** — Currency of policy country
+- **Policy Number** — Policy number
+- **Programme** — Volkswagen' as Programme
+- **Reason for denial** — Reason for claim denial
+- **System Claim Number** — Claim number
+- **Total Expense Paid Euro** — Total expense paid in EUR
+- **Total Expense Reserve Euro** — Total expense reserve in EUR
+- **Total Indemnity Paid Euro** — Total indemnity paid in EUR
+- **Total Indemnity Reserve Euro** — Total Indemnity reserve in EUR
+- **Type Of Incident** — Type of claim as type of incident
+
+## EMEA Explicit Consent
+
+- **Adjuster** — Adjuster name
+- **Broker** — Broker name
+- **Broker Reference** — Broker reference number
+- **Claim Number** — Claim number
+- **Claim Rankings** — claims ranking depend on the explicit consent indicator 
+if the consent is provided or not requiered it will be valued at 1 
+if the consent is not yet determined it will be valued at 2 
+and if the consent is withheld or withdrwan it will be valued at 3
+- **Claim Status** — Status of the claim
+- **Claim Type** — Type of claim
+- **Claimant** — Name of the claimant
+- **Closed Date** — Date claim closed
+- **Country Code** — Country Code
+- **Explicit Consent Indicator** — If explicit consent provided or not
+- **GDPR Business Rules** — GDPR business rule number
+- **GDPR Last Updated** — GDPR last updated date
+- **GDPR Risk** — GDPR risk as High, Low or No risk
+- **Opened Date** — Date claim opened
+- **Primary Contact** — Primary contact name
+- **Reported by Email** — Reported by email address
+- **Secondary Claim Status** — Secondary claim status
+- **SourceClaimId** — Claim ID
+
+## Fraud Dashbord
+
+- **Accepted for Investigation** — If the claim accepted for fraud investigation
+- **CARS Referral** — Indicator to show if referred by CARs: COG Analytics model
+- **Carpe Referral** — Indicator to show if referred by third party Carpe
+- **Cause of Loss Description** — Cause of loss selected from given options
+- **Claim Number** — Claim number
+- **Claim Status** — Status of the claim
+- **Closed Indicator** — To indicate that Suspected Claim is closed
+- **Closed No Impact** — Indicator to show Fraud claim records which are are closed and have no financial impact
+- **Closed with Impact** — Indicator to show Fraud claim records which are are closed and have a Savings assigned.
+- **Cluster** — Country Cluster
+- **Country** — Country
+- **Date Fraud Closed** — Date when fraud closed (Month-Year)
+- **Date Fraud Suspected** — Date when fraud suspected (Month-Year)
+- **Date of Incident** — Date of incident/loss
+- **Detect Referral** — Indicator to show if referral is detected
+- **Estimated Saving USD** — Estimated saving from fraud in USD
+- **Fraud Bureau Referral** — Indicator to show if referred by Fraud Bureau
+- **Fraud Threat** — Type of Fraud threat detected
+- **Gross Reserve USD** — Total reserve amount in USD
+- **Indemnity paid USD** — Total indemnity amount paid in USD
+- **Insured Name** — Name of insured
+- **Investigation Cost USD** — Cost of investigation in USD
+- **KI Referral** — Indicator to show if referred by third party Kennedys International
+- **Major LOB** — Major LOB name
+- **Manual Referral** — Indicator to show if referred manually
+- **Minor LOB** — Minor LOB name
+- **Pending Indicator** — To indicate that Suspected Claim is not closed
+- **Policy Number** — Policy number
+- **Primary Referral Source** — Primary Source of Fraud Threat referral
+- **Reason for Referral** — Reason for flagging as a Fraud Threat
+- **Refer to Financial Crime** — Fraud internal referral indicator for SIU (Financial Crime)
+- **Refer to Frausd Bureau** — Fraud internal referral indicator for SIU (Fraud Bureau)
+- **Refer to Police** — Indicator to show if referred to police
+- **Responsible Adjuster** — Adjuster name
+- **Savings Amount USD** — Saving amount in USD
+- **Savings Banding USD** — Saving banding based on saving amount
+- **Savings Currency** — Original currency in which saving was registered
+- **Vendor Appointed** — VendorAssigned to review/ refer Fraud
+- **Vendor Referral** — Indicator to show if referred by vendor
+
+## MAR-Conduct
+
+- **Acknowledgement Date** — Claim Acknowledgement date
+- **Acknowledgement System** — Acknowledgement via CC or WV
+- **Action Date** — Date any action taken on the claim
+- **Adjuster Name** — Name of the adjuster
+- **Adjuster Name** — CLAIM_LIFE_DAYS_NUMBER
+- **Adjusting Office** — name of adjusting office
+- **Auto Acknowledged Filter** — Percentage of claims auto acknowledged
+- **CGM_SYSTEM** — If London Market or not
+- **CLAIM_TIME_TO_ACKNOWLEDGED** — Time taken to acknowledge the claim
+- **COG_COUNTRY** — Country name
+- **Claim Number** — Claim number
+- **Claim Office** — Claim office location
+- **Claim System** — Claim system as Claims Connect, Workview or CGM
+- **Claim Type** — Type of claim
+- **Claimant** — Name of the claimant
+- **Complaint Category** — Type of claim complaint
+- **Complaint Reference** — Reference number of complaint
+- **Complaint Split** — If complaint split with others
+- **Complaints LOB** — Complaints line of business
+- **Country** — Country
+- **Coverage Code** — Claim coverage code
+- **DECLINATURE_REASON** — Reason for decline
+- **Declinature Date** — Date when claim got declined
+- **Document Description** — Description of attached document
+- **Document ID** — Unique ID given to each uploaded document
+- **Duplicates** — Indicator for duplicate claims (value 1 for duplicate claim else 0)
+- **Event Description** — Brief description of the claim
+- **Executive LoB** — Executive LOB name
+- **File Type** — Type of filing as 'Claim'
+- **GPI Payment ID** — GPI Payment ID is the Id of the epayment in the GPI System
+- **Ignite Product Name** — Product name in Ignite system (applicable for Ignite policy)
+- **Ignite Product Name** — Product name as per Ignite system
+- **Ingestion Date** — Date of claim ingestion
+- **Insured** — Insured name
+- **LOB** — Line of Business
+- **MAR Fast Track Flag** — Refer if a claim is Fast Track claim or not
+- **Major LOB** — Major LOB name
+- **Minor LOB** — Minor LOB name
+- **Month & Year** — Month and year is derived from ReceiptDate_CASE_F
+- **Month & Year** — Month and year is derived from PAID_DATE
+- **Originating Business Unit** — Business unit code
+- **Originator** — Originator of the claim
+- **POLICY_NUMBER** — Policy number
+- **PRODUCT** — Product name
+- **Paid Date** — Date claim paid
+- **Policy Holder** — Name of the policy holder
+- **Policy Number** — Policy number
+- **Product** — Product name
+- **Received Date** — Date claim received
+- **Reported Date** — Claim reported date
+- **SLA 10 Days** — If meet 10 days SLA
+- **SLA 5 Days** — If meet 5 days SLA
+- **SLA_ACK** — Numbwer of claims declined
+- **Secondary Status** — Claim secondary status
+- **Status Description** — Status description of the claim (FME Complete or not)
+- **Sub LOB** — Sub LOB name under selected executive LOB
+- **TPA Filter** — If managed by Chubb or TPA
+- **TPA Filter** — Chubb Managed or TPA Managed
+- **Time To Acknowledge** — Days it took to acknowledge claim from reported date
+- **Time to Effect Payment** — Days it took to complete payment from received date i.e. time to get payment processed
+- **Time to Respond (Workdays)** — Workdays to respond to the claim
+
+## MAR-Operational
+
+- **Action Needed** — Claims with a nominal reserve pending for review
+- **Broker** — Broker name
+- **Business Unit Description** — Name of the business unit
+- **Catastrophe Code** — Code given to group of claims raised for same catastophic incident
+- **Cause of Loss Code** — Associated with cause of loss description
+- **Cause of Loss Description** — Cause of loss selected from given options
+- **Claim Closed Date** — Date when claim closed
+- **Claim Event Date** — Date of the claim/loss
+- **Claim Event Description** — Details of claim event eneterd by user
+- **Claim Life Banding** — Banding based on age of Claim
+- **Claim Life Days** — Total number of days open (Reported Date to Closed Date) for closed Claims/Claimants / Count of Closed Claims/Claimants or 2. Total number of days open (Reported Date to Current Date) for pending Claims/Claimants / Count of pending Claims/Claimants
+- **Claim Number** — Claim number
+- **Claim Office** — Claim office country where claim reported
+- **Claim Opened Date** — Date when claim opened
+- **Claim Report Date** — Date claim reported
+- **Claimant Name** — Name of the claimant
+- **Closed Date** — Date claim closed
+- **Cluster** — Country cluster
+- **CoInsurance** — Coinsurace as follow or lead
+- **Coinsurance** — Coinsurace as follow or lead
+- **Country** — Country
+- **DAC Code** — Direct Assume CededCode - AR(1) Identifies a particular transaction as resulting from direct, assumed, ceded or retro ceded business
+- **Entity** — Company/Lloyds…
+- **Genius Level Indicator** — Indicate if the claim is Fast Track or Level 1/2/3 or other
+- **Global Broker** — Global broker name
+- **In Litigation?** — Any litigation for the claim - Yes/No
+- **Incurred Banding** — Loss incurred banding
+- **Incurred USD** — The aggregation of all financials on a claim i.e. (Indemnity + Expenses + Reserves - Recoveries) in USD
+- **Indemnity USD** — Indemnity amount in USD
+- **Industry Code** — The industry code specifies the type of insurance that the policy covers
+- **Insured** — Insured name
+- **Ledger Currency Code** — Original currency in which claim registered
+- **Ledger Currency Code** — Original curreny code (with respect to loss country)
+- **Ledger Expense Reserve** — Expense reserve in original currency
+- **Ledger Expense Total** — The total expense amount for every claim that is open, reopened or closed in the maximum selected accounting period - in original currency
+- **Ledger Incurred Total** — The aggregation of all financials on a claim i.e. (Indemnity + Expenses + Reserves - Recoveries) - in original currency
+- **Ledger Indemnity Total** — The total claim amount for every claim that is open, reopened or closed in the maximum selected accounting period - in original currency
+- **Ledger OSLR Total** — The total reserve for every claim that is open, reopened or closed in the maximum selected accounting period - in original currency
+- **Loss Location** — Country of Loss
+- **MAR Fast Track Flag** — Refer if a claim is Fast Track claim or not
+- **MN/FN Number** — Multination MN/FN number of the policy
+- **Major LOB** — Major LOB name
+- **Minor LOB** — Minor LOB name
+- **Month** — Month
+- **Multinational Banding** — Define if policy is multinational or not
+- **Nominal Claimant Indicator** — If nominal claimant or not
+- **Nominal Section Reserve** — This is based on reserve amount that adjuster adds in genius, generally if its 99 then its a huge reserve if its 123 then less.
+- **OSLR Ledger** — The total reserve for every claim that is open, reopened or closed in the maximum selected accounting period
+- **OSLR USD** — The total reserve for every claim that is open, reopened or closed in the maximum selected accounting period in USD
+- **Opened Date** — Date claim opened
+- **Policy Holder** — Name of the policy holder
+- **Policy Number** — Policy number
+- **Recovery Indicator** — Recovery made for the claim or not
+- **Recovery Referral Flag** — If there is any recovery referral flag available or not
+- **Registration Completion Banding 10 days** — Days banding for registartion completed banding - if it is within 10 days
+- **Registration Completion Banding 5 days** — Days banding for registartion completed banding - if it is within 5 days
+- **Registration Completion Banding SOX** — Number of days between claim submition by client and registration in our systems
+- **Reporting Month** — Month claim reported
+- **Reserve Completion - Business days** — Reserve Completion - Business Days refers to the amount of time it takes for an insurance company to complete the processing and settlement of a claim, specifically in relation to setting the reserve amount. The reserve amount is the estimated value of the claim and is used by the insurance company to manage their financial obligations.
+- **Responsible Adjuster** — Adjuster name
+- **Responsible Adjuster Code** — Adjuster code handling the claim
+- **USD Expense Reserve** — The total reserve for every claim that is open, reopened or closed in the maximum selected accounting period - in USD
+- **USD Expense Total** — The total expense amount for every claim that is open, reopened or closed in the maximum selected accounting period - in USD
+- **USD Incurred** — The aggregation of all financials on a claim i.e. (Indemnity + Expenses + Reserves - Recoveries) in USD
+- **USD Indemnity** — The total claim amount for every claim that is open, reopened or closed in the maximum selected accounting period - in USD
+- **USD OSLR Total** — The total reserve for every claim that is open, reopened or closed in the maximum selected accounting period in USD
+- **Underwriting Year** — Year of policy underwriting
+
+## Recovery Dashboard
+
+- **CIR Recovery Status Code** — Claim Recovery Status Code as ingested from PCW source data
+- **Claim Number** — Claim number
+- **Claim Report Date** — Date claim reported
+- **Cluster** — Country cluster
+- **Cluster Old** — Filter capability for Older Cluster definitions
+- **Country** — Country
+- **Exclude?** — An indicator used to flag records which should be excluded for specific reporting
+- **Major LOB** — Major LOB name
+- **Minor LOB** — Minor LOB name
+- **MonthYear** — Month year is derived from claim accounting period
+- **Nil/123 Flag** — Indicator to flag claims with Nil or 123 Nominal Reserves
+- **Policy Number** — Policy number
+- **Region** — Region as UKISA or CE or MENA
+- **Responsible Adjuster** — Adjuster name
+- **Source** — Data Source: Eg. Genius, Lloyds etc.
+
+## Transactional App
+
+- **100% Amount Paid to Date in GBP** — 100% Amount Paid to Date in GBP
+- **100% Amount Settled this Transaction in GBP** — 100% Amount Settled this Transaction in GBP
+- **100% Loss Outstanding Amount in GBP** — 100% Outstanding Amount in GBP
+- **100% Total Incurred Amoun in GBP** — 100% Total Incurred Amount in GBP
+- **Activity Code** — The activity code corresponding to the response that has been made on the transaction.
+- **Activity Date** — The date associated with the Responsible Party Code activity identified in Activity Code.
+- **Adjuster LOB** — Adjuster LOB
+- **Adjuster Name** — Name of the adjuster
+- **Binding Authority Classification** — Binding Authority Classification
+- **Binding Authority Sub Classification** — Binding Authority Sub Classification
+- **Broker Clean Up** — Field always remain blank
+- **Broker Code** — The broker code associated with the transaction
+- **Broker Contact Email** — Email address associated with the broker code
+- **Broker Contact Name** — The organisation name associated with the broker code
+- **Broker Reference** — Broker reference number
+- **Bureau Leader** — The Lirma Bureau Lead associated with the Lirma lead carrier code
+- **Bureau Leader Code** — The Lirma Bureau Lead Carrier Code
+- **Bureau Leader Organization Name** — The carrier organisation associated with the Lirma lead carrier code
+- **Business Unit** — The MA business unit mapping as defined by the MA.
+- **CGM Glasgow_Check** — Checked by CGM Glasgow office or not
+- **CGM_STAMP** — Field always remain blank
+- **Carrier Line Percentage** — The carrier claim line percentage
+- **Carrier Name** — The name of the Chubb company on the market of the claim transaction
+- **Carrier Response Code** — The latest response made by the Chubb carrier (the response made on ‘Date of Chubb Response’
+- **Category Code** — The Category Code entered by the Lirma Lead when circulating the transaction
+- **Check** — Field always remain blank
+- **Claim Line Number** — The position of the carrier within the market lines
+- **Claim Scheme** — The Claim Scheme relating the claim - this could be '2006 and Prior' or '2010'. Paper claims will be set to '---'
+- **Class of Business (10)** — The Lloyd's Class of Business (10) that the risk code associated with the claim falls into.
+- **Class of Business (60)** — The Lloyd's Class of Business (60) that the risk code associated with the claim falls into.
+- **Class of Business Code** — The Class of Business Code entered by the Lirma Lead when circulating the transaction
+- **Co-Lead/Master Cover Indicator** — Field always remain blank
+- **Created Date** — The day upon which the Broker created the transaction on ECF/CLASS – i.e. the date when the transaction was first added to the Market Repository /CLASS.
+- **Critical Path Indicator** — Shows whether the responsible party was on the critical path at this stage: Y = This response is on the critical path, N = This response is not on the critical path.
+- **Date Circulated** — The date the transaction was circulated by the lead
+- **Date Rejected** — The date that this transaction was rejected by the lead
+- **Date Transaction Cancelled** — The date this transaction was cancelled (set to transaction status ‘45’)
+- **Date Transaction Completed** — The date this transaction was set to Transaction status of Complete (set to transaction status ’40’)
+- **Date Transaction Created** — The date this transaction was first created by the broker
+- **Date Transaction Last Updated** — The date this transaction was last updated by the broker
+- **Date of Chubb Response** — The date that that Chubb responded to this market line on this transaction
+- **Delegated Lead Name** — The name of the organisation to whom the Leader has delegated their lead role, if applicable.
+- **Further Agreement Party Code** — The syndicate number of the further agreement party on the transaction concerned.
+- **Further Agreement Party Name** — The managing agent name associated with the further agreement party syndicate code on the claim transaction.
+- **LB Indicator** — Field always remain blank
+- **LOB** — Line of Business
+- **Lead Adjuster for FAP** — Field always remain blank
+- **Lead MA Name** — The name of the managing agent associated with the bureau lead syndicate code.
+- **Linked master UCR** — Field always remain blank
+- **Loss Date From** — Loss date start date
+- **Loss Date To** — Loss date end date
+- **Loss Name** — Name of the loss
+- **MA Name** — Field always remain blank
+- **Master/Subordinate UCR Indicator** — Field always remain blank
+- **Office** — Office address
+- **Overlap Duration (Calenadar Days)** — Field always remain blank
+- **Overlap Duration (Working Days)** — Field always remain blank
+- **Overlap Indicator** — Field always remain blank
+- **Paper/ECF** — Indicates whether this transaction has been processed as an ECF transaction or Paper Transaction
+- **Participant Role** — Partivipant role as Agreement Party or Lead
+- **Peer Group by COB (Open Claims)** — Field always remain blank
+- **Peer Group by Size (GWP)** — Field always remain blank
+- **Policy Reference** — Policy reference number
+- **Processing Date** — The processing date to which the file relates
+- **RT Banding** — Response time Banding
+- **Reinsured** — The Reinsured Name associated with the transaction
+- **Reponse Time in Calendar Days** — Field always remain blank
+- **Reponse Time in Working Days** — Reponse Time in Working Days
+- **Reporting Entity** — Field always remain blank
+- **Response Time Banding** — Field always remain blank
+- **Response Type** — This shows if the response was a Manual response or an Automatic response
+- **Responsible Party Assignment Date** — Field always remain blank
+- **Responsible Party Code** — Field always remain blank
+- **Responsible Party Name** — Field always remain blank
+- **SCAP Indicator** — Field always remain blank
+- **SCAP Role** — Field always remain blank
+- **SCAS Indicator** — Field always remain blank
+- **SEQUENCE_NUMBER** — The claim sequence number of the transaction within the claim
+- **SLA In/Out** — Over/Under 4 Days for Lloyd's and LIRMA
+- **SYND_ID** — Syndicate ID
+- **Settlement or Advice** — Field always remain blank
+- **Slip Leader** — Field always remain blank
+- **Slip Leader Code** — Field always remain blank
+- **Syndicate LOB** — Syndicate LOB
+- **Syndicate Line No** — Field always remain blank
+- **Third party Parallel UCR Indicator** — Field always remain blank
+- **Transaction Ref** — Transaction reference number
+- **Transaction Status** — The transaction status associated with this transaction on the processing date
+- **Transaction Type (Settlement or Advice)** — Transaction Type (Settlement or Advice)
+- **Triage Category** — Field always remain blank
+- **UCR** — Claim Ref
+- **UMR** — Unique Market Reference number
+- **Underwriting Year** — Year of policy underwriting
+- **Week** — Week for Lloyd's and Lirma file
+- **Year Month** — Year Month derived from Activity Date for Lloyds and Processing Date for Lirma
+- **Year of Account** — The Lloyd's year of account associated with the policy.
+
+## Unreserved Report
+
+- **Age** — Age of the claim
+- **Age Bracket** — Age bracket based on claim age
+- **BUSINESS_UNIT** — Business unit number
+- **Category** — Category as Unregistered, Unreserved or Recovery
+- **Claim Event Description** — Details of claim event eneterd by user
+- **Claim Number** — Claim number
+- **Claim Office** — Claim office location
+- **Date of Unreserved Report** — Unreserved report date
+- **Echo Migration** — Normal claim or migrated from Echo system
+- **Genius Claim Status** — Claim status in Genius
+- **Genius Country** — Country name from GENIUS system
+- **Genius Max Underwriting Year Check** — Genius underwriting year
+- **Insured** — Insured name
+- **LOB** — Line of Business
+- **Last Activity Date** — Last date activity performed on the claim
+- **Loss Date** — Date of loss
+- **Policy Number** — Policy number
+- **Product** — Product name
+- **Recovery Flag** — Whether any possible recovery flagged for the claim
+- **Reserve Not Required Flag** — Reserved required or not flag
+- **Source** — Data Source: Eg. Genius, Lloyds etc.
+- **Source Adjuster** — Adjuster name
+- **Source Closed Date** — Closed date if claim closed
+- **Source Country** — Source country name
+- **Source Reopened Date** — Reopened date if claim repened
+- **Source Report Date** — Report date
+- **Source Status** — Claim status in source system
+- **Unautorised Reserve** — Unauthorized reserve amount
+- **Unreserved/Unregistered Flag** — Unreserved or unregistered flag
+- **Workflow** — Maintained in Workflow or not
+- **Workitem Attachment** — Workitem attached or handled by ClaimConnect
+- **Workview Implementation Date** — Date claim implemented in Workview
+
+
+## Portfolio Insight — column headers
+
+Policy-and-claim grain (EMEA; policies from 2005, claims from 2020). Headers:
+Underwriting Year, Policy Number, Country, Policy Inception Date, Policy Effective
+Date, Policy Expiration Date, Executive LOB, Major LOB, Coverage Code, Policy Type,
+Policy Status, Claim Number, Claim Opened Date, Claim Loss Date, Claim Event Date,
+Lag Days, Reserving Class, Reserving Line, Coinsurance, Product, GWP, USD Incurred.
+
+Note: this app pairs policy and claim fields, so a "policy with claim" / claim-
+frequency view is possible here that the claim-only MAR extracts cannot give.
+
+## EMEA Unreserved Report — columns
+
+Claim Number, Row, PRODUCT, BUSINESS_UNIT, Source, Date of Unreserved Report, LOB,
+Source Country, Claim Event Description, Claim Office, MAR Mapped Claim Office,
+Source Adjuster, MAR Mapped Adjuster, Genius Country, Policy Number, Insured,
+Workitem Attachment, Workflow, Genius Max Underwriting Year Check, Loss Date,
+Source Report Date, Source Closed Date, Source Reopened Date, Last Activity Date,
+Workview Implementation Date, Source Status, Genius Claim Status, Recovery Flag,
+Reserve Not Required Flag, Unreserved/Unregistered Flag, Echo Migration,
+Unauthorised Reserve, Age, Age Bracket, Category.
