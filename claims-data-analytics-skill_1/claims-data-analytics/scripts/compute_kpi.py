@@ -134,6 +134,8 @@ def compute(meta, df, cols=None, **kwargs):
 
     # App-specific modules (exact Qlik translations) take priority.
     if meta["app"] in ("MAR-Operational", "MAR Operational"):
+        # static sibling import, deferred only to avoid import-order coupling;
+        # the module NAME is fixed — meta values never choose what is imported
         import mar_operational as mar
         if meta["name"] in mar.REGISTRY:
             return mar.compute(meta["name"], df, cols, grain=kwargs.get("grain", "claim"))
