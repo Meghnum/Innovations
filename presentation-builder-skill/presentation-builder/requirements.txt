@@ -1,5 +1,15 @@
 # Runtime dependencies for the presentation-builder skill scripts.
 # Install in the skill's execution environment (see note about polars/PyMuPDF).
+#
+# Python: 3.8+ is supported — every script carries `from __future__ import
+# annotations`, so the `X | None` hints are never evaluated at runtime.
+# On Python 3.8 pin polars to <0.21 (the last 3.8-compatible line); on an
+# x86-emulated interpreter (e.g. Rosetta on Apple Silicon) install
+# `polars-lts-cpu` instead of `polars` — plain polars wheels need AVX/FMA.
+#
+# NOTE: pl.read_excel needs an engine package (xlsx2csv or fastexcel) that is
+# NOT listed here — without one, XLSX ingest returns a "parse failed" error.
+# Adding one is a dependency decision for the owners (see skill summary).
 polars>=0.20         # ingest.py, profile.py, analyze.py, render.py
 PyMuPDF>=1.23        # ingest.py — provides `import fitz` (PDF table/text extraction)
 python-pptx>=0.6.21  # build_pptx.py, render.py — provides `import pptx`
