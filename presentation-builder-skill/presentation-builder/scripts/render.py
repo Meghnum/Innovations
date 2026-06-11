@@ -59,6 +59,26 @@ def get_brand_colors(template_path: str | None) -> dict:
         return dict(FALLBACK_COLORS)
 
 
+def get_brand_fonts(template_path: str | None) -> dict:
+    """Display/body font pairing from the template's theme (major/minor latin
+    typefaces); Office defaults when no template. Returns {"display", "body"}."""
+    if template_path and Path(template_path).exists():
+        try:
+            import zipfile
+            with zipfile.ZipFile(template_path) as z:
+                theme_files = [n for n in z.namelist()
+                               if n.startswith("ppt/theme/theme") and n.endswith(".xml")]
+                if theme_files:
+                    xml = z.read(theme_files[0]).decode("utf-8", errors="replace")
+                    major = re.search(r'<a:majorFont>\s*<a:latin typeface="([^"]+)"', xml)
+                    minor = re.search(r'<a:minorFont>\s*<a:latin typeface="([^"]+)"', xml)
+                    return {"display": major.group(1) if major else "Calibri Light",
+                            "body": minor.group(1) if minor else "Calibri"}
+        except Exception:
+            pass
+    return {"display": "Calibri Light", "body": "Calibri"}
+
+
 def render_chart(chart_data: dict, out_path: str, title: str = "", template_path: str | None = None) -> dict:
     """Render a chart PNG. Returns {"png_path", "width_px", "height_px"} on
     success, else {"error": ..., "png_path": None}. A chart that can't be drawn
