@@ -1,6 +1,13 @@
+from __future__ import annotations
+
 import re
 
-import polars as pl
+try:
+    import polars as pl
+except ImportError as _e:  # pragma: no cover
+    raise ImportError(
+        "presentation-builder requires 'polars' — pip install polars "
+        "(use polars-lts-cpu on emulated/older CPUs)") from _e
 
 # ── PII regexes ──────────────────────────────────────────────────────────────
 PII_NAME_RX = re.compile(
@@ -46,6 +53,9 @@ def _luhn_valid(num: int) -> bool:
 
 
 def _detect_pii(df: pl.DataFrame) -> list:
+    """Columns that look like PII: name match, or ANY value in the column that
+    is an SSN/email (full vectorised scan — a single leaked value is a leak),
+    or an all-Luhn-valid numeric sample (first 20, as before)."""
     pii = set()
     for col in df.columns:
         if PII_NAME_RX.search(col):
@@ -54,15 +64,15 @@ def _detect_pii(df: pl.DataFrame) -> list:
         series = df[col].drop_nulls()
         if series.len() == 0:
             continue
-        sample = series.head(min(20, series.len())).to_list()
         if df[col].dtype == pl.String:
-            if any(SSN_RX.match(str(v)) for v in sample):
-                pii.add(col)
-                continue
-            if any(EMAIL_RX.match(str(v)) for v in sample):
+            # scan EVERY value (the old 20-row sample missed PII that first
+            # appears later in the file); same anchored patterns, Rust-side
+            if bool(series.str.contains(SSN_RX.pattern).any()) or \
+               bool(series.str.contains(EMAIL_RX.pattern).any()):
                 pii.add(col)
                 continue
         if df[col].dtype.is_numeric():
+            sample = series.head(min(20, series.len())).to_list()
             try:
                 if all(_luhn_valid(int(v)) for v in sample):
                     pii.add(col)
@@ -86,23 +96,38 @@ def _date_range(df: pl.DataFrame) -> dict | None:
 
 
 def _distributions(df: pl.DataFrame) -> dict:
+    """mean/min/max/std per numeric column, computed in ONE select pass
+    (polars aggregates skip nulls, matching the old per-column drop_nulls)."""
+    num_cols = [c for c in df.columns if df.schema[c].is_numeric()]
+    if not num_cols:
+        return {}
+    aggs = []
+    for i, c in enumerate(num_cols):
+        # drop_nulls first: bit-identical to the old per-Series math (the
+        # null-aware std kernel reduces in a different order)
+        e = pl.col(c).drop_nulls()
+        aggs += [e.mean().alias(f"{i}m"), e.min().alias(f"{i}lo"),
+                 e.max().alias(f"{i}hi"), e.std().alias(f"{i}s"),
+                 e.count().alias(f"{i}n")]
+    vals = df.select(aggs).row(0)
     out = {}
-    for col in df.columns:
-        if df[col].dtype.is_numeric():
-            series = df[col].drop_nulls()
-            if series.len() == 0:
-                continue
-            out[col] = {
-                "mean": float(series.mean()),
-                "min": series.min(),
-                "max": series.max(),
-                "std": float(series.std()) if series.len() > 1 else 0.0,
-            }
+    for i, c in enumerate(num_cols):
+        mean, mn, mx, std, n = vals[5 * i:5 * i + 5]
+        if n == 0:          # all-null column: nothing to describe
+            continue
+        out[c] = {
+            "mean": float(mean),
+            "min": mn,
+            "max": mx,
+            "std": float(std) if n > 1 else 0.0,
+        }
     return out
 
 
 def _detect_outliers(df: pl.DataFrame, max_per_col: int = 5) -> list:
-    """IQR-based outlier detection. Returns top-N most extreme outliers per column."""
+    """IQR-based outlier detection. Returns top-N most extreme outliers per column.
+    The fence comparison runs vectorised over the column's DISTINCT values;
+    only the (few) actual outliers reach Python."""
     out = []
     for col in df.columns:
         if not df[col].dtype.is_numeric():
@@ -122,16 +147,13 @@ def _detect_outliers(df: pl.DataFrame, max_per_col: int = 5) -> list:
         mean = series.mean()
         if mean is None or mean == 0:
             continue
-        # Find values outside IQR fences
-        candidates = []
-        for v in series.unique().to_list():
-            if v < lower or v > upper:
-                dev_pct = 100.0 * (v - mean) / abs(mean)
-                candidates.append({
-                    "col": col,
-                    "value": v,
-                    "deviation_pct": round(dev_pct, 2),
-                })
+        # Find unique values outside the IQR fences (vectorised, not per-value Python)
+        uniq = series.unique()
+        extreme = uniq.filter((uniq < lower) | (uniq > upper)).to_list()
+        candidates = [
+            {"col": col, "value": v, "deviation_pct": round(100.0 * (v - mean) / abs(mean), 2)}
+            for v in extreme
+        ]
         # Keep top-N by absolute deviation
         candidates.sort(key=lambda x: abs(x["deviation_pct"]), reverse=True)
         out.extend(candidates[:max_per_col])
@@ -139,6 +161,10 @@ def _detect_outliers(df: pl.DataFrame, max_per_col: int = 5) -> list:
 
 
 def profile(df: pl.DataFrame) -> dict:
+    """Profile a frame: {schema, dtypes, null_pct, distributions, outliers,
+    date_range, pii_columns}. Empty/None input returns the same shape with
+    empty values. Column passes are batched — one scan each for nulls and
+    numeric distributions."""
     if df is None or df.is_empty():
         return {
             "schema": {},
@@ -150,13 +176,14 @@ def profile(df: pl.DataFrame) -> dict:
             "pii_columns": [],
         }
     schema = {col: str(df.schema[col]) for col in df.columns}
+    nulls = df.null_count().row(0)          # one pass over all columns
     null_pct = {
-        col: round(100.0 * df[col].null_count() / df.height, 2)
-        for col in df.columns
+        col: round(100.0 * n / df.height, 2)
+        for col, n in zip(df.columns, nulls)
     }
     return {
         "schema": schema,
-        "dtypes": schema,  # alias
+        "dtypes": dict(schema),  # alias (own copy: callers may mutate one view)
         "null_pct": null_pct,
         "distributions": _distributions(df),
         "outliers": _detect_outliers(df),
@@ -177,6 +204,9 @@ def _find_first(cols, rx):
     return None
 
 def detect_context(profile: dict) -> dict:
+    """Infer the story the data supports. Returns {story_type,
+    suggested_sections, required_computations} (always at least the
+    descriptive fallback)."""
     cols = list(profile.get("schema", {}).keys())
     sections = []
     computations = []
@@ -244,6 +274,9 @@ def _check_viability(profile: dict, computation_id: str) -> tuple:
 
 
 def build_outline(profile: dict, context: dict) -> dict:
+    """Slide plan from a profile+context: exec summary, viable sections
+    (PII/null-threshold checked), outlier deep-dives — budget-enforced.
+    Returns {slides, deferred, excluded} from enforce_slide_budget."""
     slides = []
     n = 1
     # Slide 1: Exec Summary placeholder (filled in Stage 2 from synthesized takeaways)
@@ -311,10 +344,10 @@ def score_slide(slide: dict) -> float:
         return 1e9
     if ct == "deep_dive":
         o = slide.get("outlier") or {}
-        return 50 + abs(float(o.get("deviation_pct", 0)))
+        return 50 + abs(float(o.get("deviation_pct") or 0))
     if ct == "insight":
         rag = _RAG_WEIGHT.get(slide.get("rag"), 40)
-        delta = abs(float((slide.get("comparison") or {}).get("delta_pct", 0)))
+        delta = abs(float((slide.get("comparison") or {}).get("delta_pct") or 0))
         return rag + min(delta, 40)
     return _BASE_PRIORITY.get(slide.get("computation_id"), 40)
 

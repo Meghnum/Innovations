@@ -1,13 +1,20 @@
+from __future__ import annotations
+
 from pathlib import Path
-import matplotlib
-matplotlib.use("Agg")  # non-interactive backend
-import matplotlib.pyplot as plt
-import seaborn as sns
+try:
+    import matplotlib
+    matplotlib.use("Agg")  # non-interactive backend
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+    import polars as pl
+    from pptx.util import Pt
+    from pptx.dml.color import RGBColor
+except ImportError as _e:  # pragma: no cover
+    raise ImportError(
+        "presentation-builder rendering requires matplotlib, seaborn, polars and "
+        "python-pptx — pip install matplotlib seaborn polars python-pptx") from _e
 
 import re
-import polars as pl
-from pptx.util import Pt
-from pptx.dml.color import RGBColor
 from difflib import get_close_matches
 
 # ── chart constants ───────────────────────────────────────────────────────────
@@ -53,39 +60,52 @@ def get_brand_colors(template_path: str | None) -> dict:
 
 
 def render_chart(chart_data: dict, out_path: str, title: str = "", template_path: str | None = None) -> dict:
+    """Render a chart PNG. Returns {"png_path", "width_px", "height_px"} on
+    success, else {"error": ..., "png_path": None}. A chart that can't be drawn
+    faithfully is refused, never guessed — matplotlib would happily broadcast a
+    short values list across all labels, inventing bars that aren't in the data."""
     labels = chart_data.get("labels", [])
     values = chart_data.get("values", [])
     chart_type = chart_data.get("chart_type", "bar")
     if not labels or not values:
         return {"error": "no data to render", "png_path": None}
+    if chart_type != "histogram" and len(labels) != len(values):
+        return {"error": f"labels/values length mismatch ({len(labels)} vs {len(values)})",
+                "png_path": None}
+    try:
+        values = [float(v) for v in values]
+    except (TypeError, ValueError):
+        return {"error": "non-numeric value in chart data", "png_path": None}
 
     colors = get_brand_colors(template_path)
     sns.set_style("whitegrid")
     fig, ax = plt.subplots(figsize=(10, 6), dpi=150)
+    try:
+        if chart_type == "line":
+            ax.plot(labels, values, color=colors["primary"], linewidth=2.5, marker="o", markersize=8)
+        elif chart_type == "bar":
+            ax.bar(labels, values, color=colors["primary"], edgecolor=colors["neutral"])
+        elif chart_type == "scatter":
+            ax.scatter(labels, values, color=colors["primary"], s=80)
+        elif chart_type == "stacked_bar":
+            ax.bar(labels, values, color=colors["primary"])
+        elif chart_type == "histogram":
+            ax.hist(values, bins=min(20, len(values)), color=colors["primary"], edgecolor=colors["neutral"])
+        else:
+            ax.bar(labels, values, color=colors["primary"])
 
-    if chart_type == "line":
-        ax.plot(labels, values, color=colors["primary"], linewidth=2.5, marker="o", markersize=8)
-    elif chart_type == "bar":
-        ax.bar(labels, values, color=colors["primary"], edgecolor=colors["neutral"])
-    elif chart_type == "scatter":
-        ax.scatter(labels, values, color=colors["primary"], s=80)
-    elif chart_type == "stacked_bar":
-        ax.bar(labels, values, color=colors["primary"])
-    elif chart_type == "histogram":
-        ax.hist(values, bins=min(20, len(values)), color=colors["primary"], edgecolor=colors["neutral"])
-    else:
-        ax.bar(labels, values, color=colors["primary"])
-
-    if title:
-        ax.set_title(title, fontsize=14, fontweight="bold", color=colors["neutral"])
-    ax.set_xlabel(chart_data.get("x_axis", ""), color=colors["neutral"])
-    ax.set_ylabel(chart_data.get("y_axis", ""), color=colors["neutral"])
-    plt.xticks(rotation=30, ha="right")
-    plt.tight_layout()
-
-    Path(out_path).parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(out_path, dpi=300, bbox_inches="tight")
-    plt.close(fig)
+        if title:
+            ax.set_title(title, fontsize=14, fontweight="bold", color=colors["neutral"])
+        ax.set_xlabel(chart_data.get("x_axis", ""), color=colors["neutral"])
+        ax.set_ylabel(chart_data.get("y_axis", ""), color=colors["neutral"])
+        plt.xticks(rotation=30, ha="right")
+        plt.tight_layout()
+        Path(out_path).parent.mkdir(parents=True, exist_ok=True)
+        fig.savefig(out_path, dpi=300, bbox_inches="tight")
+    except Exception as e:
+        return {"error": f"chart render failed: {e}", "png_path": None}
+    finally:
+        plt.close(fig)  # never leak figures, even on failure
     return {"png_path": out_path, "width_px": 3000, "height_px": 1800}
 
 
@@ -99,6 +119,9 @@ ALT_ROW_FILL = RGBColor(0xF2, 0xF2, 0xF2)
 
 
 def add_native_table(slide, df: pl.DataFrame, left, top, width, height) -> dict:
+    """Add a styled native table for a small slice. Refuses anything over
+    the 10x5 law with {"error": ...}; else returns {rows, cols, shape_id}
+    (rows includes the header row)."""
     if df.height > MAX_ROWS or df.width > MAX_COLS:
         return {
             "error": f"slice exceeds 10x5 rule (rows={df.height}, cols={df.width})",
@@ -180,6 +203,11 @@ def _matches_kv(claim: float, kv_values: list) -> bool:
 
 
 def validate_narrative(narrative: dict, kv: dict, pii_columns: list | None = None) -> dict:
+    """The slide-integrity gate. Every $/%/comma number in observe+analyze
+    must match a kv value within TOLERANCE (absolute-value matches allowed,
+    e.g. "down 7%" vs -7); SSN/email patterns and PII column names are
+    blocked across ALL tiers. Returns {"valid": bool, "mismatches": [...]}
+    — never weaken this gate."""
     mismatches = []
     text = " ".join(str(narrative.get(k, "")) for k in ("observe", "analyze"))
     kv_values = [float(v) for v in kv.values() if isinstance(v, (int, float))]
@@ -228,6 +256,7 @@ Constraints:
 
 
 def build_prompt(kv: dict, slide_ctx: dict) -> str:
+    """Narrative-generation prompt: the model may use ONLY the kv facts."""
     facts_lines = [f"- {k}: {v}" for k, v in kv.items()]
     facts = "\n".join(facts_lines)
     return PROMPT_TEMPLATE.format(
@@ -239,8 +268,9 @@ def build_prompt(kv: dict, slide_ctx: dict) -> str:
 
 # ── layouts ───────────────────────────────────────────────────────────────────
 
-MAX_TABLE_ROWS = 10
-MAX_TABLE_COLS = 5
+# single source of truth for the 10x5 law (aliases kept for callers)
+MAX_TABLE_ROWS = MAX_ROWS
+MAX_TABLE_COLS = MAX_COLS
 
 LAYOUT_FOR_CONTENT = {
     "exec_summary": "Title and Content",

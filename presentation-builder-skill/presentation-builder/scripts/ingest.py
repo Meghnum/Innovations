@@ -1,8 +1,23 @@
+from __future__ import annotations
+
 from pathlib import Path
-import polars as pl
-import fitz  # PyMuPDF
+
+try:
+    import polars as pl
+except ImportError as _e:  # pragma: no cover
+    raise ImportError(
+        "presentation-builder requires 'polars' — pip install polars "
+        "(use polars-lts-cpu on emulated/older CPUs)") from _e
+
+# SKILL.md failure mode: very large files are sampled, never fully loaded.
+MAX_INGEST_ROWS = 5_000_000
+
 
 def _ingest_pdf(p: Path) -> dict:
+    try:
+        import fitz  # PyMuPDF — imported lazily so CSV/XLSX ingest works without it
+    except ImportError:
+        return {"error": "PDF ingestion requires PyMuPDF — pip install PyMuPDF"}
     doc = fitz.open(p)
     tables = []
     text_blocks = []
@@ -48,15 +63,26 @@ def _ingest_pdf(p: Path) -> dict:
 
 
 def ingest(file_path: str) -> dict:
+    """Load a CSV/XLSX/PDF into {"dataframe": pl.DataFrame, "metadata": {...}}
+    or {"error": <plain reason>}. CSVs larger than MAX_INGEST_ROWS are
+    sampled (first rows) with a parse warning — never fully materialised."""
     p = Path(file_path)
     if not p.exists():
         return {"error": f"file not found: {file_path}"}
     ext = p.suffix.lower()
+    warnings = []
     try:
         if ext == ".csv":
-            df = pl.read_csv(p)
+            # n_rows stops reading at the cap — a 100M-row export is never
+            # fully materialised (SKILL.md: sample and warn)
+            df = pl.read_csv(p, n_rows=MAX_INGEST_ROWS + 1)
+            if df.height > MAX_INGEST_ROWS:
+                df = df.head(MAX_INGEST_ROWS)
+                warnings.append(
+                    f"large file: loaded the first {MAX_INGEST_ROWS:,} rows only "
+                    f"(skill size cap); figures describe that sample")
         elif ext in (".xlsx", ".xls"):
-            df = pl.read_excel(p)
+            df = pl.read_excel(p)   # xlsx sheets cap at ~1M rows; no sampling needed
         elif ext == ".pdf":
             return _ingest_pdf(p)
         else:
@@ -69,7 +95,7 @@ def ingest(file_path: str) -> dict:
             "source": str(p),
             "rows": df.height,
             "cols": df.width,
-            "parse_warnings": [],
+            "parse_warnings": warnings,
             "file_type": ext.lstrip("."),
         },
     }

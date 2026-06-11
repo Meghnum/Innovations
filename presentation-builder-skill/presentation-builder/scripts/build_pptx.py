@@ -1,6 +1,12 @@
+from __future__ import annotations
+
 from pathlib import Path
-from pptx import Presentation
-from pptx.util import Inches, Pt
+try:
+    from pptx import Presentation
+    from pptx.util import Inches, Pt
+except ImportError as _e:  # pragma: no cover
+    raise ImportError(
+        "presentation-builder requires 'python-pptx' — pip install python-pptx") from _e
 import os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from render import pick_layout  # sibling module; no package needed
@@ -8,12 +14,14 @@ from render import pick_layout  # sibling module; no package needed
 DEFAULT_TEMPLATE = Path(__file__).parent.parent / "assets" / "default_template.pptx"
 
 
-def _resolve_template(template_path: str | None) -> str:
+def _resolve_template(template_path: str | None) -> str | None:
+    """Explicit template if it exists, else the shipped default, else None
+    (python-pptx then starts from its built-in blank template)."""
     if template_path and Path(template_path).exists():
         return template_path
     if DEFAULT_TEMPLATE.exists():
         return str(DEFAULT_TEMPLATE)
-    return None  # python-pptx falls back to its built-in default template
+    return None
 
 
 def _add_text(text_frame, text: str, font_size: int = 18):
@@ -89,6 +97,10 @@ def _generate_exclusions_slide(prs, exclusions: list):
 
 
 def build_deck(outline: dict, template_path: str | None, out_path: str) -> dict:
+    """Assemble the deck. Returns {"pptx_path", "slide_count"}.
+    Excluded slides and any slide that fails to build are reported on the
+    Exclusions slide instead of crashing the whole deck (SKILL.md failure
+    mode: skip and log — never silent-fail)."""
     template = _resolve_template(template_path)
     prs = Presentation(template) if template else Presentation()
     exclusions = []
@@ -99,7 +111,20 @@ def build_deck(outline: dict, template_path: str | None, out_path: str) -> dict:
                 "reason": slide_data.get("reason", "no reason provided"),
             })
             continue
-        _add_slide(prs, slide_data)
+        png = slide_data.get("chart_png")
+        if png and not Path(png).exists():    # pre-check: keeps the deck free of half-built slides
+            exclusions.append({
+                "title": slide_data.get("title", "(untitled)"),
+                "reason": f"chart image missing: {png}",
+            })
+            continue
+        try:
+            _add_slide(prs, slide_data)
+        except Exception as e:
+            exclusions.append({
+                "title": slide_data.get("title", "(untitled)"),
+                "reason": f"slide build failed: {e}",
+            })
     _generate_exclusions_slide(prs, exclusions)
     Path(out_path).parent.mkdir(parents=True, exist_ok=True)
     prs.save(out_path)
