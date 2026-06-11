@@ -181,14 +181,20 @@ def profile(df: pl.DataFrame) -> dict:
         col: round(100.0 * n / df.height, 2)
         for col, n in zip(df.columns, nulls)
     }
+    # PII columns are excluded from every value-bearing statistic: a card
+    # column's min/max IS a card number, and a DOB column must not drive the
+    # date range. Only their names (schema/null_pct/pii_columns) survive —
+    # this dict travels into logs/LLM context.
+    pii = _detect_pii(df)
+    safe = df.drop(pii) if pii else df
     return {
         "schema": schema,
         "dtypes": dict(schema),  # alias (own copy: callers may mutate one view)
         "null_pct": null_pct,
-        "distributions": _distributions(df),
-        "outliers": _detect_outliers(df),
-        "date_range": _date_range(df),
-        "pii_columns": _detect_pii(df),
+        "distributions": _distributions(safe),
+        "outliers": _detect_outliers(safe),
+        "date_range": _date_range(safe),
+        "pii_columns": pii,
     }
 
 

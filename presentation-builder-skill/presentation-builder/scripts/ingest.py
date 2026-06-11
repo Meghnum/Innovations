@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 try:
@@ -65,9 +66,16 @@ def _ingest_pdf(p: Path) -> dict:
 def ingest(file_path: str) -> dict:
     """Load a CSV/XLSX/PDF into {"dataframe": pl.DataFrame, "metadata": {...}}
     or {"error": <plain reason>}. CSVs larger than MAX_INGEST_ROWS are
-    sampled (first rows) with a parse warning — never fully materialised."""
-    p = Path(file_path)
-    if not p.exists():
+    sampled (first rows) with a parse warning — never fully materialised.
+
+    Reads the caller's own upload, resolved to its real path. Set the
+    CLAIMS_DATA_ROOT env var (shared with the claims skill) to confine reads
+    to one directory — paths outside it are refused."""
+    p = Path(os.path.realpath(file_path))
+    root = os.environ.get("CLAIMS_DATA_ROOT")
+    if root and not str(p).startswith(os.path.realpath(root) + os.sep):
+        return {"error": "path is outside the allowed data directory (CLAIMS_DATA_ROOT)"}
+    if not p.is_file():
         return {"error": f"file not found: {file_path}"}
     ext = p.suffix.lower()
     warnings = []
