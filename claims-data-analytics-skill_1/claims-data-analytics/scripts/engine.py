@@ -5,21 +5,43 @@ Filter-agnostic claims engine (glossary-driven, no indicator assumptions).
   derive_state(df, schema) -> closed/open/pending/reopened/declined from real cols
   compute(metric, ...)     -> apply KPI logic; {value,audit} or {needs,reason}
 
-Status derivation is pinned to real values:
-  - Claim Status Derived / Claim Status Original take 'closed' | 'open' (exact).
-  - Reopened comes from the reopened-date column (status has no 'reopened' value).
+Status derivation is pinned to real values (assets/status_value_map.json):
+  - Claim Status Derived / Original map 'opened'/'closed' -> open/closed.
+  - Sub-states (reopened / closed after reopened / declined) live in the
+    secondary-status layer only, matched by literal value.
   - Genius Claim Status has many values -> NOT used to auto-derive state; the
     engine asks for a value->state mapping if that's all there is.
 """
 from __future__ import annotations
-import json, os, re
+import json, os, re, warnings
+from typing import Any, Dict, Iterable, List, Optional, Tuple
+
 import pandas as pd
 
 _HERE = os.path.dirname(__file__)
-try:
-    _RAW = json.load(open(os.path.join(_HERE, "..", "assets", "kpi_catalogue.json")))
-except Exception:
-    _RAW = []
+
+
+def _load_asset(name, default, want=(dict, list)):
+    """Load a JSON asset relative to this script (works packaged or in-repo).
+    A missing/corrupt/mis-shaped asset degrades to `default` but is WARNED
+    about — the engine answering 'not found' because its config silently
+    failed to load would be indistinguishable from a real 'not in catalogue'."""
+    path = os.path.join(_HERE, "..", "assets", name)
+    try:
+        with open(path) as f:
+            data = json.load(f)
+    except Exception as ex:
+        warnings.warn("claims engine: could not load asset %s (%s); "
+                      "running with defaults" % (name, ex))
+        return default
+    if not isinstance(data, want):
+        warnings.warn("claims engine: asset %s has unexpected shape; "
+                      "running with defaults" % name)
+        return default
+    return data
+
+
+_RAW = _load_asset("kpi_catalogue.json", [])
 if isinstance(_RAW, dict):                 # new form: {apps, rag_thresholds, metrics, locations}
     _CAT  = _RAW.get("metrics", [])
     _APPS = _RAW.get("apps", {})
@@ -28,19 +50,27 @@ if isinstance(_RAW, dict):                 # new form: {apps, rag_thresholds, me
     _ENTITY_MAP = _RAW.get("entity_map", {})
 else:                                       # legacy form: a bare list of metrics
     _CAT, _APPS, _RAG, _LOCATIONS, _ENTITY_MAP = _RAW, {}, {}, [], {}
+
+
+def _n(s: Any) -> str:
+    return re.sub(r"[^a-z0-9]", "", str(s).lower())
+
+
+# normalised-name indexes, built once — query lookups never re-normalise the catalogue
 _CAT_BY_NAME = {}
 for m in _CAT:
-    _CAT_BY_NAME.setdefault(re.sub(r"[^a-z0-9]", "", m["name"].lower()), m)
+    _CAT_BY_NAME.setdefault(_n(m["name"]), m)
+_CAT_NORM = [(_n(m["name"]), m) for m in _CAT]
+_LOC_NORM = [(_n(r.get("name")), r) for r in _LOCATIONS]
 
 
-def where_to_see(query):
+def where_to_see(query: Any) -> List[Dict[str, Any]]:
     """Which app(s) hold a metric, with link placeholders — for 'where can I see X' questions.
     Prefers exact name matches, then prefix, then contains; returns every app for the best tier."""
-    q = re.sub(r"[^a-z0-9]", "", str(query).lower())
+    q = _n(query)
     qs = q.rstrip("s")
     exact, prefix, contains = [], [], []
-    for m in _CAT:
-        nm = re.sub(r"[^a-z0-9]", "", m["name"].lower())
+    for nm, m in _CAT_NORM:
         app = m.get("app"); info = _APPS.get(app, {})
         row = {"metric": m["name"], "app": info.get("display", app), "url": info.get("url")}
         if nm == q or nm == qs:
@@ -58,16 +88,14 @@ def where_to_see(query):
     return out
 
 
-def rag_for(metric):
+def rag_for(metric: Any) -> Optional[Dict[str, Any]]:
     """Owner-documented Red/Amber/Green thresholds for a metric, if any."""
-    return _RAG.get(re.sub(r"[^a-z0-9]", "", str(metric).lower()))
+    return _RAG.get(_n(metric))
 
-def _n(s): return re.sub(r"[^a-z0-9]", "", str(s).lower())
-
-try:
-    _STATUS_MAP = json.load(open(os.path.join(_HERE, "..", "assets", "status_value_map.json")))
-except Exception:
-    _STATUS_MAP = {}
+_STATUS_MAP = _load_asset("status_value_map.json", {}, want=dict)
+# lowered value->state maps per status layer, built once
+_VMAPS = {k: {vk.lower(): vv for vk, vv in v["values"].items()}
+          for k, v in _STATUS_MAP.items() if isinstance(v, dict) and "values" in v}
 
 
 CLOSED_VALUES = {"closed"}
@@ -100,15 +128,12 @@ CONCEPTS = {
 
 # concept aliases may be overridden/extended from config (assets/column_synonyms.json),
 # keeping the in-code dict above only as a default.
-try:
-    _cs = json.load(open(os.path.join(_HERE, "..", "assets", "column_synonyms.json")))
-    if isinstance(_cs.get("concept_aliases"), dict) and _cs["concept_aliases"]:
-        CONCEPTS = _cs["concept_aliases"]
-except Exception:
-    pass
+_cs = _load_asset("column_synonyms.json", {}, want=dict)
+if isinstance(_cs.get("concept_aliases"), dict) and _cs["concept_aliases"]:
+    CONCEPTS = _cs["concept_aliases"]
 
 
-def resolve_schema(columns):
+def resolve_schema(columns: Iterable[Any]) -> Dict[str, Any]:
     n2a = {_n(c): c for c in columns}
     schema, used = {}, set()
     for concept, names in CONCEPTS.items():
@@ -119,7 +144,7 @@ def resolve_schema(columns):
     return {"concepts": schema, "unmapped": [c for c in columns if c not in used]}
 
 
-def status_columns(schema):
+def status_columns(schema: Dict[str, Any]) -> List[Tuple[str, str]]:
     """Status columns present, in preference order, with their concept name."""
     c = schema["concepts"]; out = []
     for k in ("status_secondary", "status_derived", "status_original", "status_genius"):
@@ -127,8 +152,17 @@ def status_columns(schema):
     return out
 
 
-def distinct_values(df, col):
-    return sorted(df[col].dropna().astype(str).str.strip().unique().tolist())
+def distinct_values(df: pd.DataFrame, col: str) -> List[str]:
+    # stringify per DISTINCT value, not per row (same set either way)
+    vals = pd.Series(df[col].dropna().unique()).astype(str).str.strip()
+    return sorted(set(vals.tolist()))
+
+
+def _norm_uniques(s):
+    """(uniques, lowered/stripped string form of each) — the per-distinct-value
+    normalisation used to match status values without casting whole columns."""
+    u = s.dropna().unique()
+    return u, pd.Series(u).astype(str).str.strip().str.lower()
 
 
 def _status_mask(df, schema, state):
@@ -144,8 +178,9 @@ def _status_mask(df, schema, state):
     if target in subs:
         spec = subs[target]; col = c.get(spec["concept"])
         if col and col in df.columns:
-            v = df[col].astype(str).str.strip().str.lower()
-            return v == spec["value"].lower(), f"{col} == '{spec['value']}'"
+            u, norm = _norm_uniques(df[col])
+            return df[col].isin(u[(norm == spec["value"].lower()).to_numpy()]), \
+                f"{col} == '{spec['value']}'"
         return None, f"sub-state '{target}' needs {spec['concept']} (not in file)"
 
     # canonical open/closed via the value map, preferring derived > original > secondary
@@ -153,16 +188,18 @@ def _status_mask(df, schema, state):
         for concept in _STATUS_MAP.get("preference_for_open_closed",
                                        ["status_derived", "status_original", "status_secondary"]):
             col = c.get(concept)
-            if col and col in df.columns and concept in _STATUS_MAP:
-                vmap = {k.lower(): val for k, val in _STATUS_MAP[concept]["values"].items()}
-                mapped = df[col].astype(str).str.strip().str.lower().map(vmap)
-                if target in set(mapped.dropna().unique()):
-                    return mapped == target, f"{col} -> '{target}' (recorded value map)"
+            if col and col in df.columns and concept in _VMAPS:
+                u, norm = _norm_uniques(df[col])
+                hit = (norm.map(_VMAPS[concept]) == target).to_numpy()
+                if hit.any():
+                    return df[col].isin(u[hit]), f"{col} -> '{target}' (recorded value map)"
         # date fallback only if no status column resolved it
-        if target == "closed" and c.get("closed_date"):
-            return df[c["closed_date"]].notna(), f"{c['closed_date']} populated"
-        if target == "open" and c.get("closed_date"):
-            return df[c["closed_date"]].isna(), f"{c['closed_date']} empty"
+        cdate = c.get("closed_date")
+        if cdate and cdate in df.columns:
+            if target == "closed":
+                return df[cdate].notna(), f"{cdate} populated"
+            if target == "open":
+                return df[cdate].isna(), f"{cdate} empty"
 
     present = [col for _, col in status_columns(schema)]
     return None, (f"state '{state}' not resolvable from status column(s) "
@@ -170,7 +207,7 @@ def _status_mask(df, schema, state):
                   f"column/value represents it (e.g. 'declined' is not in the map yet)")
 
 
-def derive_state(df, schema):
+def derive_state(df: pd.DataFrame, schema: Dict[str, Any]) -> Tuple[dict, Dict[str, str]]:
     """Thin wrapper kept for the audit: reports which status columns/values exist."""
     cols = status_columns(schema)
     methods = {concept: f"{col} values: {distinct_values(df, col)[:8]}" for concept, col in cols}
@@ -226,10 +263,7 @@ _DEFAULT_HINTS = {
                       ["outstanding reserve","oslr_usd"],["oslr","oslr_usd"]],
     "life_keywords": ["cycle time","time to settle","claim life","days to settle","age "],
 }
-try:
-    _HINTS = json.load(open(os.path.join(_HERE, "..", "assets", "inference_hints.json")))
-except Exception:
-    _HINTS = {}
+_HINTS = _load_asset("inference_hints.json", {}, want=dict)
 _POP_HINTS  = _HINTS.get("population_hints", _DEFAULT_HINTS["population_hints"])
 _MEAS_HINTS = _HINTS.get("measure_hints", _DEFAULT_HINTS["measure_hints"])
 _LIFE_KW    = _HINTS.get("life_keywords", _DEFAULT_HINTS["life_keywords"])
@@ -263,15 +297,29 @@ def _mask(df, schema, slice_is, pop):
 def _distinct(df, schema, mask, period_cols):
     idc = schema["concepts"].get("claim_id")
     if not idc: return None, "no claim identifier column"
-    sub = df[mask]
+    if (df.columns == idc).sum() != 1:
+        return None, (f"claim identifier column '{idc}' is missing or duplicated "
+                      f"in the file — can't count claims unambiguously")
     if period_cols:
         pcs = [schema["concepts"].get(p, p) for p in period_cols]
         pcs = [p for p in pcs if p in df.columns]
-        if pcs: return int(sub.groupby(pcs)[idc].nunique().sum()), f"distinct {idc} per {pcs}, summed"
-    return int(sub[idc].nunique()), f"distinct {idc} (global)"
+        if pcs:
+            # slice only the columns the count needs — frames are wide
+            sub = df.loc[mask, pcs + ([idc] if idc not in pcs else [])]
+            return int(sub.groupby(pcs)[idc].nunique().sum()), f"distinct {idc} per {pcs}, summed"
+    return int(df.loc[mask, idc].nunique()), f"distinct {idc} (global)"
 
 
-def compute(metric, df, schema, slice_is=None, period_cols=None, user_filter=None):
+def compute(metric: str, df: pd.DataFrame, schema: Dict[str, Any],
+            slice_is: Optional[str] = None, period_cols: Optional[List[str]] = None,
+            user_filter: Optional[pd.Series] = None) -> Dict[str, Any]:
+    """Compute a catalogue metric over any slice of claims data.
+
+    Returns {"value": number|None, "audit": {...}} on success, or
+    {"needs": <what>, "reason": <plain question>} when the file can't answer it
+    — never a guess and never an exception for missing/ambiguous columns.
+    `slice_is` declares what the file already is (e.g. "closed"); `period_cols`
+    requests distinct-per-period counting; `user_filter` is a boolean row mask."""
     spec = SPECS.get(metric); inferred = False
     if spec is None:
         entry = _CAT_BY_NAME.get(_n(metric))
@@ -302,18 +350,23 @@ def compute(metric, df, schema, slice_is=None, period_cols=None, user_filter=Non
         num_pop, den = arg
         mn, hn = _mask(df, schema, slice_is, num_pop)
         if mn is None: return {"needs": num_pop, "reason": hn}
-        num, _ = _distinct(df, schema, mn, period_cols)
+        num, cm = _distinct(df, schema, mn, period_cols)
+        if num is None: return {"needs": "claim_id", "reason": cm}
         if isinstance(den, tuple):
             tot = 0
             for p in den:
                 mp, hp = _mask(df, schema, slice_is, p)
                 if mp is None: return {"needs": p, "reason": hp}
-                v, _ = _distinct(df, schema, mp, period_cols); tot += v
+                v, cm = _distinct(df, schema, mp, period_cols)
+                if v is None: return {"needs": "claim_id", "reason": cm}
+                tot += v
             den_v, hd = tot, " + ".join(den)
         else:
             md, hd0 = _mask(df, schema, slice_is, den)
             if md is None: return {"needs": den, "reason": hd0}
-            den_v, hd = _distinct(df, schema, md, period_cols)[0], den
+            den_v, cm = _distinct(df, schema, md, period_cols)
+            if den_v is None: return {"needs": "claim_id", "reason": cm}
+            hd = den
         aud["method"] = f"distinct({num_pop}) / distinct({hd})"
         return {"value": (num/den_v if den_v else None), "audit": aud}
 
@@ -341,23 +394,56 @@ def compute(metric, df, schema, slice_is=None, period_cols=None, user_filter=Non
         aud["method"] = f"{meth} over {how}"; return {"value": val, "audit": aud}
 
 
-def breakdown(df, schema, by, agg="count", measure=None, user_filter=None):
+def breakdown(df: pd.DataFrame, schema: Dict[str, Any], by: str, agg: str = "count",
+              measure: Optional[str] = None,
+              user_filter: Optional[pd.Series] = None) -> Dict[str, Any]:
     """General group-by: count distinct claims (or sum/mean/median of a measure)
     by ANY column. `by` may be a glossary concept or a literal header. Values are
     whatever is in the data — nothing about them is hardcoded."""
     col = schema["concepts"].get(by, by)
     if col not in df.columns:
         return {"needs": "column", "reason": f"column '{by}' not in the file."}
+    if (df.columns == col).sum() > 1:
+        return {"needs": "column",
+                "reason": f"column '{col}' appears more than once in the file — ambiguous."}
     if user_filter is not None: df = df[user_filter]
-    g = df.groupby(df[col].astype(str).str.strip())
+    # Group key = stripped string form of the column. Built per DISTINCT value and
+    # mapped back (NA rows keep their historical labels 'None'/'nan'/'NaT', formed
+    # on the NA subset only) — except for high-cardinality object columns, where a
+    # plain whole-column cast measures faster. Both paths give identical keys.
+    raw = df[col]
+    hicard = raw.dtype == object and raw.head(50_000).nunique() > 25_000
+    if not hicard:
+        uniques = raw.dropna().unique()
+        hicard = raw.dtype == object and len(uniques) > 100_000
+    if hicard:
+        key = raw.astype(str).str.strip()
+    else:
+        labels = pd.Series(uniques).astype(str).str.strip()
+        key = raw.map(dict(zip(uniques, labels)))
+        na = raw.isna()
+        if na.any():
+            flavours = pd.unique(raw[na])      # ≤ a few NA flavours (None/nan/NaT)
+            if len(flavours) == 1:
+                key = key.fillna(str(flavours[0]).strip())
+            else:
+                key[na] = raw[na].astype(str).str.strip()
+    g = df.groupby(key)
     idc = schema["concepts"].get("claim_id")
     if agg == "count":
+        if idc and (df.columns == idc).sum() != 1:
+            return {"needs": "claim_id",
+                    "reason": (f"claim identifier column '{idc}' is missing or duplicated "
+                               f"in the file — can't count claims unambiguously.")}
         res = (g[idc].nunique() if idc else g.size())
         method = f"count distinct {idc or 'rows'} by {col}"
     else:
         mc = schema["concepts"].get(measure, measure)
         if mc not in df.columns:
             return {"needs": "measure", "reason": f"measure column '{measure}' not in the file."}
+        if (df.columns == mc).sum() > 1:
+            return {"needs": "measure",
+                    "reason": f"measure column '{mc}' appears more than once in the file — ambiguous."}
         res = getattr(g[mc], {"sum":"sum","mean":"mean","median":"median"}[agg])()
         method = f"{agg}({mc}) by {col}"
     out = {str(k): (int(v) if float(v).is_integer() else float(v)) for k, v in res.items()}
@@ -374,7 +460,7 @@ for _src in ("entity_column", "business_entity_column"):
 _ENT_SUB = {k.strip().lower(): v for k, v in (_ENTITY_MAP.get("cgm_subtype") or {}).items()}
 
 
-def resolve_entity(value):
+def resolve_entity(value: Any) -> Dict[str, Optional[str]]:
     """Map a raw Entity / Business Entity value to canonical Company | CGM.
     Returns {entity, cgm_type, matched, source}. Unknown -> entity=None (ask, never guess)."""
     v = str(value).strip(); k = v.lower()
@@ -388,7 +474,7 @@ def resolve_entity(value):
     return {"entity": None, "cgm_type": None, "matched": None, "source": v}
 
 
-def add_entity_column(df, schema):
+def add_entity_column(df: pd.DataFrame, schema: Dict[str, Any]) -> Tuple[pd.DataFrame, Dict[str, Any]]:
     """Add canonical '__entity__' (Company | CGM | None) from the Business Entity column
     if present, else the Entity column. Returns (df, audit). Applies to MAR-Operational,
     MAR-Conduct and Claim One Stop exports."""
@@ -397,13 +483,21 @@ def add_entity_column(df, schema):
     if not src or src not in df.columns:
         return df, {"needs": "entity column",
                     "reason": "no 'Business Entity' or 'Entity' column found in the file."}
-    df = df.copy()
-    df["__entity__"] = df[src].map(lambda x: resolve_entity(x)["entity"])
-    unknown = sorted(df.loc[df["__entity__"].isna(), src].astype(str).str.strip().unique().tolist())
+    col = df[src]
+    # Resolve each DISTINCT source value once (an entity column holds a handful of
+    # values however many rows there are), then map back via pandas' C path.
+    uniques = pd.unique(col)
+    lut = {u: resolve_entity(u)["entity"] for u in uniques if not pd.isna(u)}
+    ent = col.map(lut).astype(object)
+    df = df.copy(deep=False)         # new frame; the added column never reaches the caller's df
+    df["__entity__"] = ent.where(ent.notna(), None)
+    bad = [u for u in uniques if pd.isna(u) or lut.get(u) is None]
+    unknown = sorted(set(pd.Series(bad, dtype=object).astype(str).str.strip())) if bad else []
     return df, {"derived_from": src, "unmapped_values": unknown}
 
 
-def entity_split(df, schema, measure=None, agg="count"):
+def entity_split(df: pd.DataFrame, schema: Dict[str, Any], measure: Optional[str] = None,
+                 agg: str = "count") -> Dict[str, Any]:
     """Split by canonical entity (Company vs CGM): count distinct claims by default,
     or agg a measure. Unmapped source values are excluded from the table and surfaced
     in the audit instead of being bucketed (robust across pandas versions)."""
@@ -419,17 +513,16 @@ def entity_split(df, schema, measure=None, agg="count"):
     return out
 
 
-def where_to_find(query):
+def where_to_find(query: Any) -> List[Dict[str, Any]]:
     """Where a metric/field actually lives: app + the exact Sheet(s) (the location),
     grounded in the KPI list's 'Sheet' column. Exact name match if one exists, else
     every field/metric whose name contains the term — grouped by app, with sheets and
     the matched variants (e.g. currency variants). Sheets cited come ONLY from the
     data; never invent one."""
-    q = re.sub(r"[^a-z0-9]", "", str(query).lower()); qs = q.rstrip("s")
-    def n(s): return re.sub(r"[^a-z0-9]", "", str(s).lower())
+    qs = _n(query).rstrip("s")
     # comprehensive: every field/metric whose name contains the term (location-finding
     # wants breadth, not a single exact hit)
-    hits = [r for r in _LOCATIONS if qs and qs in n(r.get("name"))]
+    hits = [r for nm, r in _LOC_NORM if qs and qs in nm]
     out = {}
     for r in hits:
         app = r.get("app"); info = _APPS.get(app, {})
@@ -477,7 +570,7 @@ def _app_link(name, url):
     return f"**{name}**"
 
 
-def fmt_number(v, money=False, pct=False):
+def fmt_number(v: Any, money: bool = False, pct: bool = False) -> str:
     """Thousands-separated; 2dp only when needed; optional $ / % affix."""
     try:
         f = float(v)
@@ -489,7 +582,7 @@ def fmt_number(v, money=False, pct=False):
     return s
 
 
-def _audit_line(audit):
+def _audit_line(audit: Any) -> str:
     """Compact, muted one-liner from an audit block. Unmapped values are surfaced
     visibly (they matter); everything else is a quiet footnote."""
     if not isinstance(audit, dict): return ""
@@ -511,14 +604,16 @@ def _audit_line(audit):
     return "\n".join(out)
 
 
-def fmt_value(result, label=None, measure=None):
+def fmt_value(result: Dict[str, Any], label: Optional[str] = None,
+              measure: Optional[str] = None) -> str:
     money = _is_money(measure or label); pct = _is_pct(measure or label)
     head = f"**{label or 'Result'}:** {fmt_number(result.get('value'), money, pct)}"
     foot = _audit_line(result.get("audit"))
     return head + ("\n\n" + foot if foot else "")
 
 
-def fmt_breakdown(result, title=None, measure=None):
+def fmt_breakdown(result: Dict[str, Any], title: Optional[str] = None,
+                  measure: Optional[str] = None) -> str:
     val = result.get("value", {}) or {}
     money = _is_money(measure or title); pct = _is_pct(measure or title)
     rows = sorted(val.items(), key=lambda kv: (-float(kv[1]) if isinstance(kv[1], (int, float)) else 0, str(kv[0])))
@@ -534,7 +629,7 @@ def fmt_breakdown(result, title=None, measure=None):
     return "\n".join(tbl) + ("\n\n" + foot if foot else "")
 
 
-def fmt_where_to_find(rows, term=None):
+def fmt_where_to_find(rows: List[Dict[str, Any]], term: Optional[str] = None) -> str:
     if not rows:
         return f"I couldn't find **{term}** in the catalogue." if term else "Nothing found."
     out = [f"**Where to find {term}:**" if term else "**Where to find it:**", ""]
@@ -547,7 +642,7 @@ def fmt_where_to_find(rows, term=None):
     return "\n".join(out)
 
 
-def render(result, label=None, measure=None):
+def render(result: Any, label: Optional[str] = None, measure: Optional[str] = None) -> str:
     """Dispatch any engine result to clean text. Use this for everything a user sees."""
     if isinstance(result, list):                      # where_to_find output
         return fmt_where_to_find(result, term=label)

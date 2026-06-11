@@ -27,22 +27,33 @@ def _col(df, cols, canon):
 
 
 def _eq(df, cols, canon, val):
-    return df[_col(df, cols, canon)].astype(str).str.strip() == str(val)
+    # string-compare per DISTINCT value, then a C-path isin — equivalent to
+    # astype(str).str.strip() == str(val) without casting the whole column
+    s = df[_col(df, cols, canon)]
+    u = s.dropna().unique()
+    match = (pd.Series(u).astype(str).str.strip() == str(val)).to_numpy()
+    return s.isin(u[match])
 
 
-def _filter(df, cols, conds):
+def _mask(df, cols, conds):
     m = pd.Series(True, index=df.index)
     for canon, val in conds.items():
         m &= _eq(df, cols, canon, val)
-    return df[m]
+    return m
+
+
+def _filter(df, cols, conds):
+    return df[_mask(df, cols, conds)]
 
 
 def _distinct_per_period(df, cols, id_canon, dim_canons, conds):
-    sub = _filter(df, cols, conds)
+    m = _mask(df, cols, conds)
     idc = _col(df, cols, id_canon)
     if not dim_canons:
-        return int(sub[idc].nunique())
+        return int(df.loc[m, idc].nunique())
     dims = [_col(df, cols, d) for d in dim_canons]
+    # slice only the columns the count needs — these exports are wide
+    sub = df.loc[m, dims + [idc]]
     if sub.empty:
         return 0
     return int(sub.groupby(dims)[idc].nunique().sum())
@@ -126,9 +137,9 @@ def volume_1yr_static(df, cols, grain="claim"):
 
 
 def average_time_to_settle(df, cols, grain="claim"):
-    sub = _filter(df, cols, {"CLOSED_CLAIM_INDICATOR":1})
+    m = _mask(df, cols, {"CLOSED_CLAIM_INDICATOR":1})
     my, cn, ld = _col(df,cols,"MonthYear"), _col(df,cols,"CLAIM_NUMBER"), _col(df,cols,"CLAIM_LIFE_DAYS_NUMBER")
-    inner = sub.groupby([my, cn])[ld].mean()
+    inner = df.loc[m, [my, cn, ld]].groupby([my, cn])[ld].mean()
     val = float(inner.mean()) if len(inner) else None
     return {"value": val, "audit": _aud("Average Time to Settle",
         "avg over (MonthYear,CLAIM_NUMBER) of avg(CLAIM_LIFE_DAYS_NUMBER) where CLOSED=1",
@@ -137,9 +148,10 @@ def average_time_to_settle(df, cols, grain="claim"):
 
 
 def acpsc(df, cols, grain="claim"):
-    sub = _filter(df, cols, {"CLOSED_CLAIM_INDICATOR":1})
+    m = _mask(df, cols, {"CLOSED_CLAIM_INDICATOR":1})
     c = _col(df,cols,"INCURRED_TOTAL_GROSS_USD_AMT")
-    val = float(sub[c].mean()) if len(sub) else None
+    s = df.loc[m, c]
+    val = float(s.mean()) if len(s) else None
     return {"value": val, "audit": _aud("ACPSC",
         "mean(INCURRED_TOTAL_GROSS_USD_AMT) over rows where CLOSED=1",
         ["INCURRED_TOTAL_GROSS_USD_AMT","CLOSED_CLAIM_INDICATOR"], None,
@@ -147,9 +159,10 @@ def acpsc(df, cols, grain="claim"):
 
 
 def acpoc(df, cols, grain="claim"):
-    sub = _filter(df, cols, {"PENDING_CLAIM_INDICATOR":1})
+    m = _mask(df, cols, {"PENDING_CLAIM_INDICATOR":1})
     c = _col(df,cols,"INCURRED_TOTAL_GROSS_USD_AMT")
-    val = float(sub[c].mean()) if len(sub) else None
+    s = df.loc[m, c]
+    val = float(s.mean()) if len(s) else None
     return {"value": val, "audit": _aud("ACPOC",
         "mean(INCURRED_TOTAL_GROSS_USD_AMT) over rows where PENDING=1",
         ["INCURRED_TOTAL_GROSS_USD_AMT","PENDING_CLAIM_INDICATOR"], None)}
@@ -179,9 +192,9 @@ def nominal_reserves(df, cols, grain="claim"):
 
 
 def nominal_age(df, cols, grain="claim"):
-    sub = _filter(df, cols, {"NOMINAL_INDICATOR":1})
+    m = _mask(df, cols, {"NOMINAL_INDICATOR":1})
     my, ld = _col(df,cols,"MonthYear"), _col(df,cols,"CLAIM_LIFE_DAYS_NUMBER")
-    inner = sub.groupby(my)[ld].mean()
+    inner = df.loc[m, [my, ld]].groupby(my)[ld].mean()
     val = float(inner.mean()) if len(inner) else None
     return {"value": val, "audit": _aud("Nominal Age",
         "avg over MonthYear of avg(CLAIM_LIFE_DAYS_NUMBER) where NOMINAL=1",
@@ -234,7 +247,9 @@ CANONICAL_COLUMNS = [
 ]
 
 
-def compute(kpi, df, cols=None, grain="claim"):
+def compute(kpi: str, df: pd.DataFrame, cols=None, grain: str = "claim") -> dict:
+    """Run one MAR-Operational KPI. Returns {'value', 'audit'};
+    raises KeyError for unknown KPIs or missing required columns."""
     cols = cols or {}
     if kpi not in REGISTRY:
         raise KeyError(f"No MAR-Operational implementation for '{kpi}'. Available: {sorted(REGISTRY)}")

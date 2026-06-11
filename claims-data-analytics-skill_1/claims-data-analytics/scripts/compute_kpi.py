@@ -109,19 +109,22 @@ def _flagsum(df, cols, canonical):
     return float(df[_col(df, cols, canonical)].fillna(0).sum())
 
 
+def _flag_ratio(df, cols, num, den_canons):
+    """num / sum(dens) over flag sums, None on a zero denominator.
+    Each flag column is summed once (the denominator first, as before)."""
+    den = sum(_flagsum(df, cols, c) for c in den_canons)
+    return (_flagsum(df, cols, num) / den) if den else None
+
+
 REGISTRY = {
     ("MAR-Operational", "USD Incurred"):
         lambda df, cols: usd_incurred(df, cols),
     ("MAR-Operational", "Closing Ratio"):
-        lambda df, cols: (_flagsum(df, cols, "Closed Flag") / _flagsum(df, cols, "Opened Flag")
-                          if _flagsum(df, cols, "Opened Flag") else None),
+        lambda df, cols: _flag_ratio(df, cols, "Closed Flag", ["Opened Flag"]),
     ("MAR-Operational", "Net Closing Ratio"):
-        lambda df, cols: (_flagsum(df, cols, "Closed Flag") /
-                          (_flagsum(df, cols, "Opened Flag") + _flagsum(df, cols, "Reopened Flag"))
-                          if (_flagsum(df, cols, "Opened Flag") + _flagsum(df, cols, "Reopened Flag")) else None),
+        lambda df, cols: _flag_ratio(df, cols, "Closed Flag", ["Opened Flag", "Reopened Flag"]),
     ("MAR-Operational", "Reopened Ratio"):
-        lambda df, cols: (_flagsum(df, cols, "Reopened Flag") / _flagsum(df, cols, "Closed Flag")
-                          if _flagsum(df, cols, "Closed Flag") else None),
+        lambda df, cols: _flag_ratio(df, cols, "Reopened Flag", ["Closed Flag"]),
 }
 
 

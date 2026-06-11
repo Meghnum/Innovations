@@ -22,8 +22,12 @@ import json, os, re
 from difflib import SequenceMatcher
 
 _HERE = os.path.dirname(__file__)
-_FIELDS = json.load(open(os.path.join(_HERE, "..", "assets", "fields_index.json")))
-_CATALOGUE = json.load(open(os.path.join(_HERE, "..", "assets", "kpi_catalogue.json")))
+with open(os.path.join(_HERE, "..", "assets", "fields_index.json")) as _f:
+    _FIELDS = json.load(_f)
+with open(os.path.join(_HERE, "..", "assets", "kpi_catalogue.json")) as _f:
+    _RAW = json.load(_f)
+# the catalogue moved from a bare metrics list to {apps, metrics, ...}; accept both
+_CATALOGUE = _RAW.get("metrics", []) if isinstance(_RAW, dict) else _RAW
 
 
 def _norm(s: str) -> str:
@@ -70,11 +74,15 @@ def _guess_app(confident: dict):
     return [{"app": a, "matched_fields": n} for a, n in ranked]
 
 
+_CAT_NORM = [(_norm(m["name"]), m) for m in _CATALOGUE]
+
+
 def find_metric(name: str):
-    """Look up a KPI definition (for citation). Returns the catalogue entry or None."""
+    """Look up a KPI definition (for citation): exact-name matches if any,
+    else the 3 closest catalogue entries by name similarity."""
     nn = _norm(name)
-    exact = [m for m in _CATALOGUE if _norm(m["name"]) == nn]
+    exact = [m for n2, m in _CAT_NORM if n2 == nn]
     if exact:
         return exact
-    return sorted(_CATALOGUE, key=lambda m: _ratio(nn, _norm(m["name"])),
-                  reverse=True)[:3]
+    return [m for _, m in sorted(_CAT_NORM, key=lambda t: _ratio(nn, t[0]),
+                                 reverse=True)[:3]]
