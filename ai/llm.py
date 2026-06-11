@@ -319,7 +319,7 @@ class ClaimsLLM:
 
 # Added by Gemini
 # ... existing code ...
-def semantic_guardrail(loss_description: str, model_name: str = "gemma3:4b") -> Dict[str, Any]:
+def semantic_guardrail(loss_description: str, model_name: str = "llama3.2:3b") -> Dict[str, Any]:
     """
     Scans loss description for fraud/litigation red flags using local Ollama.
     """
@@ -386,7 +386,7 @@ Format strictly like this:
 def explain_precedents(
     new_claim: Dict[str, Any],
     precedents: List[Dict[str, Any]],
-    model_name: str = "gemma3:4b",
+    model_name: str = "llama3.2:3b",
 ) -> Dict[str, Any]:
     """
     Ask LLM to explain why similar past claims were approved/denied,
@@ -481,7 +481,7 @@ RULES:
 
 def batch_keyword_discovery(
     rejected_descriptions: List[str],
-    model_name: str = "gemma3:4b",
+    model_name: str = "llama3.2:3b",
     existing_keywords: Optional[List[str]] = None,
 ) -> List[Dict[str, str]]:
     """

@@ -1,11 +1,11 @@
 {
-  "version": 1,
-  "last_updated": "2026-04-16T00:00:00",
-  "updated_by": "system_default",
+  "version": 2,
+  "last_updated": "2026-04-21T00:59:58.935323",
+  "updated_by": "manager_dashboard",
   "rules": {
     "reserve_limit": {
       "enabled": true,
-      "max_value": 3000,
+      "max_value": 6500,
       "description": "Maximum nominal reserve for fast-track eligibility"
     },
     "reporting_lag": {
@@ -15,19 +15,33 @@
     },
     "injury_keywords": {
       "enabled": true,
-      "blocked_keywords": ["severe", "fatality", "bi", "bodily"],
+      "blocked_keywords": [
+        "severe",
+        "fatality",
+        "bi",
+        "bodily"
+      ],
       "description": "Injury type keywords that block fast-track"
     },
     "lob_exclusions": {
       "enabled": true,
-      "blocked_lobs": ["casualty"],
+      "blocked_lobs": [
+        "casualty"
+      ],
       "description": "Lines of business excluded from fast-track"
     }
   },
   "semantic_guardrail": {
     "red_flag_keywords": [
-      "attorney", "lawyer", "lawsuit", "litigation", "sue",
-      "fraud", "suspicious", "neck pain", "back pain"
+      "attorney",
+      "lawyer",
+      "lawsuit",
+      "litigation",
+      "sue",
+      "fraud",
+      "suspicious",
+      "neck pain",
+      "back pain"
     ],
     "min_description_length": 10
   },

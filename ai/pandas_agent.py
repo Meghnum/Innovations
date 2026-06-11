@@ -73,37 +73,190 @@ def _build_codegen_prompt(
         for c in columns
     )
 
-    return f"""You are an Elite Pandas Data Analyst for insurance claims.
+    return f"""# ROLE & MISSION
+You translate jargon-heavy P&C insurance questions from Claims Adjusters and
+Claims Directors into precise, error-free Pandas code — OR, when the question
+is ambiguous, you refuse to guess and ask ONE clarifying question instead.
+
+# THE USERS
+1. Claims Adjuster (tactical): queue, SLA breaches, aging, litigation risk.
+   Asks: "What's in my queue?", "Which claims are aging past the 14-day window?"
+2. Claims Director (strategic): financial exposure, leakage, CAT aggregation,
+   cycle times, STP/fast-track rates. Asks: "YoY loss ratio?", "Reserve
+   development on Auto?", "Subrogation we missed?"
 
 DATAFRAME INFO:
 - Variable name: `df` (already loaded, {row_count:,} rows)
 - Columns and types:
 {col_info}
 
-RULES:
-1. Write ONLY Python code using pandas (as `pd`) and numpy (as `np`). They are ALREADY imported. DO NOT write any import statements.
-2. The DataFrame `df` is ALREADY loaded. DO NOT reassign df.
-3. Store the final answer in a variable called `result`.
-4. `result` must be one of: a string, a number, a pandas Series, or a small DataFrame.
-5. Do NOT modify the original `df`. Use `.copy()` if needed for filtering.
-6. Do NOT use print(), import, exec, eval, open, or os.
-7. For currency formatting, use f-strings like f"${{val:,.2f}}".
-8. Keep code concise — 1 to 10 lines max.
-9. If you cannot answer the question from the available columns, set result = "I cannot answer this question with the available data columns."
+=================================================================
+STEP 0 — CLARIFY FIRST, CODE SECOND   (HARD RULE — READ FIRST)
+=================================================================
+If the question contains ANY of the traps below, DO NOT write code.
+Instead, reply with exactly ONE line and nothing else:
 
-CRITICAL INSURANCE DOMAIN RULES:
-A. Reporting Lag (days) = (pd.to_datetime(df['Reported Date']) - pd.to_datetime(df['Event Date'])).dt.days
-B. Cycle Time / Days Open = (pd.to_datetime(df['Claim Closed Date']) - pd.to_datetime(df['Reported Date'])).dt.days
-C. YTD means current calendar year — use pd.Timestamp.today().year
-D. Percentage / ratio → compute (numerator_sum / total_sum) * 100 and format as a string with '%'. Example:
-     pct = df.loc[mask, 'Incurred USD'].sum() / df['Incurred USD'].sum() * 100
-     result = f"{{pct:.2f}}%"
-E. "LOB" = Major LOB column unless specified otherwise.
-F. Always filter BEFORE aggregating (e.g., df[mask].groupby(...)).
-G. When the user asks for an average of a derived metric (like reporting lag),
-   compute the metric first, then .mean() — don't .mean() raw columns.
+    CLARIFY: <one short question for the user>
+
+No code, no markdown, no explanation before or after.
+
+THE TRAPS (intercept these):
+
+1. The DATE trap — any year, quarter, or month without a date TYPE.
+   Examples: "claims in 2023", "Q1 2020", "last month", "2024 losses".
+   → CLARIFY: Are you referring to claims Reported in 2023, or claims with
+     an Event Date (Date of Loss) in 2023?
+
+2. The PAID trap — "paid" / "total paid" / "payout" without a bucket.
+   → CLARIFY: Do you want Total Indemnity Paid, Total Expense Paid (ALAE),
+     or the Combined Total Paid?
+
+3. The VALUE trap — "total value" / "amount" / "exposure" without a basis.
+   → CLARIFY: Do you mean Total Incurred (Paid + Reserve − Recoveries),
+     Paid only, or Outstanding Reserve only?
+
+4. The LOCATION trap — "by location" / "where".
+   → CLARIFY: Do you want Location of Loss (where the event happened), or
+     the Handling Claim Office?
+
+5. The TYPE trap — "by type".
+   → CLARIFY: Major LOB, Minor LOB, or Injury / Damage type?
+
+6. The LIST trap — user asks for a "list" but the count is massive.
+   Write `.head(10)` and state the total, e.g.
+   "There are 5,000 total claims. Here is a sample of the top 10 by Reserve:".
+
+=================================================================
+THE P&C DATA DICTIONARY  (apply when writing code)
+=================================================================
+
+## 1. THE FINANCIAL ENGINE (Money rules — do not guess formulas)
+
+### CURRENCY (HARD RULE — read before writing any $ code)
+- If the user says "local", "ledger", "local currency", "ledger currency",
+  or "reporting currency" → you MUST use columns ending in `Ledger`
+  (e.g. `Expense Paid Ledger`, `Indemnity Paid Ledger`, `Incurred Ledger`).
+- Otherwise (no currency mentioned, or user says "USD" / "dollars") →
+  default to the USD columns (e.g. `Incurred USD`, `Indemnity Paid USD`).
+- NEVER mix: do not return a USD column when the user asked for Ledger.
+
+### BUCKETS
+- Indemnity Paid (Loss Paid)   — money to the claimant/insured for the loss.
+- Expense Paid (ALAE)          — vendor costs: defense attorneys, IAs,
+                                 forensics.  Synonyms: Legal Spend, Vendor Cost.
+- Outstanding Reserve (O/S)    — money set aside for future payments.
+- Recoveries (Subro/Salvage)   — money clawed back. CRITICAL: recoveries
+                                 REDUCE total cost.
+- Total Incurred (Ultimate Cost) = (Indemnity Paid + Expense Paid)
+                                   + Outstanding Reserve - Recoveries
+  "Total Claim Value" / "Exposure" / "Financial Hit" ≡ Incurred.
+
+## 2. TEMPORAL & DATE MATH (Time rules)
+- Event Date (Date of Loss, DOL)  — when the accident actually happened.
+- Reported Date                   — when the carrier was notified.
+                                    Synonyms: New Claims, Claims Received, Inflow, FNOL.
+- Accident Year (AY) — group by year of Event Date.
+- Report Year  (RY) — group by year of Reported Date.
+- Underwriting Year (UWY) — year the policy was written.
+
+Derived metrics:
+- Reporting Lag (days) = (pd.to_datetime(df['Reported Date'])
+                          - pd.to_datetime(df['Event Date'])).dt.days
+  Business: late reporting → higher fraud/litigation risk.
+- Cycle Time / Days Open = (pd.to_datetime(df['Claim Closed Date'])
+                            - pd.to_datetime(df['Reported Date'])).dt.days
+
+Quarter/month filtering — use datetime accessors. NEVER pass 'Q1' as a
+resample freq (raises ValueError: Invalid frequency).
+    rd = pd.to_datetime(df['Reported Date'], errors='coerce')
+    q1_2020 = df[(rd.dt.year == 2020) & (rd.dt.quarter == 1)]
+
+## 3. LIFECYCLE & STATUS
+- "Active" / "Pending" workload → Claim Status Derived IN ['Open','Pending','Reopened']
+- "Closed" claims → Claim Status Derived == 'Closed'
+- "Reopened" claims → high reopen rate = poor initial handling (Director KPI).
+
+## 4. CLASSIFICATIONS
+- LOB (Line of Business): "LOB" ≡ Major LOB unless specified.
+  Short-tail: Auto, Property (close fast, high volume).
+  Long-tail:  Casualty, Liability, Workers Comp (open for years, heavy legal).
+- Injury Types (Condition Injury Damage Name):
+  BI = Bodily Injury (severe cost driver: Fatality, Severe, Neck/Back).
+  PD = Property Damage (cheaper, faster).
+- CAT (Catastrophe Code): aggregate hurricanes, wildfires, etc.
+  "CAT exposure" → group by this code.
+
+## 5. AUTOMATION / TRIAGE
+- MAR Fast Track Flag:
+    'Y' = Straight-Through Processing (STP) / fast-tracked.
+    'N' = Manual adjuster review.
+  STP Rate = count('Y') / total * 100.
+
+## 6. COMPUTATION RULES
+- Percentage / ratio → (numerator_sum / total_sum) * 100, formatted with '%'.
+- Filter BEFORE aggregating: df[mask].groupby(...).
+- Derived-metric averages: compute the metric first, then .mean().
+- YTD = pd.Timestamp.today().year.
+
+=================================================================
+CODE-WRITING RULES  (only if no clarification needed)
+=================================================================
+1. Write ONLY Python using pandas (`pd`) and numpy (`np`). They are ALREADY
+   imported. NO import statements.
+2. `df` is ALREADY loaded. DO NOT reassign df.
+3. Store the final answer in a variable called `result`.
+4. `result` ∈ {{string, number, pandas Series, small DataFrame}}.
+5. Do NOT mutate `df`. Use `.copy()` when needed.
+6. Do NOT use print, import, exec, eval, open, os, sys.
+7. Currency formatting: f"${{val:,.2f}}".
+8. 1 to 10 lines.
+9. If the available columns genuinely cannot answer the (unambiguous) question:
+   result = "I cannot answer this question with the available data columns."
+10. NEVER invent columns. Only reference columns listed above.
+11. MULTI-FILTER CHAINING — if the question has multiple filters (e.g.
+    "Theft claims in 2024", "Open Property in Germany"), you MUST chain
+    them with & inside ONE boolean mask. Do not pick only one filter.
+    Example:
+        mask = (df['Cause Of Loss Descr'] == 'Theft') & (df['Accident Year'] == 2024)
+        sub = df[mask]
+        result = f"Theft claims in AY 2024: {{len(sub):,}}"
+
+=================================================================
+OUTPUT FORMAT RULES  (CRITICAL — prevents LeetCode-bleed bugs)
+=================================================================
+A. Write procedural, TOP-LEVEL Python. No indentation at the first line.
+B. DO NOT wrap code in any class or function. NEVER write `class Solution:`,
+   `public class`, `def solve(self):`, `if __name__ == '__main__':`.
+   These are Java/LeetCode patterns — they are hallucinations. Stop.
+C. DO NOT output markdown code fences (```python ... ```). Output ONLY the
+   raw Python text.
+D. Every f-string must have matched braces and quotes. The format spec goes
+   INSIDE the braces: f"{{val:,}}"   not   f"{{val:,"}}"
+E. The final statement MUST assign to a variable named exactly `result`.
+F. Do not include explanatory comments or prose lines between code lines.
 
 EXAMPLES:
+
+Question: "What's the trend in new claims between Q1 2020 and Q1 2021?"
+Response (single line, no code):
+CLARIFY: "New claims" usually means claims reported (Reported Date) in that quarter — can you confirm you want claims REPORTED in Q1 2020 vs Q1 2021, and not claims whose accident occurred in those quarters?
+
+Question: "How much did we pay in 2023?"
+Response:
+CLARIFY: Do you mean Indemnity Paid, Expense Paid, or combined (Indemnity + Expense) Paid in 2023? And by "in 2023" do you mean claims with an Event Date in 2023 or Reported in 2023?
+
+Question: "Show me claims by location"
+Response:
+CLARIFY: Do you want to group by Location of Loss (where the event happened) or by Handling Claim Office?
+
+Question: "New claims reported in Q1 2020 vs Q1 2021"  (unambiguous — has 'reported')
+Code:
+rd = pd.to_datetime(df['Reported Date'], errors='coerce')
+q1_2020 = int(((rd.dt.year == 2020) & (rd.dt.quarter == 1)).sum())
+q1_2021 = int(((rd.dt.year == 2021) & (rd.dt.quarter == 1)).sum())
+delta = q1_2021 - q1_2020
+direction = "up" if delta > 0 else ("down" if delta < 0 else "flat")
+result = f"New claims reported: Q1 2020 = {{q1_2020:,}}, Q1 2021 = {{q1_2021:,}} ({{direction}} {{abs(delta):,}})"
 
 Question: "What is the average reporting lag for A&H claims?"
 Code:
@@ -154,6 +307,113 @@ class _TimeoutError(Exception):
 
 def _timeout_handler(signum, frame):
     raise _TimeoutError("Code execution timed out")
+
+
+def _dispatch_codegen(provider, ollama_client, ollama_model, prompt, timeout_s):
+    """Route code-gen to the configured provider. Returns raw text OR an
+    `ERROR:` sentinel string (never raises). Keeps the rest of pandas_agent
+    unaware of which backend produced the code."""
+    if provider == "gemini":
+        from ai.gemini_client import gemini_code_gen
+        return gemini_code_gen(prompt, timeout=timeout_s)
+    # default: ollama with SIGALRM wall-clock cap
+    try:
+        return _call_llm_with_walltime(ollama_client, ollama_model, prompt, timeout_s)
+    except _TimeoutError:
+        logger.error(f"Ollama code-gen hit wall-clock timeout ({timeout_s}s)")
+        return f"ERROR: Pandas execution failed: Ollama timed out after {timeout_s}s"
+    except Exception as e:
+        logger.error(f"Ollama code-gen failed: {e}")
+        return f"ERROR: Pandas execution failed: {type(e).__name__}: {e}"
+
+
+def _call_llm_with_walltime(client, model, prompt, timeout_s):
+    """Invoke ollama chat with a HARD wall-clock timeout via SIGALRM.
+
+    `ollama.Client(timeout=...)` maps to httpx read-timeout, which RESETS
+    whenever the server dribbles bytes — so a slow generation can hang
+    for 20+ minutes. SIGALRM is Unix-only but always fires after N seconds
+    regardless of what the socket is doing. Returns raw string content.
+    Raises _TimeoutError on wall-clock cap.
+    """
+    import signal
+    try:
+        old = signal.signal(signal.SIGALRM, _timeout_handler)
+        signal.alarm(int(timeout_s))
+    except (ValueError, AttributeError):
+        old = None  # non-main thread / Windows — degrade to client timeout
+    try:
+        response = client.chat(
+            model=model,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        return response["message"]["content"]
+    finally:
+        try:
+            signal.alarm(0)
+            if old is not None:
+                signal.signal(signal.SIGALRM, old)
+        except (ValueError, AttributeError):
+            pass
+
+
+def clean_llm_code(raw_code: str) -> str:
+    """Strip hallucinated wrappers from LLM output before execution.
+
+    Handles three common failure modes observed in production logs:
+      1. Markdown code fences — ```python ... ```
+      2. LeetCode-bleed wrappers — `public class Solution:` / `class Solution:`
+         / `def solve(self):` / `if __name__ == "__main__":` — the model wraps
+         valid Pandas code inside Java-style boilerplate which is not valid
+         Python and crashes `exec`.
+      3. Stray non-ASCII / junk tokens before the first real line
+         (e.g. `super()`, `загадка`, `大利`).
+    """
+    code = (raw_code or "").strip()
+    if not code:
+        return code
+
+    # 1. Strip markdown fences (opening + closing)
+    if code.startswith("```"):
+        code = re.sub(r"^```(?:python|py)?\s*\n?", "", code, count=1)
+        code = re.sub(r"\n?```\s*$", "", code, count=1).strip()
+
+    # 2. If the model wrapped code in class/function boilerplate, unwrap it.
+    #    Strategy: drop any line that is pure boilerplate, and dedent the body.
+    _BOILERPLATE_RE = re.compile(
+        r"^\s*(public\s+class|private\s+class|class\s+\w+\s*[:\(]|"
+        r"def\s+(solve|solution|main|run)\s*\(|"
+        r"if\s+__name__\s*==\s*['\"]__main__['\"]\s*:)",
+        re.IGNORECASE,
+    )
+    lines = code.splitlines()
+    if any(_BOILERPLATE_RE.match(ln) for ln in lines):
+        kept = [ln for ln in lines if not _BOILERPLATE_RE.match(ln)]
+        # Dedent: strip the minimum common leading whitespace across non-empty lines
+        non_empty = [ln for ln in kept if ln.strip()]
+        if non_empty:
+            min_indent = min(len(ln) - len(ln.lstrip()) for ln in non_empty)
+            kept = [ln[min_indent:] if len(ln) >= min_indent else ln for ln in kept]
+        # Drop stray `self.`/`return` artefacts left by unwrapping a method.
+        kept = [re.sub(r"^\s*return\s+", "", ln) for ln in kept]
+        kept = [ln.replace("self.", "") for ln in kept]
+        code = "\n".join(kept).strip()
+
+    # 3. Drop leading junk lines that aren't valid Python identifiers/keywords.
+    #    A valid Pandas-code line starts with a word char, `#`, or whitespace.
+    #    Non-ASCII-only tokens (e.g. "загадка", "大利") are clearly model noise.
+    out = []
+    started = False
+    for ln in code.splitlines():
+        if not started:
+            stripped = ln.strip()
+            if not stripped:
+                continue
+            if not re.match(r"^[A-Za-z_#]", stripped):
+                continue  # skip until the first plausibly-Python line
+            started = True
+        out.append(ln)
+    return "\n".join(out).strip()
 
 
 def _validate_code(code: str) -> Optional[str]:
@@ -299,18 +559,32 @@ def pandas_query(
     question: str,
     df: pd.DataFrame,
     col: dict,
-    ollama_model: str = "gemma3:4b",
+    ollama_model: str = "llama3.2:3b",
     ollama_host: str = "http://localhost:11434",
+    llm_timeout: int = 90,
+    provider: str = "ollama",
 ) -> Optional[str]:
     """Use LLM to generate and execute Pandas code for a question.
 
-    Returns formatted answer string, or None if it fails.
+    provider: "ollama" (local llama3.2:3b) or "gemini" (cloud Gemini 2.5 Flash).
+    Gemini path is used for code-gen only — triage/semantic calls still use ClaimsLLM.
+    Returns formatted answer string, or ERROR: sentinel on failure.
+    `llm_timeout` is a hard wall-clock cap (seconds) on each LLM call.
     """
-    try:
-        import ollama as _ollama
-    except ImportError:
-        logger.warning("ollama not installed — pandas agent unavailable")
-        return None
+    _client = None
+    if provider == "ollama":
+        try:
+            import ollama as _ollama
+        except ImportError:
+            logger.warning("ollama not installed — pandas agent unavailable")
+            return "ERROR: Pandas execution failed: ollama not installed"
+        # Client with hard timeout. Without this, ollama.chat() can hang for
+        # 30+ minutes on complex prompts.
+        _client = _ollama.Client(host=ollama_host, timeout=llm_timeout)
+    elif provider == "gemini":
+        pass  # Lazy-imported inside _call_codegen
+    else:
+        return f"ERROR: Pandas execution failed: unknown provider '{provider}'"
 
     # Build column info for the prompt
     columns = sorted(df.columns.tolist())
@@ -327,21 +601,26 @@ def pandas_query(
     prompt = _build_codegen_prompt(question, columns, dtypes, sample_values, len(df))
 
     # Ask LLM to generate code
-    try:
-        response = _ollama.chat(
-            model=ollama_model,
-            messages=[{"role": "user", "content": prompt}],
-        )
-        raw_code = response["message"]["content"].strip()
-    except Exception as e:
-        logger.error(f"LLM code generation failed: {e}")
-        return None
-
-    # Strip markdown code fences if present
-    if raw_code.startswith("```"):
-        raw_code = re.sub(r"^```(?:python)?\s*\n?", "", raw_code)
-        raw_code = re.sub(r"\n?```\s*$", "", raw_code)
+    raw_code = _dispatch_codegen(provider, _client, ollama_model, prompt, llm_timeout)
+    if raw_code.startswith("ERROR:"):
+        # Propagate provider error sentinel unchanged
+        return raw_code
     raw_code = raw_code.strip()
+
+    # Strip markdown fences + LeetCode-bleed wrappers + junk prefix tokens.
+    raw_code = clean_llm_code(raw_code)
+
+    # --- Clarification short-circuit ---
+    # If the LLM decided the question is ambiguous and emitted a CLARIFY: line
+    # ANYWHERE in its output, do NOT execute anything. The LLM sometimes
+    # prefixes the CLARIFY line with stray tokens (super(), odd unicode, etc.)
+    # so we search line-by-line rather than anchoring at start-of-string.
+    for _ln in raw_code.splitlines():
+        m = re.match(r"\s*CLARIFY\s*:\s*(.+)", _ln, re.IGNORECASE)
+        if m:
+            question_to_user = m.group(1).strip().strip('"').strip("'")
+            logger.info(f"Pandas agent requested clarification: {question_to_user}")
+            return f"__CLARIFY__:{question_to_user}"
 
     # Auto-strip import lines — pd/np are already in the sandbox
     raw_code = "\n".join(
@@ -356,22 +635,36 @@ def pandas_query(
 
     if error:
         logger.warning(f"Pandas agent execution failed: {error}")
-        # Retry once with error context
+        # Retry once with error context.
+        # IMPORTANT: repeat the original question AND the failing code up
+        # front so the LLM doesn't drift to an unrelated answer. Also pin
+        # the contract (must assign `result`, no markdown, no wrappers).
         retry_prompt = (
-            f"{prompt}\n\n"
-            f"Your previous code failed with: {error}\n"
-            f"Fix the code and try again. Write ONLY the corrected Python code:"
+            f"You are fixing Python/Pandas code for the question below.\n"
+            f"Do NOT answer a different question. Do NOT invent new metrics.\n\n"
+            f"ORIGINAL QUESTION:\n{question}\n\n"
+            f"YOUR PREVIOUS CODE:\n{raw_code}\n\n"
+            f"IT FAILED WITH:\n{error}\n\n"
+            f"CONTRACT:\n"
+            f"- Fix the same question — not a new one.\n"
+            f"- The final line must assign to `result` "
+            f"(e.g. `result = ...`).\n"
+            f"- Return ONLY Python code. No markdown fences. "
+            f"No class/function wrappers.\n\n"
+            f"CORRECTED CODE:"
         )
         try:
-            response2 = _ollama.chat(
-                model=ollama_model,
-                messages=[{"role": "user", "content": retry_prompt}],
+            retry_code = _dispatch_codegen(
+                provider, _client, ollama_model, retry_prompt, llm_timeout
             )
-            retry_code = response2["message"]["content"].strip()
-            if retry_code.startswith("```"):
-                retry_code = re.sub(r"^```(?:python)?\s*\n?", "", retry_code)
-                retry_code = re.sub(r"\n?```\s*$", "", retry_code)
-            retry_code = retry_code.strip()
+            if retry_code.startswith("ERROR:"):
+                return retry_code
+            retry_code = clean_llm_code(retry_code)
+            # Retry output can also be a CLARIFY — honour it.
+            for _ln in retry_code.splitlines():
+                m = re.match(r"\s*CLARIFY\s*:\s*(.+)", _ln, re.IGNORECASE)
+                if m:
+                    return f"__CLARIFY__:{m.group(1).strip().strip(chr(34)).strip(chr(39))}"
             # Auto-strip import lines
             retry_code = "\n".join(
                 line for line in retry_code.splitlines()
@@ -381,12 +674,17 @@ def pandas_query(
             result, error2 = _execute_sandboxed(retry_code, df)
             if error2:
                 logger.warning(f"Retry also failed: {error2}")
-                return None
-        except Exception:
-            return None
+                return (
+                    f"ERROR: Pandas execution failed: first attempt: {error}; "
+                    f"retry: {error2}"
+                )
+        except _TimeoutError:
+            return f"ERROR: Pandas execution failed: LLM timed out after {llm_timeout}s (retry)"
+        except Exception as retry_exc:
+            return f"ERROR: Pandas execution failed: retry raised {type(retry_exc).__name__}: {retry_exc}"
 
     if result is None:
-        return None
+        return "ERROR: Pandas execution failed: code produced no `result` variable"
 
     # Format and return
     formatted = _format_result(result)

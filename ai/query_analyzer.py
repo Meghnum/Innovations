@@ -27,7 +27,7 @@ def _load_config() -> dict:
 _CFG = _load_config()
 _AI = _CFG.get("ai", {})
 
-OLLAMA_MODEL: str = _AI.get("ollama_model", "gemma3:4b")
+OLLAMA_MODEL: str = _AI.get("ollama_model", "llama3.2:3b")
 OLLAMA_HOST: str = _AI.get("ollama_host", "http://localhost:11434")
 QUERY_ANALYZER_TIMEOUT: int = _AI.get("query_analyzer_timeout", 8)
 
@@ -219,6 +219,26 @@ _DISJUNCTION_PREDICATE_RE = re.compile(
     re.IGNORECASE | re.DOTALL,
 )
 
+# Date-type ambiguity — query references a year/quarter/month WITHOUT saying
+# whether it means Reported Date or Event Date. Must escalate so the Pandas
+# Agent can ask a CLARIFY question instead of the heuristic silently
+# returning the total count.
+_YEAR_RE    = re.compile(r"\b(19|20)\d{2}\b")
+_QUARTER_RE = re.compile(r"\bq[1-4]\b|\b(first|second|third|fourth)\s+quarter\b", re.IGNORECASE)
+_MONTH_RE   = re.compile(
+    r"\b(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|"
+    r"jul(?:y)?|aug(?:ust)?|sep(?:t|tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\b",
+    re.IGNORECASE,
+)
+# Anything that disambiguates which date column the user means.
+_DATE_TYPE_SPECIFIED_RE = re.compile(
+    r"\b(reported|report(?:ing)?\s+date|event\s+date|date\s+of\s+loss|dol|fnol|"
+    r"notified|notification|received|inflow|new\s+claims?|submitted|"
+    r"accident\s+year|report\s+year|underwriting\s+year|uwy|"
+    r"closed(?:\s+date)?|settlement\s+date)\b",
+    re.IGNORECASE,
+)
+
 
 def assess_query_complexity(query: str) -> tuple:
     """Decide whether an aggregation query needs the Pandas Agent instead of
@@ -264,6 +284,23 @@ def assess_query_complexity(query: str) -> tuple:
         return True, "disjunction: 'either…or'"
     if _DISJUNCTION_PREDICATE_RE.search(q):
         return True, "disjunction: OR across status/amount predicates"
+
+    # 8. Any year/quarter/month filter — heuristic aggregation handler ignores
+    #    date_range entirely and returns total_claims, so we always route these
+    #    to the Pandas Agent. If no Reported/Event disambiguator is present,
+    #    the agent will CLARIFY; otherwise it filters on the specified column.
+    if _YEAR_RE.search(q) or _QUARTER_RE.search(q) or _MONTH_RE.search(q):
+        if _DATE_TYPE_SPECIFIED_RE.search(q):
+            return True, "date filter (year/quarter/month with reported/event disambiguator)"
+        return True, "date-type ambiguity (year/quarter/month w/o Reported vs Event)"
+
+    # 9. Currency & ledger differentiation — the heuristic aggregation handler
+    #    only knows the *_USD columns. When the user asks for ledger / local /
+    #    converted currency we must escalate so the agent uses *_Ledger columns.
+    ledger_keywords = ("ledger", "local currency", "local",
+                       "exchange", "converted", "reporting currency")
+    if any(kw in q for kw in ledger_keywords):
+        return True, "currency/ledger differentiation (user asked for Ledger/Local, not USD)"
 
     return False, ""
 
